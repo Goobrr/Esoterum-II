@@ -1,5 +1,6 @@
 package esoterum.world.blocks.signal;
 
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -11,6 +12,18 @@ public class SignalGate extends SignalSource{
         super(name);
 
         rotate = true;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+
+        baseRegion = Core.atlas.find(name + "-base", "eso-default-gate-base");
+
+        outputSignalRegions = new TextureRegion[size * 4];
+        for(int i : outputs){
+            outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
+        }
     }
 
     public class SignalSimpleLogicGateBuild extends SignalSourceBuild {

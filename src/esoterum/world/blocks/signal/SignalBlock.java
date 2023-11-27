@@ -50,11 +50,11 @@ public class SignalBlock extends Block {
     public void load(){
         super.load();
 
-        bottomRegion = Core.atlas.find(name + "-bottom", "eso-base-square");
+        bottomRegion = Core.atlas.find(name + "-bottom", "eso-none");
 
-        baseRegion = Core.atlas.find(name + "-base");
+        baseRegion = Core.atlas.find(name + "-base", "eso-base-square");
 
-        signalRegion = Core.atlas.find(name + "-signal");
+        signalRegion = Core.atlas.find(name + "-signal", "eso-none");
 
         inputSignalRegions = new TextureRegion[size * 4];
         for(int i : inputs){
@@ -288,8 +288,8 @@ public class SignalBlock extends Block {
             if(Esoterum.debug || debugDraw){
                 debugDraw();
             }else{
-                Draw.rect(bottomRegion, x, y, rotation * 90);
-                Draw.rect(baseRegion, x, y, rotation * 90);
+                Draw.rect(bottomRegion, x, y);
+                Draw.rect(baseRegion, x, y);
 
                 drawSignalRegions();
             }

@@ -31,7 +31,7 @@ public class Esoterum extends Mod{
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalSwitch("signal-switch"){{
-            rotate = true;
+            rotate = false;
             setOutputs(0, 1, 2, 3);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
@@ -56,7 +56,36 @@ public class Esoterum extends Mod{
                 int c = gate.signalAtInput(3) ? 1 : 0;
                 return a + b + c > 1;
             };
-        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));;
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("or-gate"){{
+            setInputs(1, 2, 3);
+            setOutputs(0);
+            function = gate -> gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3); // functionally a diode
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("not-gate"){{
+            setInputs(1, 2, 3);
+            setOutputs(0);
+            function = gate -> !(gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3)); // functionally NOR
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("xor-gate"){{
+            setInputs(1, 2, 3);
+            setOutputs(0);
+            function = gate -> {
+                int a = gate.signalAtInput(1) ? 1 : 0;
+                int b = gate.signalAtInput(2) ? 1 : 0;
+                int c = gate.signalAtInput(3) ? 1 : 0;
+                return a + b + c == 1;
+            };
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalJunction("signal-junction"){{
+            setInputs(0, 1, 2, 3);
+            setOutputs(0, 1, 2, 3);
+            mapIO(0, 2, 1, 3);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
 }
