@@ -203,9 +203,8 @@ public class SignalBlock extends Block {
         public void onRemoved(){
             for(Point2 p : Edges.getEdges(size)){
                 if(Vars.world.build(tile.x + p.x, tile.y + p.y) instanceof SignalBuild b && b.signalGraph != null){
-                    if(canConnect(b) | b.canConnect(this)){
-                        b.signalGraph.lastSignal = false;
-                        b.signalGraph.nextSignal = false;
+                    if(b.hasGraph() && (canConnect(b) | b.canConnect(this))){
+                        b.signalGraph.signal = false;
                     }
                 }
             }
@@ -214,7 +213,7 @@ public class SignalBlock extends Block {
                 signalGraph.delete();
                 for(Point2 p : getEdges()){
                     if(Vars.world.build(tile.x + p.x, tile.y + p.y) instanceof SignalBuild b){
-                        if(canConnect(b) | b.canConnect(this)){
+                        if(b.hasGraph() && (canConnect(b) | b.canConnect(this))){
 
                             b.signalGraph = new SignalGraph();
                             b.signalGraph.add(b);
@@ -272,11 +271,7 @@ public class SignalBlock extends Block {
                 t.left();
                 t.label(() -> "Graph #" + (signalGraph != null ? signalGraph.getID() : -1));
                 t.row();
-                t.label(() -> "Signal: " + (signalGraph != null && signalGraph.lastSignal ? "1" : "0"));
-                t.row();
-                t.label(() -> "LastSignal: " + (signalGraph != null && signalGraph.lastSignal ? "1" : "0"));
-                t.row();
-                t.label(() -> "NextSignal: " + (signalGraph != null && signalGraph.nextSignal ? "1" : "0"));
+                t.label(() -> "Signal: " + (signalGraph != null && signalGraph.signal ? "1" : "0"));
                 t.row();
                 t.fill();
             }).grow();
@@ -302,7 +297,7 @@ public class SignalBlock extends Block {
         public void debugDraw(){
             Draw.blend(Blending.additive);
             Draw.alpha(0.5f);
-            if(hasGraph && signalGraph != null && signalGraph.lastSignal){
+            if(hasGraph && signalGraph != null && signalGraph.signal){
                 Draw.color(Tmp.c1.set(Color.red).shiftHue(signalGraph.getID() * 15));
             }else{
                 Draw.color(Pal.gray);
@@ -336,8 +331,7 @@ public class SignalBlock extends Block {
             if(hasGraph){
                 Log.info("[" + pos() + "] Writing graph ID #" + signalGraph.getID());
                 write.i(signalGraph.getID());
-                write.bool(signalGraph.lastSignal);
-                write.bool(signalGraph.nextSignal);
+                write.bool(signalGraph.signal);
             }
         }
 
@@ -360,8 +354,7 @@ public class SignalBlock extends Block {
                 signalGraph = graph;
                 signalGraph.add(this);
 
-                signalGraph.lastSignal = read.bool();
-                signalGraph.nextSignal = read.bool();
+                signalGraph.signal = read.bool();
             }
         }
     }

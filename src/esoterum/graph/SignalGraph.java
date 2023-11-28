@@ -1,16 +1,10 @@
 package esoterum.graph;
 
 import arc.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import esoterum.world.blocks.signal.SignalBlock.*;
-import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.io.*;
-import mindustry.io.SaveFileReader.*;
-
-import java.io.*;
 
 public class SignalGraph {
     // Graph ID tracking, for saving and stuff.
@@ -24,8 +18,7 @@ public class SignalGraph {
     // Graph tomfoolery
     public Seq<SignalBuild> buildings = new Seq<>(false, 16, SignalBuild.class);
 
-    public boolean nextSignal = false;
-    public boolean lastSignal = false;
+    public boolean signal = false;
 
     private long lastUpdateFrame = -1;
 
@@ -80,8 +73,7 @@ public class SignalGraph {
             merger.add(b);
         }
 
-        merger.lastSignal |= merged.lastSignal;
-        merger.nextSignal |= merged.nextSignal;
+        merger.signal |= merged.signal;
 
         graphs.remove(merged);
         free.addLast(merged.graphID);
@@ -110,13 +102,11 @@ public class SignalGraph {
     public boolean signal(Boolean signal){
         if(lastUpdateFrame != Core.graphics.getFrameId()){
             lastUpdateFrame = Core.graphics.getFrameId();
-
-            lastSignal = nextSignal;
-            nextSignal = false;
+            this.signal = false;
         }
 
-        nextSignal |= signal;
+        this.signal |= signal;
 
-        return lastSignal;
+        return this.signal;
     }
 }

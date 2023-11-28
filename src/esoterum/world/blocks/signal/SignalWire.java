@@ -15,13 +15,13 @@ public class SignalWire extends SignalBlock{
         @Override
         public boolean signalAtOutput(int index){
             for(int i : outputs()){
-                if(i == index & (signalGraph != null && signalGraph.lastSignal)) return true;
+                if(i == index & (signalGraph != null && signalGraph.signal)) return true;
             }
             return false;
         }
 
         public void drawSignalRegions(){
-            Draw.color(signalGraph != null && signalGraph.lastSignal ? Pal.accent : Color.white);
+            Draw.color(signalGraph != null && signalGraph.signal ? Pal.accent : Color.white);
 
             Draw.rect(signalRegion, x, y, rotation * 90);
 
