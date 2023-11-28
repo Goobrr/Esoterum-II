@@ -22,7 +22,6 @@ public class SignalBlock extends Block {
     public TextureRegion[] inputSignalRegions, outputSignalRegions;
 
     public boolean debugDraw = false;
-
     public int[] inputs = new int[0];
     public int[] outputs = new int[0];
     public boolean hasGraph = true;
@@ -49,6 +48,8 @@ public class SignalBlock extends Block {
     @Override
     public void load(){
         super.load();
+
+        uiIcon = fullIcon = Core.atlas.find(name + "-full");
 
         bottomRegion = Core.atlas.find(name + "-bottom", "eso-none");
 

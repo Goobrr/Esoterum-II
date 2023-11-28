@@ -24,6 +24,12 @@ public class Esoterum extends Mod{
             setInputs(1, 2, 3);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalJunction("signal-junction"){{
+            setInputs(0, 1, 2, 3);
+            setOutputs(0, 1, 2, 3);
+            mapIO(0, 2, 1, 3);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
         new SignalWire("signal-router"){{
             rotate = true;
             setOutputs(0, 1, 3);
@@ -45,6 +51,12 @@ public class Esoterum extends Mod{
             canFloodfill = false;
 
             debugDraw = true;
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("signal-diode"){{
+            setInputs(2);
+            setOutputs(0);
+            function = gate -> gate.signalAtInput(2);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("and-gate"){{
@@ -79,12 +91,6 @@ public class Esoterum extends Mod{
                 int c = gate.signalAtInput(3) ? 1 : 0;
                 return a + b + c == 1;
             };
-        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
-
-        new SignalJunction("signal-junction"){{
-            setInputs(0, 1, 2, 3);
-            setOutputs(0, 1, 2, 3);
-            mapIO(0, 2, 1, 3);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
