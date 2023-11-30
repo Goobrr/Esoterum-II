@@ -26,7 +26,7 @@ public class SignalGate extends SignalSource{
         }
     }
 
-    public class SignalSimpleLogicGateBuild extends SignalSourceBuild {
+    public class SignalGateBuild extends SignalSourceBuild {
         @Override
         public boolean getSignal(){
             return function.get(this);

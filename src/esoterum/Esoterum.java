@@ -1,7 +1,11 @@
 package esoterum;
 
+import arc.*;
+import arc.util.*;
+import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.content.Items;
+import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
@@ -10,9 +14,11 @@ import mindustry.world.meta.BuildVisibility;
 public class Esoterum extends Mod{
 
     public static boolean debug = false;
-
     public Esoterum(){
-
+        Events.on(ClientLoadEvent.class, event -> {
+            Log.info("Waagh");
+            EsoUI.init();
+        });
     }
 
     @Override
@@ -41,14 +47,10 @@ public class Esoterum extends Mod{
             setOutputs(0, 1, 2, 3);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalBlock("test-3"){{
-            rotate = true;
-            size = 3;
-            setInputs(6, 8);
-            setOutputs(1);
-
-            hasGraph = false;
-            canFloodfill = false;
+        new SignalChipBlock("test-chip"){{
+            size = 2;
+            setInputs(4, 5);
+            setOutputs(0, 1);
 
             debugDraw = true;
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
