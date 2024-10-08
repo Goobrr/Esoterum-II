@@ -37,6 +37,13 @@ public class Esoterum extends Mod{
             mapIO(0, 2, 1, 3);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalGate("true-signal-router"){{
+            rotate = false;
+            setOutputs(0, 1, 2, 3);
+            setInputs(0, 1, 2, 3);
+            function = gate -> gate.signalAtInput(0) | gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
         new SignalWire("signal-router"){{
             rotate = true;
             setOutputs(0, 1, 3);
