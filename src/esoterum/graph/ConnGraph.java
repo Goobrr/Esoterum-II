@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
@@ -124,7 +124,7 @@ public class ConnGraph {
      * expected time and O(log N / log log N) time with high probability, because vertexInfo is a HashMap, and
      * ConnVertex.hashCode() returns a random integer.
      */
-    public Map<ConnVertex, VertexInfo> vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>();
+    public Map<ConnVertex, VertexInfo> vertexInfo = new HashMap<ConnVertex, VertexInfo>();
 
     /**
      * Ceiling of log base 2 of the maximum number of vertices in this graph since the last rebuild. This is 0 if that

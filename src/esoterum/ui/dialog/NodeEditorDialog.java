@@ -6,7 +6,6 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
 // TODO

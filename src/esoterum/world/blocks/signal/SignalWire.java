@@ -23,7 +23,6 @@ public class SignalWire extends SignalBlock{
 
             int c = 0;
             int last = -1;
-            //Log.info("start");
             bypass = false;
             for (int i=0;i<size*4;i++){
                 active[i] = false;
@@ -31,9 +30,6 @@ public class SignalWire extends SignalBlock{
                 Vec2 sideOffset = EdgeUtils.getEdgeOffset(1, i/size, rotation);
                 if(Vars.world.build((int)(x/8 + offset.x + sideOffset.x), (int)(y/8 + offset.y + sideOffset.y)) instanceof SignalBuild b){
                     int index = EdgeUtils.getOffsetIndex(b.size(), x/8 + offset.x - b.x/8, y/8 + offset.y - b.y/8, b.rotation);
-                    //Log.info("" + x/8 + " " + y/8);
-                    //Log.info("" + (int)(x/8 + offset.x + sideOffset.x) + " " + (int)(y/8 + offset.y + sideOffset.y));
-                    //Log.info(index);
                     if ((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1){
                         c += inputs[i];
                         last = i;

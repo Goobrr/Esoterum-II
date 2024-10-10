@@ -14,8 +14,9 @@ public class SignalSwitch extends SignalBlock{
         configurable = true;
         hasGraph = false;
 
-        config(Integer.class, (b, s) -> {
-            ((SignalSwitchBuild) b).signal[0] = s;
+        config(Boolean.class, (b, s) -> {
+            ((SignalSwitchBuild) b).enabled = s;
+            SignalGraph.graph.setVertexAugmentation(((SignalSwitchBuild) b).v[0], b.enabled ? 1 : 0);
         });
     }
 
@@ -29,27 +30,27 @@ public class SignalSwitch extends SignalBlock{
 
     public class SignalSwitchBuild extends SignalBuild {
         @Override
+        public void placed() {
+            super.placed();
+            enabled = false;
+        }
+
+        @Override
         public boolean configTapped(){
-            configure(1-signal[0]);
+            configure(!enabled);
             return false;
         }
 
         @Override
-        public void updateTile(){
-            SignalGraph.graph.setVertexAugmentation(v[0], signal[0]);
-            super.updateTile();
-        }
-        
-        @Override
         public void write(Writes write){
             super.write(write);
-            write.bool(signal[0] == 1);
+            write.bool(enabled);
         }
 
         @Override
         public void draw(){
             Draw.rect(baseRegion, x, y);
-            Draw.rect(signal[0] == 1 ? switchOnRegion : switchOffRegion, x, y);
+            Draw.rect(enabled ? switchOnRegion : switchOffRegion, x, y);
         }
 
         @Override

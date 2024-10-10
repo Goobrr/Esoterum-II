@@ -2,6 +2,7 @@ package esoterum;
 
 import arc.*;
 import arc.util.*;
+import esoterum.graph.SignalGraph;
 import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.content.Items;
@@ -18,6 +19,10 @@ public class Esoterum extends Mod{
         Events.on(ClientLoadEvent.class, event -> {
             Log.info("Waagh");
             EsoUI.init();
+        });
+
+        Events.on(WorldLoadBeginEvent.class, event -> {
+            SignalGraph.graph.clear();
         });
     }
 

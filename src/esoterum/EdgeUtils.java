@@ -1,7 +1,6 @@
 package esoterum;
 
 import arc.math.geom.*;
-import arc.util.Log;
 
 public class EdgeUtils {
     // Yeah, I'm hardcoding this shit

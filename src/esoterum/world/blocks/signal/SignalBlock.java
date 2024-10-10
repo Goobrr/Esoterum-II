@@ -11,6 +11,7 @@ import esoterum.*;
 import esoterum.graph.ConnVertex;
 import esoterum.graph.SignalGraph;
 import mindustry.Vars;
+import mindustry.game.EventType.WorldLoadEvent;
 import mindustry.gen.Building;
 import mindustry.graphics.*;
 import mindustry.type.Category;
@@ -127,7 +128,7 @@ public class SignalBlock extends Block {
 
             updateEdges();
         }
-
+        
         public void updateEdges(){
             for (int i=0;i<vertexCount;i++) SignalGraph.clearEdges(v[i]);
             for (int i=0;i<size*4;i++){
