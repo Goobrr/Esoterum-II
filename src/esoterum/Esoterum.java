@@ -26,71 +26,90 @@ public class Esoterum extends Mod{
 
         new SignalWire("signal-wire"){{
             rotate = true;
-            setOutputs(0);
-            setInputs(1, 2, 3);
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalJunction("signal-junction"){{
-            setInputs(0, 1, 2, 3);
-            setOutputs(0, 1, 2, 3);
-            mapIO(0, 2, 1, 3);
+            rotate = false;
+            vertexCount = 2;
+            setConns(0, 1, 0, 1);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalWire("signal-router"){{
+        new SignalRouter("signal-router"){{
             rotate = true;
-            setOutputs(0, 1, 3);
-            setInputs(2);
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 1, 0, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalSwitch("signal-switch"){{
             rotate = false;
-            setOutputs(0, 1, 2, 3);
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(0, 0, 0, 0);
+            setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalChipBlock("test-chip"){{
-            size = 2;
-            setInputs(4, 5);
-            setOutputs(0, 1);
+        // new SignalChipBlock("test-chip"){{
+        //     size = 2;
+        //     setInputs(4, 5);
+        //     setOutputs(0, 1);
 
-            debugDraw = true;
-        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+        //     debugDraw = true;
+        // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("signal-diode"){{
-            setInputs(2);
-            setOutputs(0);
-            function = gate -> gate.signalAtInput(2);
+            vertexCount = 2;
+            setConns(0, 0, 1, 0);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] == 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("and-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
             function = gate -> {
-                int a = gate.signalAtInput(1) ? 1 : 0;
-                int b = gate.signalAtInput(2) ? 1 : 0;
-                int c = gate.signalAtInput(3) ? 1 : 0;
+                int a = gate.signal[1];
+                int b = gate.signal[2];
+                int c = gate.signal[3];
                 return a + b + c > 1;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("or-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
-            function = gate -> gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3); // functionally a diode
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] | gate.signal[2] | gate.signal[3]) == 1; // functionally a diode
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("not-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
-            function = gate -> !(gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3)); // functionally NOR
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] | gate.signal[2] | gate.signal[3]) != 1; // functionally NOR
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("xor-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
             function = gate -> {
-                int a = gate.signalAtInput(1) ? 1 : 0;
-                int b = gate.signalAtInput(2) ? 1 : 0;
-                int c = gate.signalAtInput(3) ? 1 : 0;
+                int a = gate.signal[1];
+                int b = gate.signal[2];
+                int c = gate.signal[3];
                 return a + b + c == 1;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));

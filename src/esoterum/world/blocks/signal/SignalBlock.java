@@ -8,6 +8,7 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import arc.util.io.*;
 import esoterum.*;
+import esoterum.graph.ConnVertex;
 import esoterum.graph.SignalGraph;
 import mindustry.Vars;
 import mindustry.gen.Building;
@@ -24,8 +25,9 @@ public class SignalBlock extends Block {
     public boolean debugDraw = false;
     public int[] inputs = new int[0];
     public int[] outputs = new int[0];
+    public int vertexCount = 1;
+    public int[] conns = new int[0];
     public boolean hasGraph = true;
-    public boolean canFloodfill = true;
     public SignalBlock(String name) {
         super(name);
 
@@ -45,6 +47,10 @@ public class SignalBlock extends Block {
         outputs = indices;
     }
 
+    public void setConns(int... vc){
+        conns = vc;
+    }
+
     @Override
     public void load(){
         super.load();
@@ -58,13 +64,10 @@ public class SignalBlock extends Block {
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
 
         inputSignalRegions = new TextureRegion[size * 4];
-        for(int i : inputs){
-            inputSignalRegions[i] = Core.atlas.find(name + "-input-" + i, "eso-none");
-        }
-
         outputSignalRegions = new TextureRegion[size * 4];
-        for(int i : outputs){
-            outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-none");
+        for(int i=0;i<size*4;i++){
+            if (inputs[i] > 0) inputSignalRegions[i] = Core.atlas.find(name + "-input-" + i, "eso-none");
+            if (outputs[i] > 0) outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-none");
         }
     }
 
@@ -75,29 +78,27 @@ public class SignalBlock extends Block {
         if(inputs == null){
             inputs = new int[size * 4];
             for(int i = 0; i < size * 4; i++){
-                inputs[i] = i;
+                inputs[i] = 1;
             }
         }
         if(outputs == null){
             outputs = new int[size * 4];
             for(int i = 0; i < size * 4; i++){
-                outputs[i] = i;
+                outputs[i] = 1;
+            }
+        }
+        if(conns == null){
+            conns = new int[size * 4];
+            for(int i = 0; i < size * 4; i++){
+                conns[i] = 0;
             }
         }
     }
 
-
-    // TODO
-    // 1. Probably turn some of this into an interface instead.
-    // 2. Optimize O(n^2) methods.
-    // 3. Stop the flickering
-
     public class SignalBuild extends Building {
-        public SignalGraph signalGraph;
-
-        public boolean hasGraph(){
-            return hasGraph;
-        }
+        public ConnVertex[] v = new ConnVertex[vertexCount];
+        public int[] signal = new int[vertexCount];
+        public boolean[] active = new boolean[size*4];
 
         public int[] inputs(){
             return inputs;
@@ -107,8 +108,12 @@ public class SignalBlock extends Block {
             return outputs;
         }
 
-        public boolean canFloodfill(){
-            return canFloodfill;
+        public int[] conns(){
+            return conns;
+        }
+
+        public int size(){
+            return size;
         }
 
         @Override
@@ -116,85 +121,24 @@ public class SignalBlock extends Block {
             super.created();
             if(!this.block.rotate) rotation(0);
 
-            if(hasGraph && signalGraph == null){
-                signalGraph = new SignalGraph();
-                signalGraph.add(this);
-
-                for(Point2 p : getEdges()){
-                    if(Vars.world.build(tile.x + p.x, tile.y + p.y) instanceof SignalBuild b){
-                        if(b.hasGraph()){
-                            if(canConnect(b) | b.canConnect(this)){
-                                if(b.signalGraph != null){
-                                    b.signalGraph.merge(signalGraph);
-                                }else{
-                                    signalGraph.add(b);
-                                }
-                            }
-                        }
-                    }
-                }
+            for (int i=0;i<vertexCount;i++){
+                if (v[i] == null) SignalGraph.addVertex(this, i);
             }
+
+            updateEdges();
         }
 
-        // O(n^2) but I don't give a shit.
-        public boolean canConnect(SignalBuild other){
-            for(int index : outputs){
-                Vec2 a = getConnector(index);
-                for(int otherIndex : other.inputs()){
-                    Vec2 b = other.getConnector(otherIndex);
-
-                    if(a.x == b.x && a.y == b.y){
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        public Vec2 getConnector(int index){
-            Tmp.v1.set(EdgeUtils.getEdgeOffset(size, index, rotation));
-            Tmp.v1.add(tile.x, tile.y);
-
-            return new Vec2(Tmp.v1.x * 8, Tmp.v1.y * 8);
-        }
-
-        public int getOutputFrom(int index, SignalBuild other){
-            Vec2 a = getConnector(index);
-            for(int otherIndex : other.outputs()){
-                Vec2 b = other.getConnector(otherIndex);
-
-                if(a.x == b.x && a.y == b.y){
-                    return otherIndex;
-                }
-            }
-
-            return -1;
-        };
-
-        public int getInputTo(int index, SignalBuild other){
-            Vec2 a = getConnector(index);
-            for(int otherIndex : other.inputs()){
-                Vec2 b = other.getConnector(otherIndex);
-
-                if(a.x == b.x && a.y == b.y){
-                    return otherIndex;
-                }
-            }
-
-            return -1;
-        };
-
-        public void floodfill(Building source){
-            for(Point2 p : getEdges()){
-                if(Vars.world.build(tile.x + p.x, tile.y + p.y) instanceof SignalBuild b && b != source){
-                    if(b.canFloodfill() && (canConnect(b) | b.canConnect(this))){
-                        if(b.signalGraph != null){
-                            b.signalGraph.merge(signalGraph);
-                        }else{
-                            signalGraph.add(b);
-                            b.floodfill(source);
-                        }
+        public void updateEdges(){
+            for (int i=0;i<vertexCount;i++) SignalGraph.clearEdges(v[i]);
+            for (int i=0;i<size*4;i++){
+                active[i] = false;
+                Vec2 offset = EdgeUtils.getEdgeOffset(size, i, rotation);
+                Vec2 sideOffset = EdgeUtils.getEdgeOffset(1, i/size, rotation);
+                if(Vars.world.build((int)(x/8 + offset.x + sideOffset.x), (int)(y/8 + offset.y + sideOffset.y)) instanceof SignalBuild b){
+                    int index = EdgeUtils.getOffsetIndex(b.size(), x/8 + offset.x - b.x/8, y/8 + offset.y - b.y/8, b.rotation);
+                    if ((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1){
+                        SignalGraph.addEdge(v[conns[i]], b.v[b.conns()[index]]);
+                        active[i] = true;
                     }
                 }
             }
@@ -202,80 +146,25 @@ public class SignalBlock extends Block {
 
         @Override
         public void onRemoved(){
-            for(Point2 p : Edges.getEdges(size)){
-                if(Vars.world.build(tile.x + p.x, tile.y + p.y) instanceof SignalBuild b && b.signalGraph != null){
-                    if(b.hasGraph() && (canConnect(b) | b.canConnect(this))){
-                        b.signalGraph.signal = false;
-                    }
-                }
-            }
-
-            if(signalGraph != null && hasGraph){
-                signalGraph.delete();
-                for(Point2 p : getEdges()){
-                    if(Vars.world.build(tile.x + p.x, tile.y + p.y) instanceof SignalBuild b){
-                        if(b.hasGraph() && (canConnect(b) | b.canConnect(this))){
-
-                            b.signalGraph = new SignalGraph();
-                            b.signalGraph.add(b);
-
-                            b.floodfill(this);
-                        }
-                    }
-                }
-            }
+            for (int i=0;i<vertexCount;i++) SignalGraph.removeVertex(this, i);
             super.onRemoved();
         }
 
-        // Signaling Logic
-
-        public boolean signalAtOutput(int index){
-            return true;
-        }
-
-        public boolean signalAtInput(int index){
-            for(Building b : proximity()){
-                if(b instanceof SignalBuild s){
-                    int i = getOutputFrom(index, s);
-                    if(i == -1) continue;
-                    return s.signalAtOutput(i);
-                }
-            }
-
-            return false;
-        };
-
-        public void sendSignal(int index, boolean signal){
-            for(Building b : proximity()){
-                if(b instanceof SignalBuild s){
-                    int i = getInputTo(index, s);
-                    if(i == -1) continue;
-                    s.acceptSignal(this, signal);
-                }
-            }
-        }
-
-        public boolean acceptSignal(SignalBuild source, boolean signal){
-            if(hasGraph && signalGraph != null && source.canConnect(this)){
-                signalGraph.signal(signal);
-                return true;
-            }
-            return false;
+        @Override
+        public void updateTile(){
+            for (int i=0;i<vertexCount;i++) signal[i] = (int)SignalGraph.graph.getComponentAugmentation(v[i]);
         }
 
         @Override
-        public void displayBars(Table table){
-            super.displayBars(table);
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+            updateEdges();
+        }
 
-            table.row();
-            table.table(t -> {
-                t.left();
-                t.label(() -> "Graph #" + (signalGraph != null ? signalGraph.getID() : -1));
-                t.row();
-                t.label(() -> "Signal: " + (signalGraph != null && signalGraph.signal ? "1" : "0"));
-                t.row();
-                t.fill();
-            }).grow();
+        @Override
+        public void updateProximity(){
+            super.updateProximity();
+            updateEdges();
         }
 
         @Override
@@ -292,17 +181,22 @@ public class SignalBlock extends Block {
         }
 
         public void drawSignalRegions(){
+            Draw.color(signal[0] == 1 ? Pal.accent : Color.white);
 
+            Draw.rect(signalRegion, x, y, rotation * 90);
+
+            for(int i=0;i<size*4;i++){
+                if (active[i]){
+                    Draw.color(signal[conns[i]] == 1 ? Pal.accent : Color.white);
+                    if(inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
+                    if(outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
+                }
+            }
         }
 
         public void debugDraw(){
             Draw.blend(Blending.additive);
             Draw.alpha(0.5f);
-            if(hasGraph && signalGraph != null && signalGraph.signal){
-                Draw.color(Tmp.c1.set(Color.red).shiftHue(signalGraph.getID() * 15));
-            }else{
-                Draw.color(Pal.gray);
-            }
             Fill.square(x, y, size * 4);
             Draw.blend();
             Draw.alpha(1);
@@ -322,40 +216,22 @@ public class SignalBlock extends Block {
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-
-            if(hasGraph){
-                Log.info("[" + pos() + "] Writing graph ID #" + signalGraph.getID());
-                write.i(signalGraph.getID());
-                write.bool(signalGraph.signal);
-            }
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            if(revision >= 2){
 
-            if(revision >= 1 && hasGraph){
-                int id = read.i();
-                Log.info("[" + pos() + "] Read graph ID #" + id);
-                SignalGraph graph = SignalGraph.getGraphByID(id);
-
-                if(graph == null){
-                    graph = new SignalGraph();
-                    SignalGraph.mapID(id, graph.getID());
-
-                    Log.info("[" + pos() + "] Initialized graph ID #" + graph.getID() + " mapped to ID #" + id);
-                }
-
-                signalGraph = graph;
-                signalGraph.add(this);
-
-                signalGraph.signal = read.bool();
+            } else if(revision >= 1 && hasGraph){
+                read.i();
+                read.bool();
             }
         }
     }
