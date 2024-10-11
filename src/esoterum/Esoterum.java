@@ -7,6 +7,7 @@ import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.content.Items;
 import mindustry.game.EventType.*;
+import mindustry.gen.Building;
 import mindustry.mod.*;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
@@ -45,12 +46,37 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalJunction("signal-cjunction"){{
+            rotate = false;
+            vertexCount = 2;
+            setConns(0, 1, 1, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalBlock("true-signal-router"){{
+            rotate = false;
+            vertexCount = 1;
+            hasGraph = false;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
         new SignalRouter("signal-router"){{
             rotate = true;
             vertexCount = 4;
             setConns(0, 1, 2, 3);
             setInputs(0, 0, 1, 0);
             setOutputs(1, 1, 0, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalBridge("signal-bridge"){{
+            rotate = false;
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalSwitch("signal-switch"){{
@@ -61,15 +87,37 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalGate("item-sensor"){{
+            vertexCount = 1;
+            setInputs(0, 0, 0, 0);
+            setOutputs(0, 1, 1, 1);
+            function = gate ->{
+                Building front = gate.front();
+                if (front != null && front.items() != null)
+                {
+                    return !front.items().empty();
+                }
+
+                return false;
+            };
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
         // new SignalChipBlock("test-chip"){{
         //     size = 2;
         //     setInputs(4, 5);
         //     setOutputs(0, 1);
-
         //     debugDraw = true;
         // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("signal-diode"){{
+            vertexCount = 2;
+            setConns(0, 0, 1, 0);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] == 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("display"){{
             vertexCount = 2;
             setConns(0, 0, 1, 0);
             setInputs(0, 0, 1, 0);

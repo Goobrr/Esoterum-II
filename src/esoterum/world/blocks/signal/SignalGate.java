@@ -3,6 +3,7 @@ package esoterum.world.blocks.signal;
 import arc.*;
 import arc.func.*;
 import arc.graphics.g2d.*;
+import arc.util.io.Reads;
 import esoterum.graph.SignalGraph;
 
 public class SignalGate extends SignalBlock{
@@ -30,8 +31,16 @@ public class SignalGate extends SignalBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            signal[0] = function.get(this) ? 1 : 0;
-            SignalGraph.graph.setVertexAugmentation(v[0], signal[0]);
+            SignalGraph.graph.setVertexAugmentation(v[0], function.get(this) ? 1 : 0);
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            if (revision == 1) {
+                super.read(read, (byte)2);
+                read.i();
+                SignalGraph.graph.setVertexAugmentation(v[0], read.bool() ? 1 : 0);
+            } else super.read(read, revision);
         }
     }
 }

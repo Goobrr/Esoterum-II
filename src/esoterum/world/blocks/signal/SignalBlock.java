@@ -217,18 +217,21 @@ public class SignalBlock extends Block {
 
         @Override
         public byte version(){
-            return 2;
+            return 3;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
+            for(int i=0;i<vertexCount;i++) write.i(signal[i]);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            if(revision >= 2){
+            if(revision >= 3){
+                for(int i=0;i<vertexCount;i++) signal[i] = read.i();
+            } else if(revision >= 2){
 
             } else if(revision >= 1 && hasGraph){
                 read.i();

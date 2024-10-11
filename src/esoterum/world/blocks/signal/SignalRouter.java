@@ -13,7 +13,6 @@ public class SignalRouter extends SignalBlock {
             super.updateTile();
             for (int i=0;i<size*4;i++) if(outputs[i]==1){
                 SignalGraph.graph.setVertexAugmentation(v[i], signal[2]);
-                signal[i] = signal[2];
             }
         }
     }

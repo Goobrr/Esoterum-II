@@ -202,7 +202,7 @@ public class ConnGraph {
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy vertexInfo to a new HashMap, which will have a
             // suitable capacity.
-            vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>(vertexInfo);
+            vertexInfo = new HashMap<ConnVertex, VertexInfo>(vertexInfo);
             maxVertexInfoSize = vertexInfo.size();
         }
         if (vertexInfo.size() << REBUILD_CHANGE <= 1 << maxLogVertexCountSinceRebuild) {
@@ -789,7 +789,7 @@ public class ConnGraph {
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy srcInfo.edges to a new HashMap, which will have a
             // suitable capacity.
-            srcInfo.edges = new ConcurrentHashMap<ConnVertex, ConnEdge>(srcInfo.edges);
+            srcInfo.edges = new HashMap<ConnVertex, ConnEdge>(srcInfo.edges);
             srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size();
         }
         return edge;
@@ -1043,7 +1043,7 @@ public class ConnGraph {
     public void clear() {
         // Note that we construct a new HashMap rather than calling vertexInfo.clear() in order to ensure a reduction in
         // space
-        vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>();
+        vertexInfo = new HashMap<ConnVertex, VertexInfo>();
         maxLogVertexCountSinceRebuild = 0;
         maxVertexInfoSize = 0;
     }

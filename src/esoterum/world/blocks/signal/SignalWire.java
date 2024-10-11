@@ -36,6 +36,7 @@ public class SignalWire extends SignalBlock{
                         SignalGraph.addEdge(v[conns[i]], b.v[b.conns()[index]]);
                         active[i] = true;
                     }
+                    if ((b.outputs()[index] & outputs[i]) == 1) c +=2;
                 }
             }
             if (c == 1){
@@ -48,8 +49,7 @@ public class SignalWire extends SignalBlock{
         public void updateTile(){
             super.updateTile();
             if(!bypass) {
-                signal[0] = signal[1] | signal[2] | signal[3];
-                SignalGraph.graph.setVertexAugmentation(v[0], signal[0]);
+                SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
             }
         }
     }
