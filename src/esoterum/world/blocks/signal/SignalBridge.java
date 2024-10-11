@@ -24,6 +24,8 @@ public class SignalBridge extends SignalBlock
         super(name);
 
         configurable = true;
+        clipSize = range * 2 + 4f;
+        clipSize *= Vars.tilesize;
 
         config(Point2.class, (SignalBridgeBuild tile, Point2 p) -> {
             int i = p.pack();
