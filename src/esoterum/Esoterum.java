@@ -18,7 +18,6 @@ public class Esoterum extends Mod{
     public static boolean debug = false;
     public Esoterum(){
         Events.on(ClientLoadEvent.class, event -> {
-            Log.info("Waagh");
             EsoUI.init();
         });
 
@@ -109,7 +108,7 @@ public class Esoterum extends Mod{
         //     debugDraw = true;
         // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("signal-diode"){{
+        new SignalGate("display"){{
             vertexCount = 2;
             setConns(0, 0, 1, 0);
             setInputs(0, 0, 1, 0);
@@ -117,7 +116,7 @@ public class Esoterum extends Mod{
             function = gate -> (gate.signal[1] == 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("display"){{
+        new SignalGate("signal-diode"){{
             vertexCount = 2;
             setConns(0, 0, 1, 0);
             setInputs(0, 0, 1, 0);
