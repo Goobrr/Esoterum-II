@@ -5,7 +5,8 @@ package esoterum.graph;
  * level it appears in. Note that different vertices may appear in different numbers of levels, as EulerTourVertex
  * objects are only created for lower levels as needed. See the comments for the implementation of ConnGraph.
  */
-public class EulerTourVertex {
+public class EulerTourVertex
+{
     /**
      * The representation of this edge in the next-lower level. lowerVertex is null if this is the lowest-level
      * representation of this vertex.
@@ -35,9 +36,13 @@ public class EulerTourVertex {
      */
     public ConnEdge forestListHead;
 
-    /** The augmentation associated with this vertex, if any. This is null instead if higherVertex != null. */
+    /**
+     * The augmentation associated with this vertex, if any. This is null instead if higherVertex != null.
+     */
     public Object augmentation;
 
-    /** Whether there is any augmentation associated with this vertex. This is false instead if higherVertex != null. */
+    /**
+     * Whether there is any augmentation associated with this vertex. This is false instead if higherVertex != null.
+     */
     public boolean hasAugmentation;
 }

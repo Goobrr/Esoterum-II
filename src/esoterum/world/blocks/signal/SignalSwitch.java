@@ -1,13 +1,16 @@
 package esoterum.world.blocks.signal;
 
-import arc.*;
+import arc.Core;
 import arc.graphics.g2d.*;
 import arc.util.io.*;
 import esoterum.graph.SignalGraph;
 
-public class SignalSwitch extends SignalBlock{
+public class SignalSwitch extends SignalBlock
+{
     public TextureRegion switchOnRegion, switchOffRegion;
-    public SignalSwitch(String name){
+
+    public SignalSwitch(String name)
+    {
         super(name);
 
         rotate = false;
@@ -21,34 +24,40 @@ public class SignalSwitch extends SignalBlock{
     }
 
     @Override
-    public void load(){
+    public void load()
+    {
         super.load();
 
         switchOnRegion = Core.atlas.find(name + "-on");
         switchOffRegion = Core.atlas.find(name + "-off");
     }
 
-    public class SignalSwitchBuild extends SignalBuild {
+    public class SignalSwitchBuild extends SignalBuild
+    {
         @Override
-        public boolean configTapped(){
+        public boolean configTapped()
+        {
             configure(!enabled);
             return false;
         }
 
         @Override
-        public void write(Writes write){
+        public void write(Writes write)
+        {
             super.write(write);
             write.bool(enabled);
         }
 
         @Override
-        public void draw(){
+        public void draw()
+        {
             Draw.rect(baseRegion, x, y);
             Draw.rect(enabled ? switchOffRegion : switchOnRegion, x, y);
         }
 
         @Override
-        public void read(Reads read, byte revision){
+        public void read(Reads read, byte revision)
+        {
             super.read(read, revision);
             enabled = read.bool();
             SignalGraph.graph.setVertexAugmentation(v[0], enabled ? 0 : 1);

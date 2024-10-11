@@ -8,8 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Describes a ConnVertex, with respect to a particular ConnGraph. There is exactly one VertexInfo object per vertex in
  * a given graph, regardless of how many levels the vertex is in. See the comments for the implementation of ConnGraph.
  */
-public class VertexInfo {
-    /** The representation of the vertex in the highest level. */
+public class VertexInfo
+{
+    /**
+     * The representation of the vertex in the highest level.
+     */
     public EulerTourVertex vertex;
 
     /**
@@ -27,7 +30,8 @@ public class VertexInfo {
      */
     public int maxEdgeCountSinceRebuild;
 
-    public VertexInfo(EulerTourVertex vertex) {
+    public VertexInfo(EulerTourVertex vertex)
+    {
         this.vertex = vertex;
     }
 }

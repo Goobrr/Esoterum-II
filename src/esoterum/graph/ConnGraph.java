@@ -1,10 +1,6 @@
 package esoterum.graph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
@@ -12,7 +8,7 @@ import java.util.HashMap;
  * amortized time with high probability, while checking whether two vertices are connected takes O(log N) time with high
  * probability. It uses O(V log V + E) space, where V is the number of vertices and E is the number of edges. Note that
  * a ConnVertex may appear in multiple ConnGraphs, with a different set of adjacent vertices in each graph.
- *
+ * <p>
  * ConnGraph optionally supports arbitrary augmentation. Each vertex may have an associated augmentation, or value.
  * Given a vertex V, ConnGraph can quickly report the result of combining the augmentations of all of the vertices in
  * the connected component containing V, using a combining function provided to the constructor. For example, if a
@@ -22,12 +18,12 @@ import java.util.HashMap;
  * the augmentation takes a constant amount of space. Retrieving the combined augmentation for a connected component
  * takes O(log N) time with high probability. (Although ConnGraph does not directly support augmenting edges, this can
  * also be accomplished, by imputing each edge's augmentation to an adjacent vertex.)
- *
+ * <p>
  * When a vertex no longer has any adjacent edges, and it has no augmentation information, ConnGraph stops keeping track
  * of the vertex. This reduces the time and space bounds of the ConnGraph, and it enables the ConnVertex to be garbage
  * collected. If you know you are finished with a vertex, and that vertex has an augmentation, then you should call
  * removeVertexAugmentation on the vertex, so that the graph can release it.
- *
+ * <p>
  * As a side note, it would be more proper if ConnGraph had a generic type parameter indicating the type of the
  * augmentation values. However, it is expected that it is more common not to use augmentation, so by not using a type
  * parameter, we make usage of the ConnGraph class more convenient and less confusing in the common case.
@@ -94,7 +90,8 @@ import java.util.HashMap;
  * If the input to a transform is selected uniformly at random, and the transform is a permutation, than the output also
  * has a uniform random distribution.
  */
-public class ConnGraph {
+public class ConnGraph
+{
     /**
      * The difference between ceiling of log base 2 of the maximum number of vertices in the graph since the last call
      * to rebuild() or clear() and ceiling of log base 2 of the current number of vertices, at or above which we call
@@ -106,7 +103,7 @@ public class ConnGraph {
      * The maximum number of vertices we can store in a ConnGraph. This is limited by the fact that EulerTourNode.size
      * is an int. Since the size of an Euler tour tree is one less than twice the number of vertices in the tree, the
      * number of vertices may be at most (int)((((long)Integer.MAX_VALUE) + 1) / 2).
-     *
+     * <p>
      * Of course, we could simply change the "size" field to be a long. But more fundamentally, the number of vertices
      * is limited by the fact that vertexInfo and VertexInfo.edges use HashMaps. Using a HashMap becomes problematic at
      * around Integer.MAX_VALUE entries. HashMap buckets entries based on 32-bit hash codes, so in principle, it can
@@ -115,7 +112,9 @@ public class ConnGraph {
      */
     private static final int MAX_VERTEX_COUNT = 1 << 30;
 
-    /** The augmentation function for the graph, if any. */
+    /**
+     * The augmentation function for the graph, if any.
+     */
     private final Augmentation augmentation;
 
     /**
@@ -139,22 +138,32 @@ public class ConnGraph {
      */
     private int maxVertexInfoSize;
 
-    /** Constructs a new ConnGraph with no augmentation. */
-    public ConnGraph() {
+    /**
+     * Constructs a new ConnGraph with no augmentation.
+     */
+    public ConnGraph()
+    {
         augmentation = null;
     }
 
-    /** Constructs an augmented ConnGraph, using the specified function to combine augmentation values. */
-    public ConnGraph(Augmentation augmentation) {
+    /**
+     * Constructs an augmented ConnGraph, using the specified function to combine augmentation values.
+     */
+    public ConnGraph(Augmentation augmentation)
+    {
         this.augmentation = augmentation;
     }
 
-    /** Equivalent implementation is contractual. */
-    private void assertIsAugmented() {
-        if (augmentation == null) {
+    /**
+     * Equivalent implementation is contractual.
+     */
+    private void assertIsAugmented()
+    {
+        if (augmentation == null)
+        {
             throw new RuntimeException(
-                "You may only call augmentation-related methods on ConnGraph if the graph is augmented, i.e. if an " +
-                "Augmentation was passed to the constructor");
+                    "You may only call augmentation-related methods on ConnGraph if the graph is augmented, i.e. if an " +
+                            "Augmentation was passed to the constructor");
         }
     }
 
@@ -163,16 +172,19 @@ public class ConnGraph {
      * this graph (i.e. it does not have an entry in vertexInfo), this method adds it to the graph, and creates a
      * VertexInfo object for it.
      */
-    private VertexInfo ensureInfo(ConnVertex vertex) {
+    private VertexInfo ensureInfo(ConnVertex vertex)
+    {
         VertexInfo info = vertexInfo.get(vertex);
-        if (info != null) {
+        if (info != null)
+        {
             return info;
         }
 
-        if (vertexInfo.size() == MAX_VERTEX_COUNT) {
+        if (vertexInfo.size() == MAX_VERTEX_COUNT)
+        {
             throw new RuntimeException(
-                "Sorry, ConnGraph has too many vertices to perform this operation. ConnGraph does not support " +
-                "storing more than ~2^30 vertices at a time.");
+                    "Sorry, ConnGraph has too many vertices to perform this operation. ConnGraph does not support " +
+                            "storing more than ~2^30 vertices at a time.");
         }
 
         EulerTourVertex eulerTourVertex = new EulerTourVertex();
@@ -184,7 +196,8 @@ public class ConnGraph {
 
         info = new VertexInfo(eulerTourVertex);
         vertexInfo.put(vertex, info);
-        if (vertexInfo.size() > 1 << maxLogVertexCountSinceRebuild) {
+        if (vertexInfo.size() > 1 << maxLogVertexCountSinceRebuild)
+        {
             maxLogVertexCountSinceRebuild++;
         }
         maxVertexInfoSize = Math.max(maxVertexInfoSize, vertexInfo.size());
@@ -196,16 +209,19 @@ public class ConnGraph {
      * adjacent edges and does not have any augmentation information. This method assumes that the vertex is currently
      * in the graph.
      */
-    private void remove(ConnVertex vertex) {
+    private void remove(ConnVertex vertex)
+    {
         vertexInfo.remove(vertex);
-        if (4 * vertexInfo.size() <= maxVertexInfoSize && maxVertexInfoSize > 12) {
+        if (4 * vertexInfo.size() <= maxVertexInfoSize && maxVertexInfoSize > 12)
+        {
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy vertexInfo to a new HashMap, which will have a
             // suitable capacity.
             vertexInfo = new HashMap<ConnVertex, VertexInfo>(vertexInfo);
             maxVertexInfoSize = vertexInfo.size();
         }
-        if (vertexInfo.size() << REBUILD_CHANGE <= 1 << maxLogVertexCountSinceRebuild) {
+        if (vertexInfo.size() << REBUILD_CHANGE <= 1 << maxLogVertexCountSinceRebuild)
+        {
             rebuild();
         }
     }
@@ -215,40 +231,54 @@ public class ConnGraph {
      * list for an EulerTourVertex that represents the same underlying ConnVertex, but at a higher level. This has the
      * effect of prepending the list for the lower level to the beginning of the list for the higher level, and
      * replacing all links to the lower-level vertex in the ConnEdges with links to the higher-level vertex.
-     * @param head The first node in the list for the higher-level vertex.
-     * @param lowerHead The first node in the list for the lower-level vertex.
-     * @param vertex The higher-level vertex.
+     *
+     * @param head        The first node in the list for the higher-level vertex.
+     * @param lowerHead   The first node in the list for the lower-level vertex.
+     * @param vertex      The higher-level vertex.
      * @param lowerVertex The lower-level vertex.
      * @return The head of the combined linked list.
      */
     private ConnEdge collapseEdgeList(
-            ConnEdge head, ConnEdge lowerHead, EulerTourVertex vertex, EulerTourVertex lowerVertex) {
-        if (lowerHead == null) {
+            ConnEdge head, ConnEdge lowerHead, EulerTourVertex vertex, EulerTourVertex lowerVertex)
+    {
+        if (lowerHead == null)
+        {
             return head;
         }
 
         ConnEdge prevLowerEdge = null;
         ConnEdge lowerEdge = lowerHead;
-        while (lowerEdge != null) {
+        while (lowerEdge != null)
+        {
             prevLowerEdge = lowerEdge;
-            if (lowerEdge.vertex1 == lowerVertex) {
+            if (lowerEdge.vertex1 == lowerVertex)
+            {
                 lowerEdge.vertex1 = vertex;
                 lowerEdge = lowerEdge.next1;
-            } else {
+            }
+            else
+            {
                 lowerEdge.vertex2 = vertex;
                 lowerEdge = lowerEdge.next2;
             }
         }
 
-        if (prevLowerEdge.vertex1 == vertex) {
+        if (prevLowerEdge.vertex1 == vertex)
+        {
             prevLowerEdge.next1 = head;
-        } else {
+        }
+        else
+        {
             prevLowerEdge.next2 = head;
         }
-        if (head != null) {
-            if (head.vertex1 == vertex) {
+        if (head != null)
+        {
+            if (head.vertex1 == vertex)
+            {
                 head.prev1 = prevLowerEdge;
-            } else {
+            }
+            else
+            {
                 head.prev2 = prevLowerEdge;
             }
         }
@@ -257,13 +287,16 @@ public class ConnGraph {
 
     /**
      * Equivalent implementation is contractual.
-     *
+     * <p>
      * This method is useful for when an EulerTourVertex's lists (graphListHead or forestListHead) or arbitrary visit
      * change, as these affect the hasGraphEdge and hasForestEdge augmentations.
      */
-    private void augmentAncestorFlags(EulerTourNode node) {
-        for (EulerTourNode parent = node; parent != null; parent = parent.parent) {
-            if (!parent.augmentFlags()) {
+    private void augmentAncestorFlags(EulerTourNode node)
+    {
+        for (EulerTourNode parent = node; parent != null; parent = parent.parent)
+        {
+            if (!parent.augmentFlags())
+            {
                 break;
             }
         }
@@ -275,43 +308,56 @@ public class ConnGraph {
      * O(V + E) time, assuming a constant difference between maxLogVertexCountSinceRebuild and the result of the
      * logarithm.
      */
-    private void rebuild() {
+    private void rebuild()
+    {
         // Rebuild the graph by collapsing the top deleteCount + 1 levels into the top level
 
-        if (vertexInfo.isEmpty()) {
+        if (vertexInfo.isEmpty())
+        {
             maxLogVertexCountSinceRebuild = 0;
             return;
         }
         int deleteCount = 0;
-        while (2 * vertexInfo.size() <= 1 << maxLogVertexCountSinceRebuild) {
+        while (2 * vertexInfo.size() <= 1 << maxLogVertexCountSinceRebuild)
+        {
             maxLogVertexCountSinceRebuild--;
             deleteCount++;
         }
-        if (deleteCount == 0) {
+        if (deleteCount == 0)
+        {
             return;
         }
 
-        for (VertexInfo info : vertexInfo.values()) {
+        for (VertexInfo info : vertexInfo.values())
+        {
             EulerTourVertex vertex = info.vertex;
             EulerTourVertex lowerVertex = vertex;
-            for (int i = 0; i < deleteCount; i++) {
+            for (int i = 0; i < deleteCount; i++)
+            {
                 lowerVertex = lowerVertex.lowerVertex;
-                if (lowerVertex == null) {
+                if (lowerVertex == null)
+                {
                     break;
                 }
 
                 vertex.graphListHead =
-                    collapseEdgeList(vertex.graphListHead, lowerVertex.graphListHead, vertex, lowerVertex);
-                if (lowerVertex.forestListHead != null) {
+                        collapseEdgeList(vertex.graphListHead, lowerVertex.graphListHead, vertex, lowerVertex);
+                if (lowerVertex.forestListHead != null)
+                {
                     // Change the eulerTourEdge links
                     ConnEdge lowerEdge = lowerVertex.forestListHead;
-                    while (lowerEdge != null) {
-                        if (lowerEdge.vertex1 == lowerVertex) {
+                    while (lowerEdge != null)
+                    {
+                        if (lowerEdge.vertex1 == lowerVertex)
+                        {
                             // We'll address this edge when we visit lowerEdge.vertex2
                             lowerEdge = lowerEdge.next1;
-                        } else {
+                        }
+                        else
+                        {
                             EulerTourEdge edge = lowerEdge.eulerTourEdge.higherEdge;
-                            for (int j = 0; j < i; j++) {
+                            for (int j = 0; j < i; j++)
+                            {
                                 edge = edge.higherEdge;
                             }
                             lowerEdge.eulerTourEdge = edge;
@@ -320,15 +366,17 @@ public class ConnGraph {
                     }
 
                     vertex.forestListHead =
-                        collapseEdgeList(vertex.forestListHead, lowerVertex.forestListHead, vertex, lowerVertex);
+                            collapseEdgeList(vertex.forestListHead, lowerVertex.forestListHead, vertex, lowerVertex);
                 }
             }
 
-            if (lowerVertex != null) {
+            if (lowerVertex != null)
+            {
                 lowerVertex = lowerVertex.lowerVertex;
             }
             vertex.lowerVertex = lowerVertex;
-            if (lowerVertex != null) {
+            if (lowerVertex != null)
+            {
                 lowerVertex.higherVertex = vertex;
             }
             augmentAncestorFlags(vertex.arbitraryVisit);
@@ -339,13 +387,18 @@ public class ConnGraph {
      * Adds the specified edge to the graph adjacency list of edge.vertex1, as in EulerTourVertex.graphListHead.
      * Assumes it is not currently in any lists, except possibly the graph adjacency list of edge.vertex2.
      */
-    private void addToGraphLinkedList1(ConnEdge edge) {
+    private void addToGraphLinkedList1(ConnEdge edge)
+    {
         edge.prev1 = null;
         edge.next1 = edge.vertex1.graphListHead;
-        if (edge.next1 != null) {
-            if (edge.next1.vertex1 == edge.vertex1) {
+        if (edge.next1 != null)
+        {
+            if (edge.next1.vertex1 == edge.vertex1)
+            {
                 edge.next1.prev1 = edge;
-            } else {
+            }
+            else
+            {
                 edge.next1.prev2 = edge;
             }
         }
@@ -356,13 +409,18 @@ public class ConnGraph {
      * Adds the specified edge to the graph adjacency list of edge.vertex2, as in EulerTourVertex.graphListHead.
      * Assumes it is not currently in any lists, except possibly the graph adjacency list of edge.vertex1.
      */
-    private void addToGraphLinkedList2(ConnEdge edge) {
+    private void addToGraphLinkedList2(ConnEdge edge)
+    {
         edge.prev2 = null;
         edge.next2 = edge.vertex2.graphListHead;
-        if (edge.next2 != null) {
-            if (edge.next2.vertex1 == edge.vertex2) {
+        if (edge.next2 != null)
+        {
+            if (edge.next2.vertex1 == edge.vertex2)
+            {
                 edge.next2.prev1 = edge;
-            } else {
+            }
+            else
+            {
                 edge.next2.prev2 = edge;
             }
         }
@@ -373,7 +431,8 @@ public class ConnGraph {
      * Adds the specified edge to the graph adjacency lists of edge.vertex1 and edge.vertex2, as in
      * EulerTourVertex.graphListHead. Assumes it is not currently in any lists.
      */
-    private void addToGraphLinkedLists(ConnEdge edge) {
+    private void addToGraphLinkedLists(ConnEdge edge)
+    {
         addToGraphLinkedList1(edge);
         addToGraphLinkedList2(edge);
     }
@@ -382,13 +441,18 @@ public class ConnGraph {
      * Adds the specified edge to the forest adjacency lists of edge.vertex1 and edge.vertex2, as in
      * EulerTourVertex.forestListHead. Assumes it is not currently in any lists.
      */
-    private void addToForestLinkedLists(ConnEdge edge) {
+    private void addToForestLinkedLists(ConnEdge edge)
+    {
         edge.prev1 = null;
         edge.next1 = edge.vertex1.forestListHead;
-        if (edge.next1 != null) {
-            if (edge.next1.vertex1 == edge.vertex1) {
+        if (edge.next1 != null)
+        {
+            if (edge.next1.vertex1 == edge.vertex1)
+            {
                 edge.next1.prev1 = edge;
-            } else {
+            }
+            else
+            {
                 edge.next1.prev2 = edge;
             }
         }
@@ -396,10 +460,14 @@ public class ConnGraph {
 
         edge.prev2 = null;
         edge.next2 = edge.vertex2.forestListHead;
-        if (edge.next2 != null) {
-            if (edge.next2.vertex1 == edge.vertex2) {
+        if (edge.next2 != null)
+        {
+            if (edge.next2.vertex1 == edge.vertex2)
+            {
                 edge.next2.prev1 = edge;
-            } else {
+            }
+            else
+            {
                 edge.next2.prev2 = edge;
             }
         }
@@ -410,22 +478,35 @@ public class ConnGraph {
      * Removes the specified edge from an adjacency list of edge.vertex1, as in graphListHead and forestListHead.
      * Assumes it is initially in exactly one of the lists for edge.vertex1.
      */
-    private void removeFromLinkedList1(ConnEdge edge) {
-        if (edge.prev1 != null) {
-            if (edge.prev1.vertex1 == edge.vertex1) {
+    private void removeFromLinkedList1(ConnEdge edge)
+    {
+        if (edge.prev1 != null)
+        {
+            if (edge.prev1.vertex1 == edge.vertex1)
+            {
                 edge.prev1.next1 = edge.next1;
-            } else {
+            }
+            else
+            {
                 edge.prev1.next2 = edge.next1;
             }
-        } else if (edge == edge.vertex1.graphListHead) {
+        }
+        else if (edge == edge.vertex1.graphListHead)
+        {
             edge.vertex1.graphListHead = edge.next1;
-        } else {
+        }
+        else
+        {
             edge.vertex1.forestListHead = edge.next1;
         }
-        if (edge.next1 != null) {
-            if (edge.next1.vertex1 == edge.vertex1) {
+        if (edge.next1 != null)
+        {
+            if (edge.next1.vertex1 == edge.vertex1)
+            {
                 edge.next1.prev1 = edge.prev1;
-            } else {
+            }
+            else
+            {
                 edge.next1.prev2 = edge.prev1;
             }
         }
@@ -435,22 +516,35 @@ public class ConnGraph {
      * Removes the specified edge from an adjacency list of edge.vertex2, as in graphListHead and forestListHead.
      * Assumes it is initially in exactly one of the lists for edge.vertex2.
      */
-    private void removeFromLinkedList2(ConnEdge edge) {
-        if (edge.prev2 != null) {
-            if (edge.prev2.vertex1 == edge.vertex2) {
+    private void removeFromLinkedList2(ConnEdge edge)
+    {
+        if (edge.prev2 != null)
+        {
+            if (edge.prev2.vertex1 == edge.vertex2)
+            {
                 edge.prev2.next1 = edge.next2;
-            } else {
+            }
+            else
+            {
                 edge.prev2.next2 = edge.next2;
             }
-        } else if (edge == edge.vertex2.graphListHead) {
+        }
+        else if (edge == edge.vertex2.graphListHead)
+        {
             edge.vertex2.graphListHead = edge.next2;
-        } else {
+        }
+        else
+        {
             edge.vertex2.forestListHead = edge.next2;
         }
-        if (edge.next2 != null) {
-            if (edge.next2.vertex1 == edge.vertex2) {
+        if (edge.next2 != null)
+        {
+            if (edge.next2.vertex1 == edge.vertex2)
+            {
                 edge.next2.prev1 = edge.prev2;
-            } else {
+            }
+            else
+            {
                 edge.next2.prev2 = edge.prev2;
             }
         }
@@ -461,7 +555,8 @@ public class ConnGraph {
      * forestListHead. Assumes it is initially in exactly one of the lists for edge.vertex1 and exactly one of the lists
      * for edge.vertex2.
      */
-    private void removeFromLinkedLists(ConnEdge edge) {
+    private void removeFromLinkedLists(ConnEdge edge)
+    {
         removeFromLinkedList1(edge);
         removeFromLinkedList2(edge);
     }
@@ -470,15 +565,18 @@ public class ConnGraph {
      * Add an edge between the specified vertices to the Euler tour forest F_i. Assumes that the edge's endpoints are
      * initially in separate trees. Returns the created edge.
      */
-    private EulerTourEdge addForestEdge(EulerTourVertex vertex1, EulerTourVertex vertex2) {
+    private EulerTourEdge addForestEdge(EulerTourVertex vertex1, EulerTourVertex vertex2)
+    {
         // We need to be careful about where we split and where we add and remove nodes, so as to avoid breaking any
         // EulerTourEdge.visit* fields
         EulerTourNode root = vertex2.arbitraryVisit.root();
         EulerTourNode max = root.max();
-        if (max.vertex != vertex2) {
+        if (max.vertex != vertex2)
+        {
             // Reroot
             EulerTourNode min = root.min();
-            if (max.vertex.arbitraryVisit == max) {
+            if (max.vertex.arbitraryVisit == max)
+            {
                 max.vertex.arbitraryVisit = min;
                 augmentAncestorFlags(min);
                 augmentAncestorFlags(max);
@@ -505,19 +603,26 @@ public class ConnGraph {
         return new EulerTourEdge(newNode, max);
     }
 
-    /** Removes the specified edge from the Euler tour forest F_i. */
-    private void removeForestEdge(EulerTourEdge edge) {
+    /**
+     * Removes the specified edge from the Euler tour forest F_i.
+     */
+    private void removeForestEdge(EulerTourEdge edge)
+    {
         EulerTourNode firstNode;
         EulerTourNode secondNode;
-        if (edge.visit1.compareTo(edge.visit2) < 0) {
+        if (edge.visit1.compareTo(edge.visit2) < 0)
+        {
             firstNode = edge.visit1;
             secondNode = edge.visit2;
-        } else {
+        }
+        else
+        {
             firstNode = edge.visit2;
             secondNode = edge.visit1;
         }
 
-        if (firstNode.vertex.arbitraryVisit == firstNode) {
+        if (firstNode.vertex.arbitraryVisit == firstNode)
+        {
             EulerTourNode successor = secondNode.successor();
             firstNode.vertex.arbitraryVisit = successor;
             augmentAncestorFlags(firstNode);
@@ -535,13 +640,16 @@ public class ConnGraph {
     /**
      * Adds the specified edge to the edge map for srcInfo (srcInfo.edges). Assumes that the edge is not currently in
      * the map.
-     * @param edge The edge.
-     * @param srcInfo The source vertex's info.
+     *
+     * @param edge       The edge.
+     * @param srcInfo    The source vertex's info.
      * @param destVertex The destination vertex, i.e. the edge's key in srcInfo.edges.
      */
-    private void addToEdgeMap(ConnEdge edge, VertexInfo srcInfo, ConnVertex destVertex) {
+    private void addToEdgeMap(ConnEdge edge, VertexInfo srcInfo, ConnVertex destVertex)
+    {
         srcInfo.edges.put(destVertex, edge);
-        if (srcInfo.edges.size() > srcInfo.maxEdgeCountSinceRebuild) {
+        if (srcInfo.edges.size() > srcInfo.maxEdgeCountSinceRebuild)
+        {
             srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size();
         }
     }
@@ -549,19 +657,24 @@ public class ConnGraph {
     /**
      * Adds an edge between the specified vertices, if such an edge is not already present. Taken together with
      * removeEdge, this method takes O(log^2 N) amortized time with high probability.
+     *
      * @return Whether there was no edge between the vertices.
      */
-    public boolean addEdge(ConnVertex connVertex1, ConnVertex connVertex2) {
-        if (connVertex1 == connVertex2) {
+    public boolean addEdge(ConnVertex connVertex1, ConnVertex connVertex2)
+    {
+        if (connVertex1 == connVertex2)
+        {
             throw new IllegalArgumentException("Self-loops are not allowed");
         }
-        if (vertexInfo.size() >= MAX_VERTEX_COUNT - 1) {
+        if (vertexInfo.size() >= MAX_VERTEX_COUNT - 1)
+        {
             throw new RuntimeException(
-                "Sorry, ConnGraph has too many vertices to perform this operation. ConnGraph does not support " +
-                "storing more than ~2^30 vertices at a time.");
+                    "Sorry, ConnGraph has too many vertices to perform this operation. ConnGraph does not support " +
+                            "storing more than ~2^30 vertices at a time.");
         }
         VertexInfo info1 = ensureInfo(connVertex1);
-        if (info1.edges.containsKey(connVertex2)) {
+        if (info1.edges.containsKey(connVertex2))
+        {
             return false;
         }
         VertexInfo info2 = ensureInfo(connVertex2);
@@ -570,9 +683,12 @@ public class ConnGraph {
         EulerTourVertex vertex2 = info2.vertex;
         ConnEdge edge = new ConnEdge(vertex1, vertex2);
 
-        if (vertex1.arbitraryVisit.root() == vertex2.arbitraryVisit.root()) {
+        if (vertex1.arbitraryVisit.root() == vertex2.arbitraryVisit.root())
+        {
             addToGraphLinkedLists(edge);
-        } else {
+        }
+        else
+        {
             addToForestLinkedLists(edge);
             edge.eulerTourEdge = addForestEdge(vertex1, vertex2);
         }
@@ -588,9 +704,11 @@ public class ConnGraph {
      * Returns vertex.lowerVertex. If this is null, ensureLowerVertex sets vertex.lowerVertex to a new vertex and
      * returns it.
      */
-    private EulerTourVertex ensureLowerVertex(EulerTourVertex vertex) {
+    private EulerTourVertex ensureLowerVertex(EulerTourVertex vertex)
+    {
         EulerTourVertex lowerVertex = vertex.lowerVertex;
-        if (lowerVertex == null) {
+        if (lowerVertex == null)
+        {
             lowerVertex = new EulerTourVertex();
             EulerTourNode lowerNode = new EulerTourNode(lowerVertex, null);
             lowerVertex.arbitraryVisit = lowerNode;
@@ -608,25 +726,33 @@ public class ConnGraph {
      * Pushes all level-i forest edges in the tree rooted at the specified node down to level i - 1, and adds them to
      * F_{i - 1}, where i is the level of the tree.
      */
-    private void pushForestEdges(EulerTourNode root) {
+    private void pushForestEdges(EulerTourNode root)
+    {
         // Iterate over all of the nodes that have hasForestEdge == true
-        if (!root.hasForestEdge || root.size == 1) {
+        if (!root.hasForestEdge || root.size == 1)
+        {
             return;
         }
         EulerTourNode node;
-        for (node = root; node.left.hasForestEdge; node = node.left);
-        while (node != null) {
+        for (node = root; node.left.hasForestEdge; node = node.left) ;
+        while (node != null)
+        {
             EulerTourVertex vertex = node.vertex;
             ConnEdge edge = vertex.forestListHead;
-            if (edge != null) {
+            if (edge != null)
+            {
                 EulerTourVertex lowerVertex = ensureLowerVertex(vertex);
                 ConnEdge prevEdge = null;
-                while (edge != null) {
-                    if (edge.vertex2 == vertex || edge.vertex2 == lowerVertex) {
+                while (edge != null)
+                {
+                    if (edge.vertex2 == vertex || edge.vertex2 == lowerVertex)
+                    {
                         // We address this edge when we visit edge.vertex1
                         prevEdge = edge;
                         edge = edge.next2;
-                    } else {
+                    }
+                    else
+                    {
                         edge.vertex1 = lowerVertex;
                         edge.vertex2 = ensureLowerVertex(edge.vertex2);
                         EulerTourEdge lowerEdge = addForestEdge(edge.vertex1, edge.vertex2);
@@ -638,15 +764,22 @@ public class ConnGraph {
                 }
 
                 // Prepend vertex.forestListHead to the beginning of lowerVertex.forestListHead
-                if (prevEdge.vertex1 == lowerVertex) {
+                if (prevEdge.vertex1 == lowerVertex)
+                {
                     prevEdge.next1 = lowerVertex.forestListHead;
-                } else {
+                }
+                else
+                {
                     prevEdge.next2 = lowerVertex.forestListHead;
                 }
-                if (lowerVertex.forestListHead != null) {
-                    if (lowerVertex.forestListHead.vertex1 == lowerVertex) {
+                if (lowerVertex.forestListHead != null)
+                {
+                    if (lowerVertex.forestListHead.vertex1 == lowerVertex)
+                    {
                         lowerVertex.forestListHead.prev1 = prevEdge;
-                    } else {
+                    }
+                    else
+                    {
                         lowerVertex.forestListHead.prev2 = prevEdge;
                     }
                 }
@@ -656,11 +789,15 @@ public class ConnGraph {
             }
 
             // Iterate to the next node with hasForestEdge == true, clearing hasForestEdge as we go
-            if (node.right.hasForestEdge) {
-                for (node = node.right; node.left.hasForestEdge; node = node.left);
-            } else {
+            if (node.right.hasForestEdge)
+            {
+                for (node = node.right; node.left.hasForestEdge; node = node.left) ;
+            }
+            else
+            {
                 node.hasForestEdge = false;
-                while (node.parent != null && node.parent.right == node) {
+                while (node.parent != null && node.parent.right == node)
+                {
                     node = node.parent;
                     node.hasForestEdge = false;
                 }
@@ -674,43 +811,56 @@ public class ConnGraph {
      * tree, where i is the level of the tree. This is a "replacement" edge because it replaces the edge that was
      * previously connecting the two trees. We push any level-i edges we encounter that do not connect to another tree
      * down to level i - 1, adding them to G_{i - 1}. This method assumes that root.hasForestEdge is false.
+     *
      * @param root The root of the tree.
      * @return The replacement edge, or null if there is no replacement edge.
      */
-    private ConnEdge findReplacementEdge(EulerTourNode root) {
+    private ConnEdge findReplacementEdge(EulerTourNode root)
+    {
         // Iterate over all of the nodes that have hasGraphEdge == true
-        if (!root.hasGraphEdge) {
+        if (!root.hasGraphEdge)
+        {
             return null;
         }
         EulerTourNode node;
-        for (node = root; node.left.hasGraphEdge; node = node.left);
-        while (node != null) {
+        for (node = root; node.left.hasGraphEdge; node = node.left) ;
+        while (node != null)
+        {
             EulerTourVertex vertex = node.vertex;
             ConnEdge edge = vertex.graphListHead;
-            if (edge != null) {
+            if (edge != null)
+            {
                 ConnEdge replacementEdge = null;
                 ConnEdge prevEdge = null;
-                while (edge != null) {
+                while (edge != null)
+                {
                     EulerTourVertex adjVertex;
                     ConnEdge nextEdge;
-                    if (edge.vertex1 == vertex) {
+                    if (edge.vertex1 == vertex)
+                    {
                         adjVertex = edge.vertex2;
                         nextEdge = edge.next1;
-                    } else {
+                    }
+                    else
+                    {
                         adjVertex = edge.vertex1;
                         nextEdge = edge.next2;
                     }
 
-                    if (adjVertex.arbitraryVisit.root() != root) {
+                    if (adjVertex.arbitraryVisit.root() != root)
+                    {
                         replacementEdge = edge;
                         break;
                     }
 
                     // Remove the edge from the adjacency list of adjVertex. We will remove it from the adjacency list
                     // of "vertex" later.
-                    if (edge.vertex1 == adjVertex) {
+                    if (edge.vertex1 == adjVertex)
+                    {
                         removeFromLinkedList1(edge);
-                    } else {
+                    }
+                    else
+                    {
                         removeFromLinkedList2(edge);
                     }
                     augmentAncestorFlags(adjVertex.arbitraryVisit);
@@ -721,9 +871,12 @@ public class ConnGraph {
 
                     // Add the edge to the adjacency list of adjVertex.lowerVertex. We will add it to the adjacency list
                     // of lowerVertex later.
-                    if (edge.vertex1 != vertex.lowerVertex) {
+                    if (edge.vertex1 != vertex.lowerVertex)
+                    {
                         addToGraphLinkedList1(edge);
-                    } else {
+                    }
+                    else
+                    {
                         addToGraphLinkedList2(edge);
                     }
                     augmentAncestorFlags(adjVertex.lowerVertex.arbitraryVisit);
@@ -733,17 +886,25 @@ public class ConnGraph {
                 }
 
                 // Prepend the linked list up to prevEdge to the beginning of vertex.lowerVertex.graphListHead
-                if (prevEdge != null) {
+                if (prevEdge != null)
+                {
                     EulerTourVertex lowerVertex = vertex.lowerVertex;
-                    if (prevEdge.vertex1 == lowerVertex) {
+                    if (prevEdge.vertex1 == lowerVertex)
+                    {
                         prevEdge.next1 = lowerVertex.graphListHead;
-                    } else {
+                    }
+                    else
+                    {
                         prevEdge.next2 = lowerVertex.graphListHead;
                     }
-                    if (lowerVertex.graphListHead != null) {
-                        if (lowerVertex.graphListHead.vertex1 == lowerVertex) {
+                    if (lowerVertex.graphListHead != null)
+                    {
+                        if (lowerVertex.graphListHead.vertex1 == lowerVertex)
+                        {
                             lowerVertex.graphListHead.prev1 = prevEdge;
-                        } else {
+                        }
+                        else
+                        {
                             lowerVertex.graphListHead.prev2 = prevEdge;
                         }
                     }
@@ -751,25 +912,35 @@ public class ConnGraph {
                     augmentAncestorFlags(lowerVertex.arbitraryVisit);
                 }
                 vertex.graphListHead = edge;
-                if (edge == null) {
+                if (edge == null)
+                {
                     augmentAncestorFlags(vertex.arbitraryVisit);
-                } else if (edge.vertex1 == vertex) {
+                }
+                else if (edge.vertex1 == vertex)
+                {
                     edge.prev1 = null;
-                } else {
+                }
+                else
+                {
                     edge.prev2 = null;
                 }
 
-                if (replacementEdge != null) {
+                if (replacementEdge != null)
+                {
                     return replacementEdge;
                 }
             }
 
             // Iterate to the next node with hasGraphEdge == true. Note that nodes' hasGraphEdge fields can change as we
             // push down edges.
-            if (node.right.hasGraphEdge) {
-                for (node = node.right; node.left.hasGraphEdge; node = node.left);
-            } else {
-                while (node.parent != null && (node.parent.right == node || !node.parent.hasGraphEdge)) {
+            if (node.right.hasGraphEdge)
+            {
+                for (node = node.right; node.left.hasGraphEdge; node = node.left) ;
+            }
+            else
+            {
+                while (node.parent != null && (node.parent.right == node || !node.parent.hasGraphEdge))
+                {
                     node = node.parent;
                 }
                 node = node.parent;
@@ -782,10 +953,12 @@ public class ConnGraph {
      * Removes the edge from srcInfo to destVertex from the edge map for srcInfo (srcInfo.edges), if it is present.
      * Returns the edge that we removed, if any.
      */
-    private ConnEdge removeFromEdgeMap(VertexInfo srcInfo, ConnVertex destVertex) {
+    private ConnEdge removeFromEdgeMap(VertexInfo srcInfo, ConnVertex destVertex)
+    {
         ConnEdge edge = srcInfo.edges.remove(destVertex);
         if (edge != null && 4 * srcInfo.edges.size() <= srcInfo.maxEdgeCountSinceRebuild &&
-                srcInfo.maxEdgeCountSinceRebuild > 6) {
+                srcInfo.maxEdgeCountSinceRebuild > 6)
+        {
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy srcInfo.edges to a new HashMap, which will have a
             // suitable capacity.
@@ -798,19 +971,24 @@ public class ConnGraph {
     /**
      * Removes the edge between the specified vertices, if there is such an edge. Taken together with addEdge, this
      * method takes O(log^2 N) amortized time with high probability.
+     *
      * @return Whether there was an edge between the vertices.
      */
-    public boolean removeEdge(ConnVertex vertex1, ConnVertex vertex2) {
-        if (vertex1 == vertex2) {
+    public boolean removeEdge(ConnVertex vertex1, ConnVertex vertex2)
+    {
+        if (vertex1 == vertex2)
+        {
             throw new IllegalArgumentException("Self-loops are not allowed");
         }
 
         VertexInfo info1 = vertexInfo.get(vertex1);
-        if (info1 == null) {
+        if (info1 == null)
+        {
             return false;
         }
         ConnEdge edge = removeFromEdgeMap(info1, vertex2);
-        if (edge == null) {
+        if (edge == null)
+        {
             return false;
         }
         VertexInfo info2 = vertexInfo.get(vertex2);
@@ -820,8 +998,10 @@ public class ConnGraph {
         augmentAncestorFlags(edge.vertex1.arbitraryVisit);
         augmentAncestorFlags(edge.vertex2.arbitraryVisit);
 
-        if (edge.eulerTourEdge != null) {
-            for (EulerTourEdge levelEdge = edge.eulerTourEdge; levelEdge != null; levelEdge = levelEdge.higherEdge) {
+        if (edge.eulerTourEdge != null)
+        {
+            for (EulerTourEdge levelEdge = edge.eulerTourEdge; levelEdge != null; levelEdge = levelEdge.higherEdge)
+            {
                 removeForestEdge(levelEdge);
             }
             edge.eulerTourEdge = null;
@@ -830,32 +1010,40 @@ public class ConnGraph {
             ConnEdge replacementEdge = null;
             EulerTourVertex levelVertex1 = edge.vertex1;
             EulerTourVertex levelVertex2 = edge.vertex2;
-            while (levelVertex1 != null) {
+            while (levelVertex1 != null)
+            {
                 EulerTourNode root1 = levelVertex1.arbitraryVisit.root();
                 EulerTourNode root2 = levelVertex2.arbitraryVisit.root();
 
                 // Optimization: if hasGraphEdge is false for one of the roots, then there definitely isn't a
                 // replacement edge at this level
-                if (root1.hasGraphEdge && root2.hasGraphEdge) {
+                if (root1.hasGraphEdge && root2.hasGraphEdge)
+                {
                     EulerTourNode root;
-                    if (root1.size < root2.size) {
+                    if (root1.size < root2.size)
+                    {
                         root = root1;
-                    } else {
+                    }
+                    else
+                    {
                         root = root2;
                     }
 
                     pushForestEdges(root);
                     replacementEdge = findReplacementEdge(root);
-                    if (replacementEdge != null) {
+                    if (replacementEdge != null)
+                    {
                         break;
                     }
                 }
 
                 // To save space, get rid of trees with one node
-                if (root1.size == 1 && levelVertex1.higherVertex != null) {
+                if (root1.size == 1 && levelVertex1.higherVertex != null)
+                {
                     levelVertex1.higherVertex.lowerVertex = null;
                 }
-                if (root2.size == 1 && levelVertex2.higherVertex != null) {
+                if (root2.size == 1 && levelVertex2.higherVertex != null)
+                {
                     levelVertex2.higherVertex.lowerVertex = null;
                 }
 
@@ -863,7 +1051,8 @@ public class ConnGraph {
                 levelVertex2 = levelVertex2.higherVertex;
             }
 
-            if (replacementEdge != null) {
+            if (replacementEdge != null)
+            {
                 // Add the replacement edge to all of the forests at or above the current level
                 removeFromLinkedLists(replacementEdge);
                 addToForestLinkedLists(replacementEdge);
@@ -872,11 +1061,15 @@ public class ConnGraph {
                 augmentAncestorFlags(replacementVertex1.arbitraryVisit);
                 augmentAncestorFlags(replacementVertex2.arbitraryVisit);
                 EulerTourEdge lowerEdge = null;
-                while (replacementVertex1 != null) {
+                while (replacementVertex1 != null)
+                {
                     EulerTourEdge levelEdge = addForestEdge(replacementVertex1, replacementVertex2);
-                    if (lowerEdge == null) {
+                    if (lowerEdge == null)
+                    {
                         replacementEdge.eulerTourEdge = levelEdge;
-                    } else {
+                    }
+                    else
+                    {
                         lowerEdge.higherEdge = levelEdge;
                     }
 
@@ -887,10 +1080,12 @@ public class ConnGraph {
             }
         }
 
-        if (info1.edges.isEmpty() && !info1.vertex.hasAugmentation) {
+        if (info1.edges.isEmpty() && !info1.vertex.hasAugmentation)
+        {
             remove(vertex1);
         }
-        if (info2.edges.isEmpty() && !info2.vertex.hasAugmentation) {
+        if (info2.edges.isEmpty() && !info2.vertex.hasAugmentation)
+        {
             remove(vertex2);
         }
         return true;
@@ -900,24 +1095,33 @@ public class ConnGraph {
      * Returns whether the specified vertices are connected - whether there is a path between them. Returns true if
      * vertex1 == vertex2. This method takes O(log N) time with high probability.
      */
-    public boolean connected(ConnVertex vertex1, ConnVertex vertex2) {
-        if (vertex1 == vertex2) {
+    public boolean connected(ConnVertex vertex1, ConnVertex vertex2)
+    {
+        if (vertex1 == vertex2)
+        {
             return true;
         }
         VertexInfo info1 = vertexInfo.get(vertex1);
-        if (info1 == null) {
+        if (info1 == null)
+        {
             return false;
         }
         VertexInfo info2 = vertexInfo.get(vertex2);
         return info2 != null && info1.vertex.arbitraryVisit.root() == info2.vertex.arbitraryVisit.root();
     }
 
-    /** Returns the vertices that are directly adjacent to the specified vertex. */
-    public Collection<ConnVertex> adjacentVertices(ConnVertex vertex) {
+    /**
+     * Returns the vertices that are directly adjacent to the specified vertex.
+     */
+    public Collection<ConnVertex> adjacentVertices(ConnVertex vertex)
+    {
         VertexInfo info = vertexInfo.get(vertex);
-        if (info != null) {
+        if (info != null)
+        {
             return new ArrayList<ConnVertex>(info.edges.keySet());
-        } else {
+        }
+        else
+        {
             return Collections.emptyList();
         }
     }
@@ -925,24 +1129,28 @@ public class ConnGraph {
     /**
      * Sets the augmentation associated with the specified vertex. This method takes O(log N) time with high
      * probability.
-     *
+     * <p>
      * Note that passing a null value for the second argument is not the same as removing the augmentation. For that,
      * you need to call removeVertexAugmentation.
      *
      * @return The augmentation that was previously associated with the vertex. Returns null if it did not have any
-     *     associated augmentation.
+     * associated augmentation.
      */
-    public Object setVertexAugmentation(ConnVertex connVertex, Object vertexAugmentation) {
+    public Object setVertexAugmentation(ConnVertex connVertex, Object vertexAugmentation)
+    {
         assertIsAugmented();
-        if(connVertex == null) return null;
+        if (connVertex == null) return null;
         EulerTourVertex vertex = ensureInfo(connVertex).vertex;
         Object oldAugmentation = vertex.augmentation;
         if (!vertex.hasAugmentation ||
-                (vertexAugmentation != null ? !vertexAugmentation.equals(oldAugmentation) : oldAugmentation != null)) {
+                (vertexAugmentation != null ? !vertexAugmentation.equals(oldAugmentation) : oldAugmentation != null))
+        {
             vertex.augmentation = vertexAugmentation;
             vertex.hasAugmentation = true;
-            for (EulerTourNode node = vertex.arbitraryVisit; node != null; node = node.parent) {
-                if (!node.augment()) {
+            for (EulerTourNode node = vertex.arbitraryVisit; node != null; node = node.parent)
+            {
+                if (!node.augment())
+                {
                     break;
                 }
             }
@@ -953,25 +1161,33 @@ public class ConnGraph {
     /**
      * Removes any augmentation associated with the specified vertex. This method takes O(log N) time with high
      * probability.
+     *
      * @return The augmentation that was previously associated with the vertex. Returns null if it did not have any
-     *     associated augmentation.
+     * associated augmentation.
      */
-    public Object removeVertexAugmentation(ConnVertex connVertex) {
+    public Object removeVertexAugmentation(ConnVertex connVertex)
+    {
         assertIsAugmented();
         VertexInfo info = vertexInfo.get(connVertex);
-        if (info == null) {
+        if (info == null)
+        {
             return null;
         }
 
         EulerTourVertex vertex = info.vertex;
         Object oldAugmentation = vertex.augmentation;
-        if (info.edges.isEmpty()) {
+        if (info.edges.isEmpty())
+        {
             remove(connVertex);
-        } else if (vertex.hasAugmentation) {
+        }
+        else if (vertex.hasAugmentation)
+        {
             vertex.augmentation = null;
             vertex.hasAugmentation = false;
-            for (EulerTourNode node = vertex.arbitraryVisit; node != null; node = node.parent) {
-                if (!node.augment()) {
+            for (EulerTourNode node = vertex.arbitraryVisit; node != null; node = node.parent)
+            {
+                if (!node.augment())
+                {
                     break;
                 }
             }
@@ -983,12 +1199,16 @@ public class ConnGraph {
      * Returns the augmentation associated with the specified vertex. Returns null if it does not have any associated
      * augmentation. At present, this method takes constant expected time. Contrast with getComponentAugmentation.
      */
-    public Object getVertexAugmentation(ConnVertex vertex) {
+    public Object getVertexAugmentation(ConnVertex vertex)
+    {
         assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
-        if (info != null) {
+        if (info != null)
+        {
             return info.vertex.augmentation;
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
@@ -998,12 +1218,16 @@ public class ConnGraph {
      * containing the specified vertex. Returns null if none of those vertices has any associated augmentation. This
      * method takes O(log N) time with high probability.
      */
-    public Object getComponentAugmentation(ConnVertex vertex) {
+    public Object getComponentAugmentation(ConnVertex vertex)
+    {
         assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
-        if (info != null) {
+        if (info != null)
+        {
             return info.vertex.arbitraryVisit.root().augmentation == null ? 0 : info.vertex.arbitraryVisit.root().augmentation;
-        } else {
+        }
+        else
+        {
             return 0;
         }
     }
@@ -1012,12 +1236,16 @@ public class ConnGraph {
      * Returns whether the specified vertex has any associated augmentation. At present, this method takes constant
      * expected time. Contrast with componentHasAugmentation.
      */
-    public boolean vertexHasAugmentation(ConnVertex vertex) {
+    public boolean vertexHasAugmentation(ConnVertex vertex)
+    {
         assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
-        if (info != null) {
+        if (info != null)
+        {
             return info.vertex.hasAugmentation;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -1026,12 +1254,16 @@ public class ConnGraph {
      * Returns whether any of the vertices in the connected component containing the specified vertex has any associated
      * augmentation. This method takes O(log N) time with high probability.
      */
-    public boolean componentHasAugmentation(ConnVertex vertex) {
+    public boolean componentHasAugmentation(ConnVertex vertex)
+    {
         assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
-        if (info != null) {
+        if (info != null)
+        {
             return info.vertex.arbitraryVisit.root().hasAugmentation;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -1040,7 +1272,8 @@ public class ConnGraph {
      * Clears this graph, by removing all edges and vertices, and removing all augmentation information from the
      * vertices.
      */
-    public void clear() {
+    public void clear()
+    {
         // Note that we construct a new HashMap rather than calling vertexInfo.clear() in order to ensure a reduction in
         // space
         vertexInfo = new HashMap<ConnVertex, VertexInfo>();
@@ -1052,19 +1285,25 @@ public class ConnGraph {
      * Pushes all forest edges as far down as possible, so that any further pushes would violate the constraint on the
      * size of connected components. The current implementation of this method takes O(V log^2 V) time.
      */
-    private void optimizeForestEdges() {
-        for (VertexInfo info : vertexInfo.values()) {
+    private void optimizeForestEdges()
+    {
+        for (VertexInfo info : vertexInfo.values())
+        {
             int level = maxLogVertexCountSinceRebuild;
             EulerTourVertex vertex;
-            for (vertex = info.vertex; vertex.lowerVertex != null; vertex = vertex.lowerVertex) {
+            for (vertex = info.vertex; vertex.lowerVertex != null; vertex = vertex.lowerVertex)
+            {
                 level--;
             }
 
-            while (vertex != null) {
+            while (vertex != null)
+            {
                 EulerTourNode node = vertex.arbitraryVisit;
                 ConnEdge edge = vertex.forestListHead;
-                while (edge != null) {
-                    if (vertex == edge.vertex2) {
+                while (edge != null)
+                {
+                    if (vertex == edge.vertex2)
+                    {
                         // We'll address this edge when we visit edge.vertex1
                         edge = edge.next2;
                         continue;
@@ -1073,22 +1312,30 @@ public class ConnGraph {
 
                     EulerTourVertex lowerVertex1 = vertex;
                     EulerTourVertex lowerVertex2 = edge.vertex2;
-                    for (int lowerLevel = level - 1; lowerLevel > 0; lowerLevel--) {
+                    for (int lowerLevel = level - 1; lowerLevel > 0; lowerLevel--)
+                    {
                         // Compute the total size if we combine the Euler tour trees
                         int combinedSize = 1;
-                        if (lowerVertex1.lowerVertex != null) {
+                        if (lowerVertex1.lowerVertex != null)
+                        {
                             combinedSize += lowerVertex1.lowerVertex.arbitraryVisit.root().size;
-                        } else {
+                        }
+                        else
+                        {
                             combinedSize++;
                         }
-                        if (lowerVertex2.lowerVertex != null) {
+                        if (lowerVertex2.lowerVertex != null)
+                        {
                             combinedSize += lowerVertex2.lowerVertex.arbitraryVisit.root().size;
-                        } else {
+                        }
+                        else
+                        {
                             combinedSize++;
                         }
 
                         // X EulerTourVertices = (2 * X - 1) EulerTourNodes
-                        if (combinedSize > 2 * (1 << lowerLevel) - 1) {
+                        if (combinedSize > 2 * (1 << lowerLevel) - 1)
+                        {
                             break;
                         }
 
@@ -1099,7 +1346,8 @@ public class ConnGraph {
                         edge.eulerTourEdge = lowerEdge;
                     }
 
-                    if (lowerVertex1 != vertex) {
+                    if (lowerVertex1 != vertex)
+                    {
                         // We pushed the edge down at least one level
                         removeFromLinkedLists(edge);
                         augmentAncestorFlags(node);
@@ -1125,15 +1373,20 @@ public class ConnGraph {
      * Pushes each non-forest edge down to the lowest level where the endpoints are in the same connected component. The
      * current implementation of this method takes O(V log V + E log V log log V) time.
      */
-    private void optimizeGraphEdges() {
-        for (VertexInfo info : vertexInfo.values()) {
+    private void optimizeGraphEdges()
+    {
+        for (VertexInfo info : vertexInfo.values())
+        {
             EulerTourVertex vertex;
-            for (vertex = info.vertex; vertex.lowerVertex != null; vertex = vertex.lowerVertex);
-            while (vertex != null) {
+            for (vertex = info.vertex; vertex.lowerVertex != null; vertex = vertex.lowerVertex) ;
+            while (vertex != null)
+            {
                 EulerTourNode node = vertex.arbitraryVisit;
                 ConnEdge edge = vertex.graphListHead;
-                while (edge != null) {
-                    if (vertex == edge.vertex2) {
+                while (edge != null)
+                {
+                    if (vertex == edge.vertex2)
+                    {
                         // We'll address this edge when we visit edge.vertex1
                         edge = edge.next2;
                         continue;
@@ -1145,32 +1398,39 @@ public class ConnGraph {
                     int maxLevelsDown = 0;
                     EulerTourVertex lowerVertex1 = vertex.lowerVertex;
                     EulerTourVertex lowerVertex2 = edge.vertex2.lowerVertex;
-                    while (lowerVertex1 != null && lowerVertex2 != null) {
+                    while (lowerVertex1 != null && lowerVertex2 != null)
+                    {
                         maxLevelsDown++;
                         lowerVertex1 = lowerVertex1.lowerVertex;
                         lowerVertex2 = lowerVertex2.lowerVertex;
                     }
                     EulerTourVertex levelVertex1 = vertex;
                     EulerTourVertex levelVertex2 = edge.vertex2;
-                    while (maxLevelsDown > 0) {
+                    while (maxLevelsDown > 0)
+                    {
                         int levelsDown = (maxLevelsDown + 1) / 2;
                         lowerVertex1 = levelVertex1;
                         lowerVertex2 = levelVertex2;
-                        for (int i = 0; i < levelsDown; i++) {
+                        for (int i = 0; i < levelsDown; i++)
+                        {
                             lowerVertex1 = lowerVertex1.lowerVertex;
                             lowerVertex2 = lowerVertex2.lowerVertex;
                         }
 
-                        if (lowerVertex1.arbitraryVisit.root() != lowerVertex2.arbitraryVisit.root()) {
+                        if (lowerVertex1.arbitraryVisit.root() != lowerVertex2.arbitraryVisit.root())
+                        {
                             maxLevelsDown = levelsDown - 1;
-                        } else {
+                        }
+                        else
+                        {
                             levelVertex1 = lowerVertex1;
                             levelVertex2 = lowerVertex2;
                             maxLevelsDown -= levelsDown;
                         }
                     }
 
-                    if (levelVertex1 != vertex) {
+                    if (levelVertex1 != vertex)
+                    {
                         removeFromLinkedLists(edge);
                         augmentAncestorFlags(node);
                         augmentAncestorFlags(edge.vertex2.arbitraryVisit);
@@ -1195,7 +1455,8 @@ public class ConnGraph {
      * optimize() when there is some downtime. Note that this method generally increases the amount of space the
      * ConnGraph uses, but not beyond the bound of O(V log V + E).
      */
-    public void optimize() {
+    public void optimize()
+    {
         // The current implementation of optimize() takes O(V log^2 V + E log V log log V) time
         rebuild();
         optimizeForestEdges();

@@ -1,22 +1,23 @@
 package esoterum;
 
-import arc.*;
-import arc.util.*;
+import arc.Events;
 import esoterum.graph.SignalGraph;
 import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.content.Items;
 import mindustry.game.EventType.*;
 import mindustry.gen.Building;
-import mindustry.mod.*;
-import mindustry.type.Category;
-import mindustry.type.ItemStack;
+import mindustry.mod.Mod;
+import mindustry.type.*;
 import mindustry.world.meta.BuildVisibility;
 
-public class Esoterum extends Mod{
+public class Esoterum extends Mod
+{
 
     public static boolean debug = false;
-    public Esoterum(){
+
+    public Esoterum()
+    {
         Events.on(ClientLoadEvent.class, event -> {
             EsoUI.init();
         });
@@ -27,9 +28,10 @@ public class Esoterum extends Mod{
     }
 
     @Override
-    public void loadContent(){
-
-        new SignalWire("signal-wire"){{
+    public void loadContent()
+    {
+        new SignalWire("signal-wire")
+        {{
             rotate = true;
             vertexCount = 4;
             setConns(0, 1, 2, 3);
@@ -37,7 +39,8 @@ public class Esoterum extends Mod{
             setOutputs(1, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalJunction("signal-junction"){{
+        new SignalJunction("signal-junction")
+        {{
             rotate = false;
             vertexCount = 2;
             setConns(0, 1, 0, 1);
@@ -45,7 +48,8 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalJunction("signal-cjunction"){{
+        new SignalJunction("signal-cjunction")
+        {{
             rotate = true;
             vertexCount = 2;
             setConns(0, 1, 1, 0);
@@ -53,7 +57,8 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalBlock("true-signal-router"){{
+        new SignalBlock("true-signal-router")
+        {{
             rotate = false;
             vertexCount = 1;
             hasGraph = false;
@@ -62,7 +67,8 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalRouter("signal-router"){{
+        new SignalRouter("signal-router")
+        {{
             rotate = true;
             vertexCount = 4;
             setConns(0, 1, 2, 3);
@@ -70,7 +76,8 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 0, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalBridge("signal-bridge"){{
+        new SignalBridge("signal-bridge")
+        {{
             rotate = false;
             vertexCount = 1;
             setConns(0, 0, 0, 0);
@@ -78,7 +85,8 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalSwitch("signal-switch"){{
+        new SignalSwitch("signal-switch")
+        {{
             rotate = false;
             vertexCount = 1;
             setConns(0, 0, 0, 0);
@@ -86,11 +94,12 @@ public class Esoterum extends Mod{
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("item-sensor"){{
+        new SignalGate("item-sensor")
+        {{
             vertexCount = 1;
             setInputs(0, 0, 0, 0);
             setOutputs(0, 1, 1, 1);
-            function = gate ->{
+            function = gate -> {
                 Building front = gate.front();
                 if (front != null && front.items() != null)
                 {
@@ -108,7 +117,8 @@ public class Esoterum extends Mod{
         //     debugDraw = true;
         // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("display"){{
+        new SignalGate("display")
+        {{
             vertexCount = 2;
             setConns(0, 0, 1, 0);
             setInputs(0, 0, 1, 0);
@@ -116,7 +126,8 @@ public class Esoterum extends Mod{
             function = gate -> (gate.signal[1] == 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("signal-diode"){{
+        new SignalGate("signal-diode")
+        {{
             vertexCount = 2;
             setConns(0, 0, 1, 0);
             setInputs(0, 0, 1, 0);
@@ -124,7 +135,8 @@ public class Esoterum extends Mod{
             function = gate -> (gate.signal[1] == 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("and-gate"){{
+        new SignalGate("and-gate")
+        {{
             vertexCount = 4;
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
@@ -137,7 +149,8 @@ public class Esoterum extends Mod{
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("or-gate"){{
+        new SignalGate("or-gate")
+        {{
             vertexCount = 4;
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
@@ -145,7 +158,8 @@ public class Esoterum extends Mod{
             function = gate -> (gate.signal[1] | gate.signal[2] | gate.signal[3]) == 1; // functionally a diode
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("not-gate"){{
+        new SignalGate("not-gate")
+        {{
             vertexCount = 4;
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
@@ -153,7 +167,8 @@ public class Esoterum extends Mod{
             function = gate -> (gate.signal[1] | gate.signal[2] | gate.signal[3]) != 1; // functionally NOR
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("xor-gate"){{
+        new SignalGate("xor-gate")
+        {{
             vertexCount = 4;
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
@@ -167,4 +182,9 @@ public class Esoterum extends Mod{
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
+    @Override
+    public void init()
+    {
+        new SettingsDialog(); // Initialize the settings dialog
+    }
 }

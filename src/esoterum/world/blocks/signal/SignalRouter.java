@@ -2,18 +2,24 @@ package esoterum.world.blocks.signal;
 
 import esoterum.graph.SignalGraph;
 
-public class SignalRouter extends SignalBlock {
-    public SignalRouter(String name){
+public class SignalRouter extends SignalBlock
+{
+    public SignalRouter(String name)
+    {
         super(name);
     }
 
-    public class SignalRouterBuild extends SignalBuild {
+    public class SignalRouterBuild extends SignalBuild
+    {
         @Override
-        public void updateTile(){
+        public void updateTile()
+        {
             super.updateTile();
-            for (int i=0;i<size*4;i++) if(outputs[i]==1){
-                SignalGraph.graph.setVertexAugmentation(v[i], signal[2]);
-            }
+            for (int i = 0; i < size * 4; i++)
+                if (outputs[i] == 1)
+                {
+                    SignalGraph.graph.setVertexAugmentation(v[i], signal[2]);
+                }
         }
     }
 }
