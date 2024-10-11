@@ -125,20 +125,32 @@ public class SignalBridge extends SignalBlock
                 {
                     float halfwayX = x / 2 + p.x * 4;
                     Lines.line(
+                            x, y + 2,
+                            halfwayX, y + 2,
+                            true
+                    );
+
+                    Lines.line(
+                            halfwayX, y + 2,
+                            halfwayX, p.y * 8 + 2,
+                            true
+                    );
+
+                    Lines.line(
+                            halfwayX, p.y * 8 + 2,
+                            p.x * 8, p.y * 8 + 2,
+                            true
+                    );
+
+                    Lines.line(
                             x, y,
-                            halfwayX, y,
+                            x, y + 2,
                             true
                     );
 
                     Lines.line(
-                            halfwayX, y,
-                            halfwayX, p.y * 8,
-                            true
-                    );
-
-                    Lines.line(
-                            halfwayX, p.y * 8,
                             p.x * 8, p.y * 8,
+                            p.x * 8, p.y * 8 + 2,
                             true
                     );
                 }
