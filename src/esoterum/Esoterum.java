@@ -47,7 +47,7 @@ public class Esoterum extends Mod{
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalJunction("signal-cjunction"){{
-            rotate = false;
+            rotate = true;
             vertexCount = 2;
             setConns(0, 1, 1, 0);
             setInputs(1, 1, 1, 1);

@@ -33,10 +33,10 @@ public class SignalJunction extends SignalBlock{
             super.drawSignalRegions();
 
             Draw.color(signal[0] == 1? Pal.accent : Color.white);
-            Draw.rect(signalRegion1, x, y);
+            Draw.rect(signalRegion1, x, y, rotate ? rotdeg() : 0);
 
             Draw.color(signal[1] == 1 ? Pal.accent : Color.white);
-            Draw.rect(signalRegion2, x, y);
+            Draw.rect(signalRegion2, x, y, rotate ? rotdeg() : 0);
         }
     }
 }
