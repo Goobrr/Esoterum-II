@@ -50,11 +50,38 @@ public class SignalBlock extends Block
             tile.updateEdges();
         });
 
-        config(Point2[].class, (SignalBuild tile, Point2[] p) -> {
-            long i = (p[0].pack() << 32) | p[1].pack();
-            tile.shielding = tile.shielding ^ i;
+        config(PtLong[].class, (SignalBuild tile, PtLong[] p) -> {
+            long i = p[0].l;
+            tile.shielding = i;
             tile.updateEdges();
         });
+
+        config(Point2[].class, (SignalBuild tile, Point2[] p) -> {
+            long i = ((PtLong)p[0]).l;
+            tile.shielding = i;
+            tile.updateEdges();
+        });
+    }
+
+    public class PtLong extends Point2 {
+        public long l;
+
+        public PtLong(long i){
+            super();
+            l = i;
+        }
+
+        public PtLong(Point2 p){
+            x = p.x;
+            y = p.y;
+        }
+
+        @Override
+        public PtLong cpy(){
+            PtLong p = new PtLong(super.cpy());
+            p.l = l;
+            return p;
+        }
     }
 
     public void setInputs(int... indices)
@@ -306,8 +333,8 @@ public class SignalBlock extends Block
         }
 
         @Override
-        public Point2[] config(){
-            return new Point2[]{Point2.unpack((int)(shielding >> 32)), Point2.unpack((int)shielding)};
+        public PtLong[] config(){
+            return new PtLong[]{new PtLong(shielding)};
         }
 
         public void debugDraw()

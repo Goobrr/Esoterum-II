@@ -41,7 +41,7 @@ public class Esoterum extends Mod
 
         new SignalJunction("signal-junction")
         {{
-            rotate = false;
+            rotate = true;
             vertexCount = 2;
             setConns(0, 1, 0, 1);
             setInputs(1, 1, 1, 1);
@@ -59,7 +59,7 @@ public class Esoterum extends Mod
 
         new SignalBlock("true-signal-router")
         {{
-            rotate = false;
+            rotate = true;
             vertexCount = 1;
             hasGraph = false;
             setConns(0, 0, 0, 0);
@@ -78,7 +78,7 @@ public class Esoterum extends Mod
 
         new SignalBridge("signal-bridge")
         {{
-            rotate = false;
+            rotate = true;
             vertexCount = 1;
             setConns(0, 0, 0, 0);
             setInputs(1, 1, 1, 1);

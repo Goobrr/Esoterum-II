@@ -1,6 +1,7 @@
 package esoterum.graph;
 
 import java.util.*;
+import java.util.concurrent.*;;
 
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
@@ -123,7 +124,7 @@ public class ConnGraph
      * expected time and O(log N / log log N) time with high probability, because vertexInfo is a HashMap, and
      * ConnVertex.hashCode() returns a random integer.
      */
-    public Map<ConnVertex, VertexInfo> vertexInfo = new HashMap<ConnVertex, VertexInfo>();
+    public Map<ConnVertex, VertexInfo> vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>();
 
     /**
      * Ceiling of log base 2 of the maximum number of vertices in this graph since the last rebuild. This is 0 if that
@@ -217,7 +218,7 @@ public class ConnGraph
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy vertexInfo to a new HashMap, which will have a
             // suitable capacity.
-            vertexInfo = new HashMap<ConnVertex, VertexInfo>(vertexInfo);
+            vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>(vertexInfo);
             maxVertexInfoSize = vertexInfo.size();
         }
         if (vertexInfo.size() << REBUILD_CHANGE <= 1 << maxLogVertexCountSinceRebuild)
@@ -962,7 +963,7 @@ public class ConnGraph
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy srcInfo.edges to a new HashMap, which will have a
             // suitable capacity.
-            srcInfo.edges = new HashMap<ConnVertex, ConnEdge>(srcInfo.edges);
+            srcInfo.edges = new ConcurrentHashMap<ConnVertex, ConnEdge>(srcInfo.edges);
             srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size();
         }
         return edge;
@@ -1276,7 +1277,7 @@ public class ConnGraph
     {
         // Note that we construct a new HashMap rather than calling vertexInfo.clear() in order to ensure a reduction in
         // space
-        vertexInfo = new HashMap<ConnVertex, VertexInfo>();
+        vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>();
         maxLogVertexCountSinceRebuild = 0;
         maxVertexInfoSize = 0;
     }
