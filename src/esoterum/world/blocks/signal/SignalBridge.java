@@ -207,6 +207,7 @@ public class SignalBridge extends SignalBlock
         @Override
         public void write(Writes write)
         {
+            super.write(write);
             write.i(link.size);
             for (int i = 0; i < link.size; i++)
             {
@@ -217,6 +218,7 @@ public class SignalBridge extends SignalBlock
         @Override
         public void read(Reads read, byte revision)
         {
+            if (revision >= 4) super.read(read, revision);
             int s = read.i(), l;
             for (int i = 0; i < s; i++)
             {

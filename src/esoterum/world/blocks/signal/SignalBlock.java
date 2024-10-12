@@ -3,12 +3,18 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.geom.Point2;
 import arc.math.geom.Vec2;
+import arc.scene.ui.TextButton;
+import arc.scene.ui.layout.Table;
+import arc.util.Align;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
+import esoterum.world.blocks.signal.SignalBridge.SignalBridgeBuild;
 import mindustry.Vars;
 import mindustry.gen.Building;
+import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.world.Block;
@@ -16,7 +22,7 @@ import mindustry.world.Block;
 public class SignalBlock extends Block
 {
 
-    public TextureRegion bottomRegion, baseRegion, signalRegion;
+    public TextureRegion bottomRegion, baseRegion, signalRegion, shieldRegion;
 
     public TextureRegion[] inputSignalRegions, outputSignalRegions;
 
@@ -31,12 +37,18 @@ public class SignalBlock extends Block
     {
         super(name);
 
+        configurable = true;
         update = true;
         solid = true;
         size = 1;
         health = 60;
 
         category = Category.logic;
+
+        config(Long.class, (SignalBuild tile, Long i) -> {
+            tile.shielding = tile.shielding ^ i;
+            tile.updateEdges();
+        });
     }
 
     public void setInputs(int... indices)
@@ -66,6 +78,8 @@ public class SignalBlock extends Block
         baseRegion = Core.atlas.find(name + "-base", "eso-base-square");
 
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
+
+        shieldRegion = Core.atlas.find("eso-shielding", "eso-none");
 
         inputSignalRegions = new TextureRegion[size * 4];
         outputSignalRegions = new TextureRegion[size * 4];
@@ -112,6 +126,7 @@ public class SignalBlock extends Block
         public ConnVertex[] v = new ConnVertex[vertexCount];
         public int[] signal = new int[vertexCount];
         public boolean[] active = new boolean[size * 4];
+        public long shielding;
 
         public int[] inputs()
         {
@@ -158,11 +173,12 @@ public class SignalBlock extends Block
                 if (Vars.world.build((int) (x / 8 + offset.x + sideOffset.x), (int) (y / 8 + offset.y + sideOffset.y)) instanceof SignalBuild b)
                 {
                     int index = EdgeUtils.getOffsetIndex(b.size(), x / 8 + offset.x - b.x / 8, y / 8 + offset.y - b.y / 8, b.rotation);
-                    if ((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1)
+                    if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1l << i)) == 0) && ((b.shielding & (1l << index)) == 0))
                     {
                         SignalGraph.addEdge(v[conns[i]], b.v[b.conns()[index]]);
                         active[i] = true;
                     }
+                    b.active[index] = active[i];
                 }
             }
         }
@@ -225,7 +241,62 @@ public class SignalBlock extends Block
                     if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
                     if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
                 }
+                if ((shielding & (1l << i)) > 0){
+                    Draw.color(Color.white);
+                    Vec2 offset = EdgeUtils.getEdgeOffset(size, i, rotation);
+                    Vec2 sideOffset = EdgeUtils.getEdgeOffset(1, i / size, rotation);
+                    Draw.rect(shieldRegion, x + offset.x*8 - sideOffset.x*8, y + offset.y*8 - sideOffset.y*8, (int)(i / size + rotation) * 90);
+                }
             }
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            table.table().size(40f);
+            for(int i=size*6 - rotation*size - 1;i>=size*5 - rotation*size;i--) {
+                final int t = i % (size*4);
+                TextButton b = table.button((shielding & (1l << t)) > 0 ? ""+t : "X", () -> {
+                    configure(1l << t);
+                }).size(40f).tooltip("Toggle Shielding").get();
+                b.update(() -> {
+                    b.setText((shielding & (1l << t)) > 0 ? ""+t : "X");
+                });
+            }
+            table.row();
+            for(int i=0;i<size;i++) {
+                final int t1 = (6 * size + i - rotation*size) % (size*4);
+                TextButton b1 = table.button((shielding & (1l << t1)) > 0 ? ""+t1 : "X", () -> {
+                    configure(1l << t1);
+                }).size(40f).tooltip("Toggle Shielding").get();
+                b1.update(() -> {
+                    b1.setText((shielding & (1l << t1)) > 0 ? ""+t1 : "X");
+                });
+                for(int j=0;j<size;j++) table.table().size(40f);
+                final int t2 = (size*5 - i - 1 - rotation*size) % (size*4);
+                TextButton b2 = table.button((shielding & (1l << t2)) > 0 ? ""+t2 : "X", () -> {
+                    configure(1l << t2);
+                }).size(40f).tooltip("Toggle Shielding").get();
+                b2.update(() -> {
+                    b2.setText((shielding & (1l << t2)) > 0 ? ""+t2 : "X");
+                });
+                table.row();
+            }
+            table.table().size(40f);
+            for(int i=size*7 - rotation*size;i<size*8 - rotation*size;i++) {
+                final int t = i % (size*4);
+                TextButton b = table.button((shielding & (1l << t)) > 0 ? ""+t : "X", () -> {
+                    configure(1l << t);
+                }).size(40f).tooltip("Toggle Shielding").get();
+                b.update(() -> {
+                    b.setText((shielding & (1l << t)) > 0 ? ""+t : "X");
+                });
+            }
+        }
+
+        @Override
+        public void updateTableAlign(Table table){
+            Vec2 pos = Core.input.mouseScreen(x, y);
+            table.setPosition(pos.x, pos.y, Align.center);
         }
 
         public void debugDraw()
@@ -254,13 +325,14 @@ public class SignalBlock extends Block
         @Override
         public byte version()
         {
-            return 3;
+            return 4;
         }
 
         @Override
         public void write(Writes write)
         {
             super.write(write);
+            write.l(shielding);
             for (int i = 0; i < vertexCount; i++) write.i(signal[i]);
         }
 
@@ -268,7 +340,11 @@ public class SignalBlock extends Block
         public void read(Reads read, byte revision)
         {
             super.read(read, revision);
-            if (revision >= 3)
+            if (revision >= 4){
+                configure(read.l());
+                for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
+            }
+            else if (revision >= 3)
             {
                 for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
             }

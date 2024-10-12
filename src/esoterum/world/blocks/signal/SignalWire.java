@@ -24,7 +24,6 @@ public class SignalWire extends SignalBlock
 
             int c = 0;
             int last = -1;
-            bypass = false;
             for (int i = 0; i < size * 4; i++)
             {
                 active[i] = false;
@@ -33,7 +32,7 @@ public class SignalWire extends SignalBlock
                 if (Vars.world.build((int) (x / 8 + offset.x + sideOffset.x), (int) (y / 8 + offset.y + sideOffset.y)) instanceof SignalBuild b)
                 {
                     int index = EdgeUtils.getOffsetIndex(b.size(), x / 8 + offset.x - b.x / 8, y / 8 + offset.y - b.y / 8, b.rotation);
-                    if ((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1)
+                    if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1l << i)) == 0) && ((b.shielding & (1l << index)) == 0))
                     {
                         c += inputs[i];
                         last = i;
@@ -41,13 +40,15 @@ public class SignalWire extends SignalBlock
                         active[i] = true;
                     }
                     if ((b.outputs()[index] & outputs[i]) == 1) c += 2;
+                    b.active[index] = active[i];
                 }
             }
             if (c == 1)
             {
                 SignalGraph.addEdge(v[0], v[conns[last]]);
-                bypass = true;
-            }
+                if(bypass) SignalGraph.graph.setVertexAugmentation(v[0], 0);
+                else bypass = true;
+            } else bypass = false;
         }
 
         @Override
