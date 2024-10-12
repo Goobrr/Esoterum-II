@@ -72,6 +72,17 @@ public class SignalBridge extends SignalBlock
             }
         });
 
+        config(Point2[].class, (SignalBridgeBuild tile, Point2[] p) -> {
+            long l = ((PtLong)p[0]).l;
+            tile.shielding = tile.shielding = l;
+            tile.updateEdges();
+            for (int i=1;i<p.length;i++)
+            {
+                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add(p[i]).pack());
+                if (linkValid(tile.tile, other)) tile.configure(other.pos());
+            }
+        });
+
         configClear((SignalBridgeBuild tile) -> tile.link.clear());
     }
 
