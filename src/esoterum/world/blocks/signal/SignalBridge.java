@@ -61,10 +61,13 @@ public class SignalBridge extends SignalBlock
             }
         });
 
-        config(Point2[].class, (SignalBridgeBuild tile, Point2[] l) -> {
-            for (Point2 i : l)
+        config(Point2[].class, (SignalBridgeBuild tile, Point2[] p) -> {
+            long l = (p[0].pack() << 32) | p[1].pack();
+            tile.shielding = tile.shielding ^ l;
+            tile.updateEdges();
+            for (int i=2;i<p.length;i++)
             {
-                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add(i).pack());
+                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add(p[i]).pack());
                 if (linkValid(tile.tile, other)) tile.configure(other.pos());
             }
         });
@@ -196,10 +199,12 @@ public class SignalBridge extends SignalBlock
         @Override
         public Point2[] config()
         {
-            Point2[] p = new Point2[link.size];
-            for (int i = 0; i < link.size; i++)
+            Point2[] p = new Point2[link.size+2];
+            p[0] = Point2.unpack((int)(shielding >> 32));
+            p[1] = Point2.unpack((int)((shielding << 32) >> 32));
+            for (int i = 2; i < link.size+2; i++)
             {
-                p[i] = Point2.unpack(link.get(i)).sub(Point2.unpack(pos()));
+                p[i] = Point2.unpack(link.get(i-2)).sub(Point2.unpack(pos()));
             }
             return p;
         }

@@ -49,6 +49,12 @@ public class SignalBlock extends Block
             tile.shielding = tile.shielding ^ i;
             tile.updateEdges();
         });
+
+        config(Point2[].class, (SignalBuild tile, Point2[] p) -> {
+            long i = (p[0].pack() << 32) | p[1].pack();
+            tile.shielding = tile.shielding ^ i;
+            tile.updateEdges();
+        });
     }
 
     public void setInputs(int... indices)
@@ -297,6 +303,11 @@ public class SignalBlock extends Block
         public void updateTableAlign(Table table){
             Vec2 pos = Core.input.mouseScreen(x, y);
             table.setPosition(pos.x, pos.y, Align.center);
+        }
+
+        @Override
+        public Point2[] config(){
+            return new Point2[]{Point2.unpack((int)(shielding >> 32)), Point2.unpack((int)shielding)};
         }
 
         public void debugDraw()
