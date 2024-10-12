@@ -53,8 +53,7 @@ public class Esoterum extends Mod
         new SignalJunction("signal-cjunction")
         {{
             rotate = true;
-            rotateDraw = false;
-            drawArrow = false;
+
             vertexCount = 2;
             setConns(0, 1, 1, 0);
             setInputs(1, 1, 1, 1);
