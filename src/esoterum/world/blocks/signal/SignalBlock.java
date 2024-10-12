@@ -47,16 +47,11 @@ public class SignalBlock extends Block
             tile.updateEdges();
         });
 
-        config(PtLong[].class, (SignalBuild tile, PtLong[] p) -> {
-            long i = p[0].l;
-            tile.shielding = i;
-            tile.updateEdges();
-        });
-
-        config(Point2[].class, (SignalBuild tile, Point2[] p) -> {
-            long i = ((PtLong) p[0]).l;
-            tile.shielding = i;
-            tile.updateEdges();
+        config(Object[].class, (SignalBuild tile, Object[] p) -> {
+            if (p[0] instanceof Long l){
+                tile.shielding = tile.shielding = l;
+                tile.updateEdges();
+            }
         });
     }
 
@@ -133,31 +128,6 @@ public class SignalBlock extends Block
             {
                 conns[i] = 0;
             }
-        }
-    }
-
-    public class PtLong extends Point2
-    {
-        public long l;
-
-        public PtLong(long i)
-        {
-            super();
-            l = i;
-        }
-
-        public PtLong(Point2 p)
-        {
-            x = p.x;
-            y = p.y;
-        }
-
-        @Override
-        public PtLong cpy()
-        {
-            PtLong p = new PtLong(super.cpy());
-            p.l = l;
-            return p;
         }
     }
 
@@ -346,9 +316,9 @@ public class SignalBlock extends Block
         }
 
         @Override
-        public PtLong[] config()
+        public Object[] config()
         {
-            return new PtLong[]{new PtLong(shielding)};
+            return new Object[]{shielding};
         }
 
         public void debugDraw()

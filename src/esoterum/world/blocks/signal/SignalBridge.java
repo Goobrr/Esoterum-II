@@ -61,24 +61,14 @@ public class SignalBridge extends SignalBlock
             }
         });
 
-        config(PtLong[].class, (SignalBridgeBuild tile, PtLong[] p) -> {
-            long l = p[0].l;
-            tile.shielding = tile.shielding = l;
-            tile.updateEdges();
-            for (int i = 1; i < p.length; i++)
-            {
-                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add(p[i]).pack());
-                if (linkValid(tile.tile, other)) tile.configure(other.pos());
+        config(Object[].class, (SignalBridgeBuild tile, Object[] p) -> {
+            if (p[0] instanceof Long l){
+                tile.shielding = tile.shielding = l;
+                tile.updateEdges();
             }
-        });
-
-        config(Point2[].class, (SignalBridgeBuild tile, Point2[] p) -> {
-            long l = ((PtLong) p[0]).l;
-            tile.shielding = tile.shielding = l;
-            tile.updateEdges();
             for (int i = 1; i < p.length; i++)
             {
-                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add(p[i]).pack());
+                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2)p[i]).pack());
                 if (linkValid(tile.tile, other)) tile.configure(other.pos());
             }
         });
@@ -208,13 +198,13 @@ public class SignalBridge extends SignalBlock
         }
 
         @Override
-        public PtLong[] config()
+        public Object[] config()
         {
-            PtLong[] p = new PtLong[link.size + 1];
-            p[0] = new PtLong(shielding);
+            Object[] p = new Object[link.size + 1];
+            p[0] = shielding;
             for (int i = 1; i < link.size + 1; i++)
             {
-                p[i] = new PtLong(Point2.unpack(link.get(i - 1)).sub(Point2.unpack(pos())));
+                p[i] = Point2.unpack(link.get(i - 1)).sub(Point2.unpack(pos()));
             }
             return p;
         }
