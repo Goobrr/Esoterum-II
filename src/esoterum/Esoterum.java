@@ -117,13 +117,12 @@ public class Esoterum extends Mod
         //     debugDraw = true;
         // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("display")
+        new SignalBlock("display")
         {{
-            vertexCount = 2;
-            setConns(0, 0, 1, 0);
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
             setInputs(0, 0, 1, 0);
             setOutputs(1, 0, 0, 0);
-            function = gate -> (gate.signal[1] == 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("signal-diode")
