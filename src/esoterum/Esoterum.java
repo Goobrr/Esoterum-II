@@ -120,6 +120,7 @@ public class Esoterum extends Mod
         new SignalBlock("display")
         {{
             vertexCount = 1;
+            hasGraph = false;
             setConns(0, 0, 0, 0);
             setInputs(0, 0, 1, 0);
             setOutputs(1, 0, 0, 0);
