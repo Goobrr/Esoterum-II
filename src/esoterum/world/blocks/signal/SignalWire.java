@@ -46,9 +46,10 @@ public class SignalWire extends SignalBlock
             if (c == 1)
             {
                 SignalGraph.addEdge(v[0], v[conns[last]]);
-                if(bypass) SignalGraph.graph.setVertexAugmentation(v[0], 0);
+                if (bypass) SignalGraph.graph.setVertexAugmentation(v[0], 0);
                 else bypass = true;
-            } else bypass = false;
+            }
+            else bypass = false;
         }
 
         @Override

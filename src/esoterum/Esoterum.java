@@ -42,6 +42,8 @@ public class Esoterum extends Mod
         new SignalJunction("signal-junction")
         {{
             rotate = true;
+            rotateDraw = false;
+            drawArrow = false;
             vertexCount = 2;
             setConns(0, 1, 0, 1);
             setInputs(1, 1, 1, 1);
@@ -51,6 +53,8 @@ public class Esoterum extends Mod
         new SignalJunction("signal-cjunction")
         {{
             rotate = true;
+            rotateDraw = false;
+            drawArrow = false;
             vertexCount = 2;
             setConns(0, 1, 1, 0);
             setInputs(1, 1, 1, 1);
@@ -60,6 +64,8 @@ public class Esoterum extends Mod
         new SignalBlock("true-signal-router")
         {{
             rotate = true;
+            rotateDraw = false;
+            drawArrow = false;
             vertexCount = 1;
             hasGraph = false;
             setConns(0, 0, 0, 0);
@@ -79,6 +85,8 @@ public class Esoterum extends Mod
         new SignalBridge("signal-bridge")
         {{
             rotate = true;
+            rotateDraw = false;
+            drawArrow = false;
             vertexCount = 1;
             setConns(0, 0, 0, 0);
             setInputs(1, 1, 1, 1);
@@ -110,15 +118,10 @@ public class Esoterum extends Mod
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        // new SignalChipBlock("test-chip"){{
-        //     size = 2;
-        //     setInputs(4, 5);
-        //     setOutputs(0, 1);
-        //     debugDraw = true;
-        // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
-
         new SignalBlock("display")
         {{
+            rotate = true;
+
             vertexCount = 2;
             hasGraph = false;
             setConns(0, 0, 0, 0);
