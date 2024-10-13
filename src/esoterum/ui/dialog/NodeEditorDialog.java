@@ -46,7 +46,7 @@ public class NodeEditorDialog extends BaseDialog
             t.table(Tex.button, t1 -> {
 
             }).size(scaleUnit * 1.5f, scaleUnit * 4);
-            ;
+
             t.table(Tex.button, t2 -> {
 
             }).size(scaleUnit * 4);

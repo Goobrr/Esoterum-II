@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
-import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
@@ -50,8 +49,9 @@ public class SignalBlock extends Block
         });
 
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
-            if (p[0] instanceof Long l){
-                tile.shielding = tile.shielding = l;
+            if (p[0] instanceof Long l)
+            {
+                tile.shielding = l;
                 tile.updateEdges();
             }
         });
@@ -134,16 +134,19 @@ public class SignalBlock extends Block
     }
 
     @Override
-    public Object pointConfig(Object config, arc.func.Cons<Point2> transformer) {
-        if(config instanceof Object[] configs){
+    public Object pointConfig(Object config, arc.func.Cons<Point2> transformer)
+    {
+        if (config instanceof Object[] configs)
+        {
             Object[] result = new Object[configs.length];
-            for (int i=0;i<configs.length;i++){
+            for (int i = 0; i < configs.length; i++)
+            {
                 result[i] = BuildPlan.pointConfig(this, configs[i], transformer);
             }
             return result;
         }
         return config;
-    };
+    }
 
     public class SignalBuild extends Building
     {
@@ -381,15 +384,11 @@ public class SignalBlock extends Block
                 configure(read.l());
                 for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
             }
-            else if (revision >= 3)
+            else if (revision == 3)
             {
                 for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
             }
-            else if (revision >= 2)
-            {
-
-            }
-            else if (revision >= 1 && hasGraph)
+            else if (revision == 1 && hasGraph)
             {
                 read.i();
                 read.bool();

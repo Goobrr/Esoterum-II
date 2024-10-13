@@ -39,7 +39,7 @@ class Reference<T>
 }
 
 /**
- * A node in a red-black tree ( https://en.wikipedia.org/wiki/Red%E2%80%93black_tree ). Compared to a class like Java's
+ * A node in a red-black tree ( <a href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree">...</a> ). Compared to a class like Java's
  * TreeMap, RedBlackNode is a low-level data structure. The internals of a node are exposed as public fields, allowing
  * clients to directly observe and manipulate the structure of the tree. This gives clients flexibility, although it
  * also enables them to violate the red-black or BST properties. The RedBlackNode class provides methods for performing
@@ -1151,7 +1151,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
      * same tree as splitNode. It takes O(log N) time. It is considerably more efficient than removing all of the
      * nodes at or after splitNode and then creating a new tree from those nodes.
      *
-     * @param The node at which to split the tree.
+     * @param splitNode The node at which to split the tree.
      * @return An array consisting of the resulting trees.
      */
     public N[] split(N splitNode)
@@ -1605,7 +1605,6 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
             {
                 throw new RuntimeException("Not all root-to-leaf paths have the same number of black nodes");
             }
-            return;
         }
         else if (!visited.add(new Reference<N>(nThis)))
         {

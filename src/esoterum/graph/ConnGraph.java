@@ -3,8 +3,6 @@ package esoterum.graph;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-;
-
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
  * whether two vertices are connected - whether there is a path between them. Adding and removing edges take O(log^2 N)

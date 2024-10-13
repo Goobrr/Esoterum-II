@@ -62,13 +62,14 @@ public class SignalBridge extends SignalBlock
         });
 
         config(Object[].class, (SignalBridgeBuild tile, Object[] p) -> {
-            if (p[0] instanceof Long l){
-                tile.shielding = tile.shielding = l;
+            if (p[0] instanceof Long l)
+            {
+                tile.shielding = l;
                 tile.updateEdges();
             }
             for (int i = 1; i < p.length; i++)
             {
-                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2)p[i]).pack());
+                Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2) p[i]).pack());
                 if (linkValid(tile.tile, other)) tile.configure(other.pos());
             }
         });
