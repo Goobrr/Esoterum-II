@@ -7,10 +7,12 @@ import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
 import mindustry.Vars;
+import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
@@ -130,6 +132,18 @@ public class SignalBlock extends Block
             }
         }
     }
+
+    @Override
+    public Object pointConfig(Object config, arc.func.Cons<Point2> transformer) {
+        if(config instanceof Object[] configs){
+            Object[] result = new Object[configs.length];
+            for (int i=0;i<configs.length;i++){
+                result[i] = BuildPlan.pointConfig(this, configs[i], transformer);
+            }
+            return result;
+        }
+        return config;
+    };
 
     public class SignalBuild extends Building
     {
