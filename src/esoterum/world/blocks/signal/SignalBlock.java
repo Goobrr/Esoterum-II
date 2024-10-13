@@ -148,6 +148,16 @@ public class SignalBlock extends Block
         return config;
     }
 
+    public Color getWireOffColor()
+    {
+        return Color.white;
+    }
+
+    public Color getWireColor()
+    {
+        return Pal.accent;
+    }
+
     public class SignalBuild extends Building
     {
         public ConnVertex[] v = new ConnVertex[vertexCount];
@@ -256,7 +266,7 @@ public class SignalBlock extends Block
 
         public void drawSignalRegions()
         {
-            Draw.color(signal[0] == 1 ? Pal.accent : Color.white);
+            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
 
             Draw.rect(signalRegion, x, y, rotation * 90);
 
@@ -264,13 +274,13 @@ public class SignalBlock extends Block
             {
                 if (active[i])
                 {
-                    Draw.color(signal[conns[i]] == 1 ? Pal.accent : Color.white);
+                    Draw.color(signal[conns[i]] == 1 ? getWireColor() : getWireOffColor());
                     if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
                     if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
                 }
                 if ((shielding & (1l << i)) > 0)
                 {
-                    Draw.color(Color.white);
+                    Draw.color(getWireOffColor());
                     Vec2 offset = EdgeUtils.getEdgeOffset(size, i, rotation);
                     Vec2 sideOffset = EdgeUtils.getEdgeOffset(1, i / size, rotation);
                     Draw.rect(shieldRegion, x + offset.x * 8 - sideOffset.x * 8, y + offset.y * 8 - sideOffset.y * 8, (int) (i / size + rotation) * 90);
@@ -357,7 +367,7 @@ public class SignalBlock extends Block
             {
                 Vec2 p = EdgeUtils.getEdgeOffset(size, index, rotation);
 
-                DrawUtils.text((tile.x + p.x) * 8, (tile.y + p.y) * 8, Pal.accent, String.valueOf(index));
+                DrawUtils.text((tile.x + p.x) * 8, (tile.y + p.y) * 8, getWireColor(), String.valueOf(index));
             }
         }
 

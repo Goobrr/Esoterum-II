@@ -16,7 +16,6 @@ import mindustry.world.Tile;
 
 public class SignalBridge extends SignalBlock
 {
-
     int range = 100;
 
     public SignalBridge(String name)

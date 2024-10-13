@@ -117,7 +117,7 @@ public class Esoterum extends Mod
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalBlock("display")
+        new SignalDisplay("display")
         {{
             rotate = true;
 
