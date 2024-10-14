@@ -25,9 +25,10 @@ public class SignalGate extends SignalBlock
         baseRegion = Core.atlas.find(name + "-base", "eso-default-gate-base");
 
         outputSignalRegions = new TextureRegion[size * 4];
-        for (int i : outputs)
+        for (int i = 0; i < outputs.length; i++)
         {
-            outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
+            if (outputs[i] == 1)
+                outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
         }
     }
 

@@ -21,7 +21,8 @@ public class SettingsDialog
 {
     public SettingsDialog()
     {
-        if(!headless){
+        if (!headless)
+        {
             ui.settings.hidden(this::run);
             ui.settings.addCategory("@category.eso.name", Icon.settings, table -> {
                 table.pref(new LabelSetting("displayoffcolor"));

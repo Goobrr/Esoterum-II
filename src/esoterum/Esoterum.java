@@ -104,6 +104,7 @@ public class Esoterum extends Mod
         new SignalGate("item-sensor")
         {{
             vertexCount = 1;
+            setConns(0, 0, 0, 0);
             setInputs(0, 0, 0, 0);
             setOutputs(0, 1, 1, 1);
             function = gate -> {

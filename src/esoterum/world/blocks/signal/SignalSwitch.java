@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.util.io.*;
 import esoterum.graph.SignalGraph;
 import mindustry.world.Block;
-import mindustry.world.meta.BlockGroup;
 
 public class SignalSwitch extends SignalBlock
 {
@@ -19,11 +18,12 @@ public class SignalSwitch extends SignalBlock
         configurable = true;
         hasGraph = false;
 
-        group = BlockGroup.logic; // Thank you so much Anuke for spaghetti code
+        alwaysReplace = true;
+        replaceable = true;
 
         config(Boolean.class, (b, s) -> {
             b.enabled = s;
-            SignalGraph.graph.setVertexAugmentation(((SignalSwitchBuild) b).v[0], b.enabled ? 0 : 1);
+            SignalGraph.graph.setVertexAugmentation(((SignalSwitchBuild) b).v[0], s ? 0 : 1);
         });
 
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
@@ -63,6 +63,14 @@ public class SignalSwitch extends SignalBlock
         {
             configure(!enabled);
             return false;
+        }
+
+        @Override
+        public void update()
+        {
+            super.update();
+
+            SignalGraph.graph.setVertexAugmentation(this.v[0], enabled ? 0 : 1);
         }
 
         @Override
