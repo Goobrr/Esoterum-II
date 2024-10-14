@@ -21,44 +21,46 @@ public class SettingsDialog
 {
     public SettingsDialog()
     {
-        ui.settings.hidden(this::run);
-        ui.settings.addCategory("@category.eso.name", Icon.settings, table -> {
-            table.pref(new LabelSetting("displayoffcolor"));
+        if(!headless){
+            ui.settings.hidden(this::run);
+            ui.settings.addCategory("@category.eso.name", Icon.settings, table -> {
+                table.pref(new LabelSetting("displayoffcolor"));
 
-            settings.defaults("displayroff", 255);
-            settings.defaults("displaygoff", 255);
-            settings.defaults("displayboff", 255);
+                settings.defaults("displayroff", 255);
+                settings.defaults("displaygoff", 255);
+                settings.defaults("displayboff", 255);
 
-            Cons<Integer> offChanged = e -> EsoVars.displayOffColor = GetOffColor();
+                Cons<Integer> offChanged = e -> EsoVars.displayOffColor = GetOffColor();
 
-            ColorSliderSetting rOffSlider = new ColorSliderSetting(0, 255, 1, "displayroff", true, false, false, false, offChanged, this::GetOffColor);
-            ColorSliderSetting gOffSlider = new ColorSliderSetting(0, 255, 1, "displaygoff", false, true, false, false, offChanged, this::GetOffColor);
-            ColorSliderSetting bOffSlider = new ColorSliderSetting(0, 255, 1, "displayboff", false, false, true, true, offChanged, this::GetOffColor);
+                ColorSliderSetting rOffSlider = new ColorSliderSetting(0, 255, 1, "displayroff", true, false, false, false, offChanged, this::GetOffColor);
+                ColorSliderSetting gOffSlider = new ColorSliderSetting(0, 255, 1, "displaygoff", false, true, false, false, offChanged, this::GetOffColor);
+                ColorSliderSetting bOffSlider = new ColorSliderSetting(0, 255, 1, "displayboff", false, false, true, true, offChanged, this::GetOffColor);
 
-            table.pref(rOffSlider);
-            table.pref(gOffSlider);
-            table.pref(bOffSlider);
+                table.pref(rOffSlider);
+                table.pref(gOffSlider);
+                table.pref(bOffSlider);
 
-            table.pref(new LabelSetting("displaycolor"));
+                table.pref(new LabelSetting("displaycolor"));
 
-            settings.defaults("displayr", (int) (Pal.accent.r * 255f));
-            settings.defaults("displayg", (int) (Pal.accent.g * 255f));
-            settings.defaults("displayb", (int) (Pal.accent.b * 255f));
+                settings.defaults("displayr", (int) (Pal.accent.r * 255f));
+                settings.defaults("displayg", (int) (Pal.accent.g * 255f));
+                settings.defaults("displayb", (int) (Pal.accent.b * 255f));
 
-            Cons<Integer> onChanged = e -> EsoVars.displayColor = GetColor();
+                Cons<Integer> onChanged = e -> EsoVars.displayColor = GetColor();
 
-            ColorSliderSetting rSlider = new ColorSliderSetting(0, 255, 1, "displayr", true, false, false, false, onChanged, this::GetColor);
-            ColorSliderSetting gSlider = new ColorSliderSetting(0, 255, 1, "displayg", false, true, false, false, onChanged, this::GetColor);
-            ColorSliderSetting bSlider = new ColorSliderSetting(0, 255, 1, "displayb", false, false, true, true, onChanged, this::GetColor);
+                ColorSliderSetting rSlider = new ColorSliderSetting(0, 255, 1, "displayr", true, false, false, false, onChanged, this::GetColor);
+                ColorSliderSetting gSlider = new ColorSliderSetting(0, 255, 1, "displayg", false, true, false, false, onChanged, this::GetColor);
+                ColorSliderSetting bSlider = new ColorSliderSetting(0, 255, 1, "displayb", false, false, true, true, onChanged, this::GetColor);
 
-            table.pref(rSlider);
-            table.pref(gSlider);
-            table.pref(bSlider);
+                table.pref(rSlider);
+                table.pref(gSlider);
+                table.pref(bSlider);
 
-            table.checkPref("manhattannode", true);
-        });
+                table.checkPref("manhattannode", true);
+            });
 
-        run();
+            run();
+        }
     }
 
     private Slider.SliderStyle CopyStyle(Slider.SliderStyle style)
