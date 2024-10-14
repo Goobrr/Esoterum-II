@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
@@ -47,6 +48,7 @@ public class SignalBlock extends Block
         config(Long.class, (SignalBuild tile, Long i) -> {
             tile.shielding = tile.shielding ^ i;
             tile.updateEdges();
+            Log.info("config Long");
         });
 
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
@@ -55,6 +57,7 @@ public class SignalBlock extends Block
                 tile.shielding = l;
                 tile.updateEdges();
             }
+            Log.info("config Object[]");
         });
     }
 
