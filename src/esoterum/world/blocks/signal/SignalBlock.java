@@ -40,6 +40,7 @@ public class SignalBlock extends Block
         solid = true;
         size = 1;
         health = 60;
+        sync = true;
 
         category = Category.logic;
 
