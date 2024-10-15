@@ -32,14 +32,14 @@ public class SignalBridge extends SignalBlock
             if (other == null) return;
             if (tile.link.contains(i))
             {
-                Log.info("remove bridge " + p);
+                // Log.info("remove bridge " + p);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.removeEdge(tile.v[0], other.v[0]);
             }
             else if (i != tile.pos())
             {
-                Log.info("add bridge " + p);
+                // Log.info("add bridge " + p);
                 tile.link.add(i);
                 other.link.add(tile.pos());
                 SignalGraph.addEdge(tile.v[0], other.v[0]);
@@ -51,14 +51,14 @@ public class SignalBridge extends SignalBlock
             if(other == null) return;
             if (tile.link.contains(i))
             {
-                Log.info("remove bridge " + i);
+                // Log.info("remove bridge " + i);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.removeEdge(tile.v[0], other.v[0]);
             }
             else if (i != tile.pos())
             {
-                Log.info("add bridge " + i);
+                // Log.info("add bridge " + i);
                 tile.link.add(i);
                 other.link.add(tile.pos());
                 SignalGraph.addEdge(tile.v[0], other.v[0]);
@@ -69,14 +69,22 @@ public class SignalBridge extends SignalBlock
             if (p[0] instanceof Long l)
             {
                 tile.shielding = l;
-                Log.info("set shielding " + l);
+                // Log.info("set shielding " + l);
                 tile.updateEdges();
             }
             for (int i = 1; i < p.length; i++)
             {
-                Log.info("bulk config " + i + ": " + p);
+                // Log.info("bulk config " + i + ": " + p[i]);
                 Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2) p[i]).pack());
-                if (linkValid(tile.tile, other)) tile.configure(other.pos());
+                if (linkValid(tile.tile, other)) {
+                    if (other.pos() != tile.pos() && other.build instanceof SignalBridgeBuild b)
+                    {
+                        // Log.info("add bridge " + other.pos());
+                        tile.link.add(b.pos());
+                        b.link.add(tile.pos());
+                        SignalGraph.addEdge(tile.v[0], b.v[0]);
+                    }
+                }
             }
         });
 
@@ -232,11 +240,22 @@ public class SignalBridge extends SignalBlock
         {
             if (revision >= 4) super.read(read, revision);
             int s = read.i(), l;
+            link.clear();
             for (int i = 0; i < s; i++)
             {
                 l = read.i();
-                if (linkValid(tile, Vars.world.tile(l))) configure(l);
+                if (linkValid(tile, Vars.world.tile(l))) {
+                    SignalBridgeBuild other = (SignalBridgeBuild) Vars.world.build(l);
+                    if(other == null) return;
+                    if (l != tile.pos())
+                    {
+                        link.add(l);
+                        other.link.add(pos());
+                        SignalGraph.addEdge(v[0], other.v[0]);
+                    }
+                }
             }
+            updateEdges();
         }
     }
 }

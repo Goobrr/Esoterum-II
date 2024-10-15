@@ -41,12 +41,11 @@ public class SignalBlock extends Block
         solid = true;
         size = 1;
         health = 60;
-        sync = true;
 
         category = Category.logic;
 
         config(Long.class, (SignalBuild tile, Long i) -> {
-            Log.info("toggle shielding " + i);
+            // Log.info("toggle shielding " + i);
             tile.shielding = tile.shielding ^ i;
             tile.updateEdges();
             //Log.info("config Long");
@@ -55,7 +54,7 @@ public class SignalBlock extends Block
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
             if (p[0] instanceof Long l)
             {
-                Log.info("set shielding " + l);
+                // Log.info("set shielding " + l);
                 tile.shielding = l;
                 tile.updateEdges();
             }
@@ -397,8 +396,9 @@ public class SignalBlock extends Block
             super.read(read, revision);
             if (revision >= 4)
             {
-                configure(read.l());
+                shielding = read.l();
                 for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
+                updateEdges();
             }
             else if (revision == 3)
             {
