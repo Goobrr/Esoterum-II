@@ -46,6 +46,7 @@ public class SignalBlock extends Block
         category = Category.logic;
 
         config(Long.class, (SignalBuild tile, Long i) -> {
+            Log.info("toggle shielding " + i);
             tile.shielding = tile.shielding ^ i;
             tile.updateEdges();
             //Log.info("config Long");
@@ -54,6 +55,7 @@ public class SignalBlock extends Block
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
             if (p[0] instanceof Long l)
             {
+                Log.info("set shielding " + l);
                 tile.shielding = l;
                 tile.updateEdges();
             }

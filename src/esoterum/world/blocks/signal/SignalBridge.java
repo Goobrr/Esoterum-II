@@ -32,13 +32,14 @@ public class SignalBridge extends SignalBlock
             if (other == null) return;
             if (tile.link.contains(i))
             {
-                Log.info("remove");
+                Log.info("remove bridge " + p);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.removeEdge(tile.v[0], other.v[0]);
             }
             else if (i != tile.pos())
             {
+                Log.info("add bridge " + p);
                 tile.link.add(i);
                 other.link.add(tile.pos());
                 SignalGraph.addEdge(tile.v[0], other.v[0]);
@@ -50,13 +51,14 @@ public class SignalBridge extends SignalBlock
             if(other == null) return;
             if (tile.link.contains(i))
             {
-                Log.info("remove");
+                Log.info("remove bridge " + i);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.removeEdge(tile.v[0], other.v[0]);
             }
             else if (i != tile.pos())
             {
+                Log.info("add bridge " + i);
                 tile.link.add(i);
                 other.link.add(tile.pos());
                 SignalGraph.addEdge(tile.v[0], other.v[0]);
@@ -67,10 +69,12 @@ public class SignalBridge extends SignalBlock
             if (p[0] instanceof Long l)
             {
                 tile.shielding = l;
+                Log.info("set shielding " + l);
                 tile.updateEdges();
             }
             for (int i = 1; i < p.length; i++)
             {
+                Log.info("bulk config " + i + ": " + p);
                 Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2) p[i]).pack());
                 if (linkValid(tile.tile, other)) tile.configure(other.pos());
             }
