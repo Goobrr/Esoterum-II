@@ -46,6 +46,7 @@ public class SignalBridge extends SignalBlock
 
         config(Integer.class, (SignalBridgeBuild tile, Integer i) -> {
             SignalBridgeBuild other = (SignalBridgeBuild) Vars.world.build(i);
+            if(other == null) return;
             if (tile.link.contains(i))
             {
                 tile.link.removeValue(i);

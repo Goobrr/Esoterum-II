@@ -48,7 +48,7 @@ public class SignalBlock extends Block
         config(Long.class, (SignalBuild tile, Long i) -> {
             tile.shielding = tile.shielding ^ i;
             tile.updateEdges();
-            Log.info("config Long");
+            //Log.info("config Long");
         });
 
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
@@ -57,7 +57,7 @@ public class SignalBlock extends Block
                 tile.shielding = l;
                 tile.updateEdges();
             }
-            Log.info("config Object[]");
+            //Log.info("config Object[]");
         });
     }
 
