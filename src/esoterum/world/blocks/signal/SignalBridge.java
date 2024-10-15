@@ -32,6 +32,7 @@ public class SignalBridge extends SignalBlock
             if (other == null) return;
             if (tile.link.contains(i))
             {
+                Log.info("remove");
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.removeEdge(tile.v[0], other.v[0]);
@@ -49,6 +50,7 @@ public class SignalBridge extends SignalBlock
             if(other == null) return;
             if (tile.link.contains(i))
             {
+                Log.info("remove");
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.removeEdge(tile.v[0], other.v[0]);
