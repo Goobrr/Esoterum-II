@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
-import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
