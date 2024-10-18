@@ -1,9 +1,22 @@
 package esoterum.graph;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import esoterum.world.blocks.signal.SignalBlock;
+import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
+import mindustry.Vars;
+import mindustry.world.Tile;
 
 public class SignalGraph
 {
+    public static int n;
+    public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    public static Runnable updater = () -> SignalGraph.updateTiles();
+    public static ScheduledFuture<?> updateHandle;
+    
     private static final Augmentation AUGMENTATION = new Augmentation()
     {
         @Override
@@ -61,5 +74,25 @@ public class SignalGraph
         {
             graph.removeEdge(v, u);
         }
+    }
+
+    public static void updateTiles(){
+        int c = 0;
+        for (Tile t : Vars.world.tiles){
+            if(t.build instanceof SignalBuild b){
+                c++;
+                b.updateSignal();
+            }
+            if(c == n) break;
+        }
+    }
+
+    public static void run(boolean b){
+        if (b) updateHandle = scheduler.scheduleAtFixedRate(updater, 0, 1, TimeUnit.NANOSECONDS);
+        else if (updateHandle != null) updateHandle.cancel(false);
+    }
+
+    public static int getAugment(ConnVertex v){
+        return (int)graph.getVertexAugmentation(v);
     }
 }

@@ -35,9 +35,9 @@ public class SignalGate extends SignalBlock
     public class SignalGateBuild extends SignalBuild
     {
         @Override
-        public void updateTile()
+        public void updateSignal()
         {
-            super.updateTile();
+            super.updateSignal();
             SignalGraph.graph.setVertexAugmentation(v[0], function.get(this) ? 1 : 0);
         }
     }

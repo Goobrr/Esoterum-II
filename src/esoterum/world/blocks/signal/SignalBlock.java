@@ -194,6 +194,7 @@ public class SignalBlock extends Block
         public void created()
         {
             super.created();
+            SignalGraph.n++;
             if (!this.block.rotate) rotation(0);
 
             for (int i = 0; i < vertexCount; i++)
@@ -228,12 +229,12 @@ public class SignalBlock extends Block
         @Override
         public void onRemoved()
         {
+            SignalGraph.n--;
             for (int i = 0; i < vertexCount; i++) SignalGraph.removeVertex(this, i);
             super.onRemoved();
         }
 
-        @Override
-        public void updateTile()
+        public void updateSignal()
         {
             for (int i = 0; i < vertexCount; i++) signal[i] = (int) SignalGraph.graph.getComponentAugmentation(v[i]);
         }

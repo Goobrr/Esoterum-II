@@ -5,6 +5,7 @@ import esoterum.graph.SignalGraph;
 import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.content.Items;
+import mindustry.core.GameState.State;
 import mindustry.game.EventType.*;
 import mindustry.gen.Building;
 import mindustry.mod.Mod;
@@ -17,13 +18,25 @@ public class Esoterum extends Mod
     public static boolean debug = false;
 
     public Esoterum()
-    {
+    {        
         Events.on(ClientLoadEvent.class, event -> {
             EsoUI.init();
         });
 
         Events.on(WorldLoadBeginEvent.class, event -> {
             SignalGraph.graph.clear();
+            SignalGraph.n = 0;
+        });
+
+        
+        Events.on(StateChangeEvent.class, event -> {
+            if(event.to == State.menu){
+                SignalGraph.run(false);
+            } else if(event.to == State.paused){
+                SignalGraph.run(false);
+            } else if (event.to == State.playing){
+                SignalGraph.run(true);
+            }
         });
     }
 
