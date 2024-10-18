@@ -48,7 +48,7 @@ public class SignalBridge extends SignalBlock
 
         config(Integer.class, (SignalBridgeBuild tile, Integer i) -> {
             SignalBridgeBuild other = (SignalBridgeBuild) Vars.world.build(i);
-            if(other == null) return;
+            if (other == null) return;
             if (tile.link.contains(i))
             {
                 // Log.info("remove bridge " + i);
@@ -76,7 +76,8 @@ public class SignalBridge extends SignalBlock
             {
                 // Log.info("bulk config " + i + ": " + p[i]);
                 Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2) p[i]).pack());
-                if (linkValid(tile.tile, other)) {
+                if (linkValid(tile.tile, other))
+                {
                     if (other.pos() != tile.pos() && other.build instanceof SignalBridgeBuild b)
                     {
                         // Log.info("add bridge " + other.pos());
@@ -244,9 +245,10 @@ public class SignalBridge extends SignalBlock
             for (int i = 0; i < s; i++)
             {
                 l = read.i();
-                if (linkValid(tile, Vars.world.tile(l))) {
+                if (linkValid(tile, Vars.world.tile(l)))
+                {
                     SignalBridgeBuild other = (SignalBridgeBuild) Vars.world.build(l);
-                    if(other == null) return;
+                    if (other == null) return;
                     if (l != tile.pos())
                     {
                         link.add(l);

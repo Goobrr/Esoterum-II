@@ -138,8 +138,8 @@ public class Esoterum extends Mod
             vertexCount = 2;
             hasGraph = false;
             setConns(0, 0, 0, 0);
-            setInputs(0, 0, 1, 0);
-            setOutputs(1, 0, 0, 0);
+            setInputs(1, 0, 1, 0);
+            setOutputs(1, 0, 1, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("signal-diode")
