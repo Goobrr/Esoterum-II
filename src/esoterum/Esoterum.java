@@ -128,7 +128,7 @@ public class Esoterum extends Mod
                 Building front = gate.front();
                 if (front != null && (gate.signal[1] | gate.signal[2] | gate.signal[3]) >= 1)
                 {
-                    front.enabled = false;
+                    front.enabled = true;
                 }
 
                 return false;
@@ -145,7 +145,7 @@ public class Esoterum extends Mod
                 Building front = gate.front();
                 if (front != null && (gate.signal[1] | gate.signal[2] | gate.signal[3]) >= 1)
                 {
-                    front.enabled = true;
+                    front.enabled = false;
                 }
 
                 return false;
