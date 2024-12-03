@@ -118,6 +118,24 @@ public class Esoterum extends Mod
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalGate("toggler")
+        {{
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(0, 0, 0, 0);
+            function = gate -> {
+                Building front = gate.front();
+                if (front != null)
+                {
+                    front.enabled = ((gate.signal[1] | gate.signal[2] | gate.signal[3]) >= 1);
+                    return front.enabled;
+                }
+
+                return false;
+            };
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
         new SignalDisplay("display")
         {{
             rotate = true;
