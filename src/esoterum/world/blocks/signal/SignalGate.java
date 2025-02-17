@@ -1,50 +1,44 @@
 package esoterum.world.blocks.signal;
 
-import arc.*;
-import arc.func.*;
-import arc.graphics.*;
-import arc.graphics.g2d.*;
-import mindustry.graphics.*;
+import arc.Core;
+import arc.func.Boolf;
+import arc.graphics.g2d.TextureRegion;
+import esoterum.graph.SignalGraph;
 
-public class SignalGate extends SignalSource{
+public class SignalGate extends SignalBlock
+{
     public Boolf<SignalBuild> function;
-    public SignalGate(String name){
+
+    public SignalGate(String name)
+    {
         super(name);
 
         rotate = true;
+        hasGraph = false;
     }
 
     @Override
-    public void load(){
+    public void load()
+    {
         super.load();
 
         baseRegion = Core.atlas.find(name + "-base", "eso-default-gate-base");
 
         outputSignalRegions = new TextureRegion[size * 4];
-        for(int i : outputs){
-            outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
+        for (int i = 0; i < outputs.length; i++)
+        {
+            if (outputs[i] == 1)
+                outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
         }
     }
 
-    public class SignalGateBuild extends SignalSourceBuild {
+    public class SignalGateBuild extends SignalBuild
+    {
         @Override
-        public boolean getSignal(){
-            return function.get(this);
-        }
-
-        @Override
-        public void drawSignalRegions(){
-            Draw.color(signal ? Pal.accent : Color.white);
-
-            Draw.rect(signalRegion, x, y, rotation * 90);
-            for(int i : outputs()){
-                Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
-            }
-
-            for(int i : inputs()){
-                Draw.color(signalAtInput(i) ? Pal.accent : Color.white);
-                Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
-            }
+        public void updateTile()
+        {
+            super.updateTile();
+            SignalGraph.graph.setVertexAugmentation(v[0], function.get(this) ? 1 : 0);
         }
     }
 }

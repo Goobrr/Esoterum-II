@@ -1,14 +1,13 @@
 package esoterum.ui;
 
-import arc.*;
-import arc.util.*;
-import esoterum.ui.dialog.*;
-import mindustry.game.EventType.*;
+import esoterum.ui.dialog.NodeEditorDialog;
 
-public class EsoUI{
+public class EsoUI
+{
     public static NodeEditorDialog nodeEditor;
 
-    public static void init(){
+    public static void init()
+    {
         nodeEditor = new NodeEditorDialog();
     }
 }

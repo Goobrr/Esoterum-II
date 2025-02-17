@@ -1,0 +1,43 @@
+package esoterum.world.blocks.signal;
+
+import arc.Core;
+import arc.graphics.g2d.TextureRegion;
+import esoterum.graph.SignalGraph;
+
+public class SignalAdder extends SignalBlock
+{
+    public SignalAdder(String name)
+    {
+        super(name);
+
+        rotate = true;
+        size = 2;
+        hasGraph = false;
+    }
+
+    @Override
+    public void load()
+    {
+        super.load();
+
+        baseRegion = Core.atlas.find(name + "-base", "eso-mega-base-square");
+
+        outputSignalRegions = new TextureRegion[size * 4];
+        for (int i = 0; i < outputs.length; i++)
+        {
+            if (outputs[i] == 1)
+                outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
+        }
+    }
+
+    public class SignalAdderBuild extends SignalBuild
+    {
+        @Override
+        public void updateTile()
+        {
+            super.updateTile();
+            SignalGraph.graph.setVertexAugmentation(v[0], signal[2] ^ signal[3] ^ signal[4]);
+            SignalGraph.graph.setVertexAugmentation(v[1], (signal[2] + signal[3] + signal[4] > 1) ? 1 : 0);
+        }
+    }
+}

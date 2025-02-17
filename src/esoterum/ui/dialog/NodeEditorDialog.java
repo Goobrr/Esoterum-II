@@ -1,18 +1,19 @@
 package esoterum.ui.dialog;
 
-import arc.*;
-import arc.scene.ui.*;
-import arc.scene.ui.layout.*;
-import arc.util.*;
+import arc.Core;
+import arc.scene.ui.Dialog;
+import arc.scene.ui.layout.Scl;
+import arc.util.Align;
 import mindustry.gen.*;
-import mindustry.graphics.*;
-import mindustry.ui.*;
-import mindustry.ui.dialogs.*;
+import mindustry.graphics.Pal;
+import mindustry.ui.dialogs.BaseDialog;
 
 // TODO
 // actually make the thing
-public class NodeEditorDialog extends BaseDialog{
-    public NodeEditorDialog(){
+public class NodeEditorDialog extends BaseDialog
+{
+    public NodeEditorDialog()
+    {
         super("Eso UI Editor");
 
         onResize(this::rebuild);
@@ -21,12 +22,14 @@ public class NodeEditorDialog extends BaseDialog{
     }
 
     @Override
-    public Dialog show(){
+    public Dialog show()
+    {
         rebuild();
         return super.show();
     }
 
-    public void rebuild(){
+    public void rebuild()
+    {
         cont.clear();
 
         float scaleUnit = Math.min(Core.graphics.getHeight(), Core.graphics.getWidth()) / Scl.scl(5f);
@@ -42,7 +45,8 @@ public class NodeEditorDialog extends BaseDialog{
             t.defaults().pad(10f);
             t.table(Tex.button, t1 -> {
 
-            }).size(scaleUnit * 1.5f, scaleUnit * 4);;
+            }).size(scaleUnit * 1.5f, scaleUnit * 4);
+
             t.table(Tex.button, t2 -> {
 
             }).size(scaleUnit * 4);
@@ -55,8 +59,10 @@ public class NodeEditorDialog extends BaseDialog{
             t.left().top();
             t.defaults().pad(10f).padTop(0f);
             t.button(Icon.exit, this::hide).size(50f).padRight(4f).tooltip("Save & Exit");
-            t.button(Icon.cancel, () -> {}).size(50f).padRight(4f).tooltip("Exit without saving");
-            t.button(Icon.refresh, () -> {}).size(50f).padRight(4f).tooltip("Reset");
+            t.button(Icon.cancel, () -> {
+            }).size(50f).padRight(4f).tooltip("Exit without saving");
+            t.button(Icon.refresh, () -> {
+            }).size(50f).padRight(4f).tooltip("Reset");
         }).left().top();
     }
 }

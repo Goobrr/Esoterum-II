@@ -1,63 +1,113 @@
 package esoterum;
 
-import arc.*;
-import arc.util.*;
+import arc.Events;
+import esoterum.graph.SignalGraph;
 import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.content.Items;
 import mindustry.game.EventType.*;
 import mindustry.gen.Building;
-import mindustry.mod.*;
-import mindustry.type.Category;
-import mindustry.type.ItemStack;
+import mindustry.mod.Mod;
+import mindustry.type.*;
 import mindustry.world.meta.BuildVisibility;
 
-public class Esoterum extends Mod{
+public class Esoterum extends Mod
+{
 
     public static boolean debug = false;
-    public Esoterum(){
+
+    public Esoterum()
+    {
         Events.on(ClientLoadEvent.class, event -> {
-            Log.info("Waagh");
             EsoUI.init();
+        });
+
+        Events.on(WorldLoadBeginEvent.class, event -> {
+            SignalGraph.graph.clear();
         });
     }
 
     @Override
-    public void loadContent(){
-
-        new SignalWire("signal-wire"){{
+    public void loadContent()
+    {
+        new SignalWire("signal-wire")
+        {{
             rotate = true;
-            setOutputs(0);
-            setInputs(1, 2, 3);
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalJunction("signal-junction"){{
-            setInputs(0, 1, 2, 3);
-            setOutputs(0, 1, 2, 3);
-            mapIO(0, 2, 1, 3);
-        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
-
-        new SignalGate("true-signal-router"){{
-            rotate = false;
-            setOutputs(0, 1, 2, 3);
-            setInputs(0, 1, 2, 3);
-            function = gate -> gate.signalAtInput(0) | gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3);
-        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
-
-        new SignalWire("signal-router"){{
+        new SignalJunction("signal-junction")
+        {{
             rotate = true;
-            setOutputs(0, 1, 3);
-            setInputs(2);
+            rotateDraw = false;
+            drawArrow = false;
+            vertexCount = 2;
+            setConns(0, 1, 0, 1);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalSwitch("signal-switch"){{
+        new SignalJunction("signal-cjunction")
+        {{
+            rotate = true;
+
+            vertexCount = 2;
+            setConns(0, 1, 1, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalBlock("true-signal-router")
+        {{
+            rotate = true;
+            rotateDraw = false;
+            drawArrow = false;
+            vertexCount = 1;
+            hasGraph = false;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalRouter("signal-router")
+        {{
+            rotate = true;
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 1, 0, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalBridge("signal-bridge")
+        {{
+            rotate = true;
+            rotateDraw = false;
+            drawArrow = false;
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalSwitch("signal-switch")
+        {{
             rotate = false;
-            setOutputs(0, 1, 2, 3);
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(0, 0, 0, 0);
+            setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("item-sensor"){{
-            setOutputs(1, 2, 3);
-            function = gate ->{
+        new SignalGate("item-sensor")
+        {{
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(0, 0, 0, 0);
+            setOutputs(0, 1, 1, 1);
+            function = gate -> {
                 Building front = gate.front();
                 if (front != null && front.items() != null)
                 {
@@ -68,59 +118,92 @@ public class Esoterum extends Mod{
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalChipBlock("test-chip"){{
-            size = 2;
-            setInputs(4, 5);
-            setOutputs(0, 1);
+        new SignalDisplay("display")
+        {{
+            rotate = true;
 
-            debugDraw = true;
+            vertexCount = 2;
+            hasGraph = false;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 0, 1, 0);
+            setOutputs(1, 0, 1, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("signal-diode"){{
-            setInputs(2);
-            setOutputs(0);
-            function = gate -> gate.signalAtInput(2);
+        new SignalGate("signal-diode")
+        {{
+            vertexCount = 2;
+            setConns(0, 0, 1, 0);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] == 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("display"){{
-            setInputs(2);
-            setOutputs(0);
-            function = gate -> gate.signalAtInput(2);
-        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
-
-        new SignalGate("and-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
+        new SignalGate("and-gate")
+        {{
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
             function = gate -> {
-                int a = gate.signalAtInput(1) ? 1 : 0;
-                int b = gate.signalAtInput(2) ? 1 : 0;
-                int c = gate.signalAtInput(3) ? 1 : 0;
+                int a = gate.signal[1];
+                int b = gate.signal[2];
+                int c = gate.signal[3];
                 return a + b + c > 1;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("or-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
-            function = gate -> gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3); // functionally a diode
+        new SignalGate("or-gate")
+        {{
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] | gate.signal[2] | gate.signal[3]) == 1; // functionally a diode
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("not-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
-            function = gate -> !(gate.signalAtInput(1) | gate.signalAtInput(2) | gate.signalAtInput(3)); // functionally NOR
+        new SignalGate("not-gate")
+        {{
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
+            function = gate -> (gate.signal[1] | gate.signal[2] | gate.signal[3]) != 1; // functionally NOR
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
-        new SignalGate("xor-gate"){{
-            setInputs(1, 2, 3);
-            setOutputs(0);
+        new SignalGate("xor-gate")
+        {{
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
             function = gate -> {
-                int a = gate.signalAtInput(1) ? 1 : 0;
-                int b = gate.signalAtInput(2) ? 1 : 0;
-                int c = gate.signalAtInput(3) ? 1 : 0;
+                int a = gate.signal[1];
+                int b = gate.signal[2];
+                int c = gate.signal[3];
                 return a + b + c == 1;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        // new SignalAdder("full-adder")
+        // {{
+        //     vertexCount = 5;
+        //     setConns(0, 0, 0, 1, 2, 3, 4, 0);
+        //     setInputs(0, 0, 0, 0, 1, 1, 1, 0);
+        //     setOutputs(1, 0, 0, 1, 0, 0, 0, 0);
+        // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalMem("memory")
+        {{
+            vertexCount = 26;
+            setConns(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 25, 25, 25, 25);
+            setInputs(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
+    @Override
+    public void init()
+    {
+        new SettingsDialog(); // Initialize the settings dialog
+    }
 }
