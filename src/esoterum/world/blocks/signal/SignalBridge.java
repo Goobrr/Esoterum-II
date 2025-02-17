@@ -132,10 +132,8 @@ public class SignalBridge extends SignalBlock
         }
 
         @Override
-        public void draw()
-        {
-            super.draw();
-
+        public void drawSignalRegions(){
+            super.drawSignalRegions();
             Draw.z(Layer.power);
             Lines.stroke(1f, signal[0] == 1 ? team.color : Color.white);
             for (int i = 0; i < link.size; i++)

@@ -58,6 +58,7 @@ public class SettingsDialog
                 table.pref(bSlider);
 
                 table.checkPref("manhattannode", true);
+                table.checkPref("drawsignals", true);
             });
 
             run();
@@ -109,6 +110,7 @@ public class SettingsDialog
     public void run()
     {
         EsoVars.drawNodesAsManhattan = settings.getBool("manhattannode");
+        EsoVars.drawSignalRegions = settings.getBool("drawsignals");
     }
 
     private class LabelSetting extends SettingsMenuDialog.SettingsTable.Setting

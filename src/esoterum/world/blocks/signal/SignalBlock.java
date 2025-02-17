@@ -215,14 +215,6 @@ public class SignalBlock extends Block
                 if (Vars.world.build((int) (x / 8 + offset.x + sideOffset.x), (int) (y / 8 + offset.y + sideOffset.y)) instanceof SignalBuild b)
                 {
                     int index = EdgeUtils.getOffsetIndex(b.size(), x / 8 + offset.x - b.x / 8, y / 8 + offset.y - b.y / 8, b.rotation);
-                    Log.info("x: "+(x / 8));
-                    Log.info("y: "+(y / 8));
-                    Log.info("b.x: "+(b.x / 8));
-                    Log.info("b.y: "+(b.y / 8));
-                    Log.info("offset: "+offset);
-                    Log.info("b.size: "+b.size());
-                    Log.info("b.rotation: "+b.rotation);
-                    Log.info("index: "+index);
                     if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1l << i)) == 0) && ((b.shielding & (1l << index)) == 0))
                     {
                         SignalGraph.addEdge(v[conns[i]], b.v[b.conns()[index]]);
@@ -231,6 +223,7 @@ public class SignalBlock extends Block
                     b.active[index] = active[i];
                 }
             }
+            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override
@@ -243,38 +236,51 @@ public class SignalBlock extends Block
         @Override
         public void updateTile()
         {
-            for (int i = 0; i < vertexCount; i++) signal[i] = (int) SignalGraph.graph.getComponentAugmentation(v[i]);
+            if (SignalGraph.needsUpdate > 0)
+            {
+                for (int i = 0; i < vertexCount; i++) v[i].root = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
+                SignalGraph.needsUpdate -= vertexCount;
+            }
+            for (int i = 0; i < vertexCount; i++) if (v[i].root != null) signal[i] = (int) v[i].root.augmentation;
+            // for (int i = 0; i < vertexCount; i++) signal[i] = (int) SignalGraph.graph.getComponentAugmentation(v[i]);
         }
 
-        @Override
-        public void onProximityUpdate()
-        {
-            super.onProximityUpdate();
-            updateEdges();
-        }
+        // @Override
+        // public void onProximityUpdate()
+        // {
+        //     super.onProximityUpdate();
+        //     updateEdges();
+        // }
 
-        @Override
-        public void updateProximity()
-        {
-            super.updateProximity();
-            updateEdges();
-        }
+        // @Override
+        // public void updateProximity()
+        // {
+        //     super.updateProximity();
+        //     updateEdges();
+        // }
 
         @Override
         public void draw()
         {
 
-            if (Esoterum.debug || debugDraw)
-            {
-                debugDraw();
-            }
-            else
+            if (EsoVars.drawSignalRegions)
             {
                 Draw.rect(bottomRegion, x, y);
                 Draw.rect(baseRegion, x, y);
 
                 drawSignalRegions();
             }
+            else
+            {
+                Draw.rect(uiIcon, x, y, rotation * 90);
+            }
+        }
+
+        @Override
+        public void drawSelect()
+        {
+            super.drawSelect();
+            if (!EsoVars.drawSignalRegions) drawSignalRegions();
         }
 
         public void drawSignalRegions()

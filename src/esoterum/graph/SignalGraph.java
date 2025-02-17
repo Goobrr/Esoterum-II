@@ -14,11 +14,14 @@ public class SignalGraph
     };
 
     public static ConnGraph graph = new ConnGraph(AUGMENTATION);
+    public static int needsUpdate = 0;
+    public static int vertices = 0;
 
     public static void addVertex(SignalBlock.SignalBuild b, int k)
     {
         b.v[k] = new ConnVertex();
         graph.setVertexAugmentation(b.v[k], 0);
+        vertices++;
         //Log.info("add");
     }
 
