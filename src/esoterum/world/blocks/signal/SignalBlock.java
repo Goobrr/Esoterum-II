@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
@@ -38,7 +39,6 @@ public class SignalBlock extends Block
         configurable = true;
         update = true;
         solid = true;
-        size = 1;
         health = 60;
 
         category = Category.logic;
@@ -91,7 +91,8 @@ public class SignalBlock extends Block
 
         bottomRegion = Core.atlas.find(name + "-bottom", "eso-none");
 
-        baseRegion = Core.atlas.find(name + "-base", "eso-base-square");
+        String[] bases = {"eso-base-square", "eso-mega-base-square", "eso-none", "eso-giga-base-square", "eso-none", "eso-none", "eso-none", "eso-tera-base-square"};
+        baseRegion = Core.atlas.find(name + "-base", bases[size-1]);
 
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
 
@@ -214,6 +215,14 @@ public class SignalBlock extends Block
                 if (Vars.world.build((int) (x / 8 + offset.x + sideOffset.x), (int) (y / 8 + offset.y + sideOffset.y)) instanceof SignalBuild b)
                 {
                     int index = EdgeUtils.getOffsetIndex(b.size(), x / 8 + offset.x - b.x / 8, y / 8 + offset.y - b.y / 8, b.rotation);
+                    Log.info("x: "+(x / 8));
+                    Log.info("y: "+(y / 8));
+                    Log.info("b.x: "+(b.x / 8));
+                    Log.info("b.y: "+(b.y / 8));
+                    Log.info("offset: "+offset);
+                    Log.info("b.size: "+b.size());
+                    Log.info("b.rotation: "+b.rotation);
+                    Log.info("index: "+index);
                     if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1l << i)) == 0) && ((b.shielding & (1l << index)) == 0))
                     {
                         SignalGraph.addEdge(v[conns[i]], b.v[b.conns()[index]]);
