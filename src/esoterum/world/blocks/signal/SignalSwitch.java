@@ -70,7 +70,7 @@ public class SignalSwitch extends SignalBlock
         {
             super.update();
 
-            SignalGraph.graph.setVertexAugmentation(this.v[0], enabled ? 0 : 1);
+            if ((enabled ? 0 : 1) != signal[0]) SignalGraph.graph.setVertexAugmentation(this.v[0], enabled ? 0 : 1);
         }
 
         @Override

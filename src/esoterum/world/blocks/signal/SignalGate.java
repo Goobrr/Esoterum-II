@@ -2,6 +2,7 @@ package esoterum.world.blocks.signal;
 
 import arc.Core;
 import arc.func.Boolf;
+import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import esoterum.graph.SignalGraph;
 
@@ -24,12 +25,8 @@ public class SignalGate extends SignalBlock
 
         baseRegion = Core.atlas.find(name + "-base", "eso-default-gate-base");
 
-        outputSignalRegions = new TextureRegion[size * 4];
-        for (int i = 0; i < outputs.length; i++)
-        {
-            if (outputs[i] == 1)
-                outputSignalRegions[i] = Core.atlas.find(name + "-output-" + i, "eso-default-gate-output");
-        }
+        outputSignalRegions = new TextureRegion[1];
+        outputSignalRegions[0] = Core.atlas.find(name + "-output", "eso-default-gate-output");
     }
 
     public class SignalGateBuild extends SignalBuild
@@ -38,7 +35,16 @@ public class SignalGate extends SignalBlock
         public void updateTile()
         {
             super.updateTile();
-            SignalGraph.graph.setVertexAugmentation(v[0], function.get(this) ? 1 : 0);
+            int r = function.get(this) ? 1 : 0;
+            if (r != signal[0]) SignalGraph.graph.setVertexAugmentation(v[0], r);
+        }
+
+        @Override
+        public void drawSignalRegions()
+        {
+            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
+            if (active[0]) Draw.rect(outputSignalRegions[0], x, y, rotation * 90);
+            else Draw.rect(signalRegion, x, y, rotation * 90);
         }
     }
 }

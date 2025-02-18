@@ -23,7 +23,7 @@ public class SignalBlock extends Block
 
     public TextureRegion bottomRegion, baseRegion, signalRegion, shieldRegion;
 
-    public TextureRegion[] inputSignalRegions, outputSignalRegions;
+    public TextureRegion[] inputSignalRegions, outputSignalRegions, shieldRegions;
 
     public boolean debugDraw = false;
     public int[] inputs = new int[0];
@@ -96,7 +96,9 @@ public class SignalBlock extends Block
 
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
 
+        shieldRegions = new TextureRegion[16]; // pre-generated shielding for 1x1 blocks
         shieldRegion = Core.atlas.find("eso-shielding", "eso-none");
+        for (int i = 0; i < 16; i++) shieldRegions[i] = Core.atlas.find("eso-shielding-" + i, "eso-none");
 
         inputSignalRegions = new TextureRegion[size * 4];
         outputSignalRegions = new TextureRegion[size * 4];
@@ -166,6 +168,7 @@ public class SignalBlock extends Block
     public class SignalBuild extends Building
     {
         public ConnVertex[] v = new ConnVertex[vertexCount];
+        public EulerTourNode[] r = new EulerTourNode[vertexCount];
         public int[] signal = new int[vertexCount];
         public boolean[] active = new boolean[size * 4];
         public long shielding;
@@ -223,7 +226,7 @@ public class SignalBlock extends Block
                     b.active[index] = active[i];
                 }
             }
-            SignalGraph.needsUpdate = SignalGraph.vertices;
+            SignalGraph.needsUpdate += SignalGraph.vertices;
         }
 
         @Override
@@ -231,6 +234,7 @@ public class SignalBlock extends Block
         {
             for (int i = 0; i < vertexCount; i++) SignalGraph.removeVertex(this, i);
             super.onRemoved();
+            SignalGraph.needsUpdate += SignalGraph.vertices;
         }
 
         @Override
@@ -238,10 +242,10 @@ public class SignalBlock extends Block
         {
             if (SignalGraph.needsUpdate > 0)
             {
-                for (int i = 0; i < vertexCount; i++) v[i].root = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
+                for (int i = 0; i < vertexCount; i++) r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
                 SignalGraph.needsUpdate -= vertexCount;
             }
-            for (int i = 0; i < vertexCount; i++) if (v[i].root != null) signal[i] = (int) v[i].root.augmentation;
+            for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = (int) r[i].augmentation;
             // for (int i = 0; i < vertexCount; i++) signal[i] = (int) SignalGraph.graph.getComponentAugmentation(v[i]);
         }
 
@@ -265,9 +269,10 @@ public class SignalBlock extends Block
 
             if (EsoVars.drawSignalRegions)
             {
-                Draw.rect(bottomRegion, x, y);
+                //Draw.rect(bottomRegion, x, y);
                 Draw.rect(baseRegion, x, y);
 
+                drawShieldRegions();
                 drawSignalRegions();
             }
             else
@@ -280,6 +285,7 @@ public class SignalBlock extends Block
         public void drawSelect()
         {
             super.drawSelect();
+            if (!EsoVars.drawSignalRegions) drawShieldRegions();
             if (!EsoVars.drawSignalRegions) drawSignalRegions();
         }
 
@@ -295,16 +301,15 @@ public class SignalBlock extends Block
                 {
                     Draw.color(signal[conns[i]] == 1 ? getWireColor() : getWireOffColor());
                     if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
-                    if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
-                }
-                if ((shielding & (1l << i)) > 0)
-                {
-                    Draw.color(getWireOffColor());
-                    Vec2 offset = EdgeUtils.getEdgeOffset(size, i, rotation);
-                    Vec2 sideOffset = EdgeUtils.getEdgeOffset(1, i / size, rotation);
-                    Draw.rect(shieldRegion, x + offset.x * 8 - sideOffset.x * 8, y + offset.y * 8 - sideOffset.y * 8, (int) (i / size + rotation) * 90);
+                    else if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
                 }
             }
+        }
+
+        // full shield drawing code in SignalMem
+        public void drawShieldRegions()
+        {
+            Draw.rect(shieldRegions[(int)shielding & 15], x, y, rotation * 90);
         }
 
         @Override

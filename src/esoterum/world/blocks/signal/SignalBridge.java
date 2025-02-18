@@ -1,5 +1,6 @@
 package esoterum.world.blocks.signal;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
@@ -17,6 +18,7 @@ import mindustry.world.Tile;
 public class SignalBridge extends SignalBlock
 {
     int range = 100;
+    public TextureRegion[] signalRegions;
 
     public SignalBridge(String name)
     {
@@ -107,6 +109,14 @@ public class SignalBridge extends SignalBlock
         return other.block() == tile.block() && tile.team() == other.team();
     }
 
+    @Override
+    public void load()
+    {
+        super.load();
+        signalRegions = new TextureRegion[16];
+        for (int i = 0; i < 16; i++) signalRegions[i] = Core.atlas.find("eso-signal-bridge-" + i, "eso-none");
+    }
+
     public class SignalBridgeBuild extends SignalBuild
     {
         public IntSeq link = new IntSeq();
@@ -133,12 +143,15 @@ public class SignalBridge extends SignalBlock
 
         @Override
         public void drawSignalRegions(){
-            super.drawSignalRegions();
+            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
+            Draw.rect(signalRegions[(active[0] ? 1 : 0) + ((active[1] ? 1 : 0) << 1) + ((active[2] ? 1 : 0) << 2) + ((active[3] ? 1 : 0) << 3)], x, y, rotation * 90);
+
             Draw.z(Layer.power);
-            Lines.stroke(1f, signal[0] == 1 ? team.color : Color.white);
+            Lines.stroke(1f, signal[0] == 1 ? getWireColor() : getWireOffColor());
             for (int i = 0; i < link.size; i++)
             {
                 Point2 p = Point2.unpack(link.get(i));
+                if (p.y * 8 > y || (p.y * 8 == y && p.x * 8 < x)) continue;
                 if (EsoVars.drawNodesAsManhattan)
                 {
                     float halfwayX = x / 2 + p.x * 4;

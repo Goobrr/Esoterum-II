@@ -59,7 +59,7 @@ public class SignalWire extends SignalBlock
             }
             else bypass = false;
 
-            SignalGraph.needsUpdate = SignalGraph.vertices;
+            SignalGraph.needsUpdate += SignalGraph.vertices;
         }
 
         @Override
@@ -68,7 +68,7 @@ public class SignalWire extends SignalBlock
             super.updateTile();
             if (!bypass)
             {
-                SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
+                if ((signal[1] | signal[2] | signal[3]) != signal[0]) SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
             }
         }
     }

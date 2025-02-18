@@ -28,10 +28,9 @@ public class SignalDisplay extends SignalBlock
         @Override
         public void draw()
         {
-            Draw.rect(bottomRegion, x, y);
-            Draw.rect(baseRegion, x, y);
-
-            drawSignalRegions();
+            //drawSignalRegions();
+            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
+            Draw.rect(signalRegion, x, y);
         }
     }
 }
