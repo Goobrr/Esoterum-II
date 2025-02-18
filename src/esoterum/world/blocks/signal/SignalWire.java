@@ -59,7 +59,7 @@ public class SignalWire extends SignalBlock
             }
             else bypass = false;
 
-            SignalGraph.needsUpdate += SignalGraph.vertices;
+            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override

@@ -3,9 +3,7 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
-import arc.math.geom.Vec2;
 import arc.scene.ui.layout.Table;
-import esoterum.EdgeUtils;
 import esoterum.EsoVars;
 import esoterum.graph.SignalGraph;
 
@@ -18,15 +16,16 @@ public class SignalMem extends SignalBlock {
         rotate = true;
         size = 8;
         hasGraph = false;
+        configurable = false;
     }
 
     @Override
     public void load()
     {
         super.load();
-        fullWireRegion = Core.atlas.find("eso-memory-full", "eso-none");
-        leftWireRegion = Core.atlas.find("eso-memory-left", "eso-none");
-        rightWireRegion = Core.atlas.find("eso-memory-right", "eso-none");
+        fullWireRegion = Core.atlas.find("eso-memory-wire-full", "eso-none");
+        leftWireRegion = Core.atlas.find("eso-memory-wire-left", "eso-none");
+        rightWireRegion = Core.atlas.find("eso-memory-wire-right", "eso-none");
     }
 
     public class SignalMemBuild extends SignalBuild
@@ -40,42 +39,48 @@ public class SignalMem extends SignalBlock {
         }
 
         @Override
+        public void drawSignalRegions()
+        {
+            Draw.color((signal[0]
+                | signal[1]
+                | signal[2]
+                | signal[3]
+                | signal[4]
+                | signal[5]
+                | signal[6]
+                | signal[7]) > 0 ? getWireColor() : getWireOffColor());
+            Draw.rect(fullWireRegion, x, y, rotation * 90);
+            Draw.color((signal[8]
+                | signal[9]
+                | signal[10]
+                | signal[11]
+                | signal[12]
+                | signal[13]
+                | signal[14]
+                | signal[15]) > 0 ? getWireColor() : getWireOffColor());
+            Draw.rect(fullWireRegion, x, y, rotation * 90 + 90);
+            Draw.color((signal[16]
+                | signal[17]
+                | signal[18]
+                | signal[19]
+                | signal[20]
+                | signal[21]
+                | signal[22]
+                | signal[23]) > 0 ? getWireColor() : getWireOffColor());
+            Draw.rect(fullWireRegion, x, y, rotation * 90 + 180);
+            Draw.color(signal[24] > 0 ? getWireColor() : getWireOffColor());
+            Draw.rect(leftWireRegion, x, y, rotation * 90);
+            Draw.color(signal[25] > 0 ? getWireColor() : getWireOffColor());
+            Draw.rect(rightWireRegion, x, y, rotation * 90);
+        }
+
+        @Override
         public void draw()
         {
             if (EsoVars.drawSignalRegions)
             {
                 Draw.rect(outputSignalRegions[rotation], x, y);
-                Draw.color((signal[0]
-                    | signal[1]
-                    | signal[2]
-                    | signal[3]
-                    | signal[4]
-                    | signal[5]
-                    | signal[6]
-                    | signal[7]) > 0 ? getWireColor() : getWireOffColor());
-                Draw.rect(fullWireRegion, x, y, rotation * 90);
-                Draw.color((signal[8]
-                    | signal[9]
-                    | signal[10]
-                    | signal[11]
-                    | signal[12]
-                    | signal[13]
-                    | signal[14]
-                    | signal[15]) > 0 ? getWireColor() : getWireOffColor());
-                Draw.rect(fullWireRegion, x, y, rotation * 90 + 90);
-                Draw.color((signal[16]
-                    | signal[17]
-                    | signal[18]
-                    | signal[19]
-                    | signal[20]
-                    | signal[21]
-                    | signal[22]
-                    | signal[23]) > 0 ? getWireColor() : getWireOffColor());
-                Draw.rect(fullWireRegion, x, y, rotation * 90 + 180);
-                Draw.color(signal[24] > 0 ? getWireColor() : getWireOffColor());
-                Draw.rect(leftWireRegion, x, y, rotation * 90);
-                Draw.color(signal[25] > 0 ? getWireColor() : getWireOffColor());
-                Draw.rect(rightWireRegion, x, y, rotation * 90);
+                drawSignalRegions();
             }
             else
             {

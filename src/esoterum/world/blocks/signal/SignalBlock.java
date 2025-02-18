@@ -226,7 +226,7 @@ public class SignalBlock extends Block
                     b.active[index] = active[i];
                 }
             }
-            SignalGraph.needsUpdate += SignalGraph.vertices;
+            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override
@@ -234,7 +234,7 @@ public class SignalBlock extends Block
         {
             for (int i = 0; i < vertexCount; i++) SignalGraph.removeVertex(this, i);
             super.onRemoved();
-            SignalGraph.needsUpdate += SignalGraph.vertices;
+            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override
