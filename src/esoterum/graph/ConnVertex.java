@@ -47,5 +47,5 @@ public class ConnVertex
         return hash;
     }
 
-    public EulerTourNode root;
+    //public EulerTourNode root;
 }
