@@ -272,8 +272,8 @@ public class SignalBlock extends Block
                 //Draw.rect(bottomRegion, x, y);
                 Draw.rect(baseRegion, x, y);
 
-                drawShieldRegions();
-                drawSignalRegions();
+                // drawShieldRegions();
+                // drawSignalRegions();
             }
             else
             {
@@ -286,10 +286,10 @@ public class SignalBlock extends Block
         {
             super.drawSelect();
             if (!EsoVars.drawSignalRegions) drawShieldRegions();
-            if (!EsoVars.drawSignalRegions) drawSignalRegions();
+            if (!EsoVars.drawSignalRegions) drawSignalRegions(Core.camera.bounds(new Rect()));
         }
 
-        public void drawSignalRegions()
+        public void drawSignalRegions(Rect camera)
         {
             Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
 
@@ -370,29 +370,6 @@ public class SignalBlock extends Block
         public Object[] config()
         {
             return new Object[]{shielding};
-        }
-
-        public void debugDraw()
-        {
-            Draw.blend(Blending.additive);
-            Draw.alpha(0.5f);
-            Fill.square(x, y, size * 4);
-            Draw.blend();
-            Draw.alpha(1);
-
-            for (int index : outputs)
-            {
-                Vec2 p = EdgeUtils.getEdgeOffset(size, index, rotation);
-
-                DrawUtils.text((tile.x + p.x) * 8, (tile.y + p.y) * 8, Pal.heal, String.valueOf(index));
-            }
-
-            for (int index : inputs)
-            {
-                Vec2 p = EdgeUtils.getEdgeOffset(size, index, rotation);
-
-                DrawUtils.text((tile.x + p.x) * 8, (tile.y + p.y) * 8, getWireColor(), String.valueOf(index));
-            }
         }
 
         @Override

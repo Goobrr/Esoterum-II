@@ -3,6 +3,7 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.geom.Rect;
 import mindustry.graphics.Pal;
 
 // TODO
@@ -34,9 +35,9 @@ public class SignalJunction extends SignalBlock
     public class SignalJunctionBuild extends SignalBuild
     {
         @Override
-        public void drawSignalRegions()
+        public void drawSignalRegions(Rect camera)
         {
-            super.drawSignalRegions();
+            super.drawSignalRegions(camera);
 
             Draw.color(signal[0] == 1 ? Pal.accent : Color.white);
             Draw.rect(signalRegion1, x, y, rotate ? rotdeg() : 0);

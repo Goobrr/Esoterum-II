@@ -3,6 +3,7 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.geom.Rect;
 import arc.scene.ui.layout.Table;
 import esoterum.EsoVars;
 import esoterum.graph.SignalGraph;
@@ -39,7 +40,7 @@ public class SignalMem extends SignalBlock {
         }
 
         @Override
-        public void drawSignalRegions()
+        public void drawSignalRegions(Rect camera)
         {
             Draw.color((signal[0]
                 | signal[1]
@@ -80,13 +81,16 @@ public class SignalMem extends SignalBlock {
             if (EsoVars.drawSignalRegions)
             {
                 Draw.rect(outputSignalRegions[rotation], x, y);
-                drawSignalRegions();
+                // drawSignalRegions();
             }
             else
             {
                 Draw.rect(uiIcon, x, y, rotation * 90);
             }
         }
+
+        @Override
+        public void drawShieldRegions(){}
 
         @Override
         public void updateTile()

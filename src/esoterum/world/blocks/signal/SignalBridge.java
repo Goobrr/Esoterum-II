@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.math.geom.Point2;
+import arc.math.geom.Rect;
 import arc.struct.IntSeq;
 import arc.util.*;
 import arc.util.io.*;
@@ -142,7 +143,7 @@ public class SignalBridge extends SignalBlock
         }
 
         @Override
-        public void drawSignalRegions(){
+        public void drawSignalRegions(Rect camera){
             Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
             Draw.rect(signalRegions[(active[0] ? 1 : 0) + ((active[1] ? 1 : 0) << 1) + ((active[2] ? 1 : 0) << 2) + ((active[3] ? 1 : 0) << 3)], x, y, rotation * 90);
 
@@ -151,10 +152,12 @@ public class SignalBridge extends SignalBlock
             for (int i = 0; i < link.size; i++)
             {
                 Point2 p = Point2.unpack(link.get(i));
-                if (p.y * 8 > y || (p.y * 8 == y && p.x * 8 < x)) continue;
+                p.x *= 8;
+                p.y *= 8;
+                if (!camera.overlaps(Math.min(p.x,x), Math.min(p.y,y), Math.abs(p.x - x) + 1, Math.abs(p.y - y) + 1) && (p.y > y || (p.y == y && p.x < x))) continue;
                 if (EsoVars.drawNodesAsManhattan)
                 {
-                    float halfwayX = x / 2 + p.x * 4;
+                    float halfwayX = (x + p.x) / 2;
                     Lines.line(
                             x, y + 2,
                             halfwayX, y + 2,
@@ -163,13 +166,13 @@ public class SignalBridge extends SignalBlock
 
                     Lines.line(
                             halfwayX, y + 2,
-                            halfwayX, p.y * 8 + 2,
+                            halfwayX, p.y + 2,
                             true
                     );
 
                     Lines.line(
-                            halfwayX, p.y * 8 + 2,
-                            p.x * 8, p.y * 8 + 2,
+                            halfwayX, p.y + 2,
+                            p.x, p.y + 2,
                             true
                     );
 
@@ -180,8 +183,8 @@ public class SignalBridge extends SignalBlock
                     );
 
                     Lines.line(
-                            p.x * 8, p.y * 8,
-                            p.x * 8, p.y * 8 + 2,
+                            p.x, p.y,
+                            p.x, p.y + 2,
                             true
                     );
                 }

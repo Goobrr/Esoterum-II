@@ -4,6 +4,7 @@ import arc.Core;
 import arc.func.Boolf;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
+import arc.math.geom.Rect;
 import esoterum.graph.SignalGraph;
 
 public class SignalGate extends SignalBlock
@@ -40,7 +41,7 @@ public class SignalGate extends SignalBlock
         }
 
         @Override
-        public void drawSignalRegions()
+        public void drawSignalRegions(Rect camera)
         {
             Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
             if (active[0]) Draw.rect(outputSignalRegions[0], x, y, rotation * 90);

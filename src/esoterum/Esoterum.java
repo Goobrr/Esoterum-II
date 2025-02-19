@@ -2,9 +2,12 @@ package esoterum;
 
 import arc.Events;
 import esoterum.graph.SignalGraph;
+import esoterum.overlay.SignalOverlay;
 import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
+import mindustry.Vars;
 import mindustry.content.Items;
+import mindustry.game.EventType;
 import mindustry.game.EventType.*;
 import mindustry.gen.Building;
 import mindustry.mod.Mod;
@@ -24,6 +27,12 @@ public class Esoterum extends Mod
 
         Events.on(WorldLoadBeginEvent.class, event -> {
             SignalGraph.graph.clear();
+        });
+
+        Events.run(EventType.Trigger.drawOver, () -> {
+            if (!Vars.state.isGame()) return;
+
+            SignalOverlay.draw();
         });
     }
 

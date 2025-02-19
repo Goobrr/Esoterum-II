@@ -2,6 +2,7 @@ package esoterum.world.blocks.signal;
 
 import arc.Core;
 import arc.graphics.g2d.*;
+import arc.math.geom.Rect;
 import arc.util.io.*;
 import esoterum.graph.SignalGraph;
 import mindustry.world.Block;
@@ -92,6 +93,12 @@ public class SignalSwitch extends SignalBlock
             Draw.rect(baseRegion, x, y);
             Draw.rect(enabled ? switchOffRegion : switchOnRegion, x, y);
         }
+
+        @Override
+        public void drawSignalRegions(Rect camera){}
+        
+        @Override
+        public void drawShieldRegions(){}
 
         @Override
         public void read(Reads read, byte revision)
