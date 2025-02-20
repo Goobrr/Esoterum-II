@@ -81,10 +81,10 @@ public class SignalGraph
 
     public static void removeBuild(int id)
     {
-        SignalBuild b = builds.get(builds.size - 1);
+        SignalBuild b = builds.pop();
+        if (id == builds.size) return;
         b.id = id;
         builds.set(id, b);
-        builds.pop();
     }
 
     public static void updateBuilds(boolean update)

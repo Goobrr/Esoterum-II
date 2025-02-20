@@ -45,7 +45,7 @@ public class Esoterum extends Mod
         });
 
         Events.on(WorldLoadBeginEvent.class, event -> {
-            SignalGraph.clear();
+            SignalGraph.events.add(new GraphEvent.clearEvent());
             if (t == null || !t.isAlive()) (t = new Thread(r)).start();
         });
 
