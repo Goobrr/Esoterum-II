@@ -1,7 +1,9 @@
 package esoterum.graph;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Comparator;
+
+import arc.struct.ObjectSet;
 
 /**
  * Wraps a value using reference equality.  In other words, two references are equal only if their values are the same
@@ -102,80 +104,80 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
      */
     public boolean isRed;
 
-    /**
-     * Returns the root of a perfectly height-balanced subtree containing the next "size" (non-leaf) nodes from
-     * "iterator", in iteration order.  This method is responsible for setting the "left", "right", "parent", and isRed
-     * fields of the nodes, and calling augment() as appropriate.  It ignores the initial values of the "left", "right",
-     * "parent", and isRed fields.
-     *
-     * @param iterator The nodes.
-     * @param size     The number of nodes.
-     * @param height   The "height" of the subtree's root node above the deepest leaf in the tree that contains it.  Since
-     *                 insertion fixup is slow if there are too many red nodes and deleteion fixup is slow if there are too few red
-     *                 nodes, we compromise and have red nodes at every fourth level.  We color a node red iff its "height" is equal
-     *                 to 1 mod 4.
-     * @param leaf     The leaf node.
-     * @return The root of the subtree.
-     */
-    private static <N extends RedBlackNode<N>> N createTree(
-            Iterator<? extends N> iterator, int size, int height, N leaf)
-    {
-        if (size == 0)
-        {
-            return leaf;
-        }
-        else
-        {
-            N left = createTree(iterator, (size - 1) / 2, height - 1, leaf);
-            N node = iterator.next();
-            N right = createTree(iterator, size / 2, height - 1, leaf);
+    // /**
+    //  * Returns the root of a perfectly height-balanced subtree containing the next "size" (non-leaf) nodes from
+    //  * "iterator", in iteration order.  This method is responsible for setting the "left", "right", "parent", and isRed
+    //  * fields of the nodes, and calling augment() as appropriate.  It ignores the initial values of the "left", "right",
+    //  * "parent", and isRed fields.
+    //  *
+    //  * @param iterator The nodes.
+    //  * @param size     The number of nodes.
+    //  * @param height   The "height" of the subtree's root node above the deepest leaf in the tree that contains it.  Since
+    //  *                 insertion fixup is slow if there are too many red nodes and deleteion fixup is slow if there are too few red
+    //  *                 nodes, we compromise and have red nodes at every fourth level.  We color a node red iff its "height" is equal
+    //  *                 to 1 mod 4.
+    //  * @param leaf     The leaf node.
+    //  * @return The root of the subtree.
+    //  */
+    // private static <N extends RedBlackNode<N>> N createTree(
+    //         Iterator<? extends N> iterator, int size, int height, N leaf)
+    // {
+    //     if (size == 0)
+    //     {
+    //         return leaf;
+    //     }
+    //     else
+    //     {
+    //         N left = createTree(iterator, (size - 1) / 2, height - 1, leaf);
+    //         N node = iterator.next();
+    //         N right = createTree(iterator, size / 2, height - 1, leaf);
 
-            node.isRed = height % 4 == 1;
-            node.left = left;
-            node.right = right;
-            if (!left.isLeaf())
-            {
-                left.parent = node;
-            }
-            if (!right.isLeaf())
-            {
-                right.parent = node;
-            }
+    //         node.isRed = height % 4 == 1;
+    //         node.left = left;
+    //         node.right = right;
+    //         if (!left.isLeaf())
+    //         {
+    //             left.parent = node;
+    //         }
+    //         if (!right.isLeaf())
+    //         {
+    //             right.parent = node;
+    //         }
 
-            node.augment();
-            return node;
-        }
-    }
+    //         node.augment();
+    //         return node;
+    //     }
+    // }
 
-    /**
-     * Returns the root of a perfectly height-balanced tree containing the specified nodes, in iteration order. This
-     * method is responsible for setting the "left", "right", "parent", and isRed fields of the nodes (excluding
-     * "leaf"), and calling augment() as appropriate. It ignores the initial values of the "left", "right", "parent",
-     * and isRed fields.
-     *
-     * @param nodes The nodes.
-     * @param leaf  The leaf node.
-     * @return The root of the tree.
-     */
-    public static <N extends RedBlackNode<N>> N createTree(Collection<? extends N> nodes, N leaf)
-    {
-        int size = nodes.size();
-        if (size == 0)
-        {
-            return leaf;
-        }
+    // /**
+    //  * Returns the root of a perfectly height-balanced tree containing the specified nodes, in iteration order. This
+    //  * method is responsible for setting the "left", "right", "parent", and isRed fields of the nodes (excluding
+    //  * "leaf"), and calling augment() as appropriate. It ignores the initial values of the "left", "right", "parent",
+    //  * and isRed fields.
+    //  *
+    //  * @param nodes The nodes.
+    //  * @param leaf  The leaf node.
+    //  * @return The root of the tree.
+    //  */
+    // public static <N extends RedBlackNode<N>> N createTree(Collection<? extends N> nodes, N leaf)
+    // {
+    //     int size = nodes.size();
+    //     if (size == 0)
+    //     {
+    //         return leaf;
+    //     }
 
-        int height = 0;
-        for (int subtreeSize = size; subtreeSize > 0; subtreeSize /= 2)
-        {
-            height++;
-        }
+    //     int height = 0;
+    //     for (int subtreeSize = size; subtreeSize > 0; subtreeSize /= 2)
+    //     {
+    //         height++;
+    //     }
 
-        N node = createTree(nodes.iterator(), size, height, leaf);
-        node.parent = null;
-        node.isRed = false;
-        return node;
-    }
+    //     N node = createTree(nodes.iterator(), size, height, leaf);
+    //     node.parent = null;
+    //     node.isRed = false;
+    //     return node;
+    // }
 
     /**
      * Sets any augmentation information about the subtree rooted at this node that is stored in this node.  For
@@ -1594,7 +1596,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
      * @param visited     The nodes we have reached thus far, other than leaf nodes. This method adds the non-leaf nodes in
      *                    the subtree rooted at this node to "visited".
      */
-    private void assertSubtreeIsValidRedBlack(int blackHeight, Set<Reference<N>> visited)
+    private void assertSubtreeIsValidRedBlack(int blackHeight, ObjectSet<Reference<N>> visited)
     {
         @SuppressWarnings("unchecked")
         N nThis = (N) this;
@@ -1679,7 +1681,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
             }
 
             // Compute the black height of the tree
-            Set<Reference<N>> nodes = new HashSet<Reference<N>>();
+            ObjectSet<Reference<N>> nodes = new ObjectSet<Reference<N>>();
             int blackHeight = 0;
             @SuppressWarnings("unchecked")
             N node = (N) this;
@@ -1696,7 +1698,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
                 node = node.left;
             }
 
-            assertSubtreeIsValidRedBlack(blackHeight, new HashSet<Reference<N>>());
+            assertSubtreeIsValidRedBlack(blackHeight, new ObjectSet<Reference<N>>());
         }
     }
 

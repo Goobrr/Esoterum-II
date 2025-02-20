@@ -1,10 +1,15 @@
 package esoterum;
 
 import arc.Events;
+import arc.util.Log;
+import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
+import esoterum.overlay.SignalOverlay;
 import esoterum.ui.*;
 import esoterum.world.blocks.signal.*;
+import mindustry.Vars;
 import mindustry.content.Items;
+import mindustry.game.EventType;
 import mindustry.game.EventType.*;
 import mindustry.gen.Building;
 import mindustry.mod.Mod;
@@ -15,6 +20,23 @@ public class Esoterum extends Mod
 {
 
     public static boolean debug = false;
+    public static Thread t;
+    public static Runnable r = () -> {
+        try {
+            boolean update = false;
+            GraphEvent.eventType e;
+            while (true)
+            {
+                update = !SignalGraph.events.isEmpty();
+                while ((e = SignalGraph.events.poll()) != null) e.run();
+                //Log.info(SignalGraph.builds.size);
+                SignalGraph.updateBuilds(update);
+                update = false;
+            }
+        } catch (Throwable e) {
+            Log.err(e);
+        }
+    };
 
     public Esoterum()
     {
@@ -23,8 +45,28 @@ public class Esoterum extends Mod
         });
 
         Events.on(WorldLoadBeginEvent.class, event -> {
-            SignalGraph.graph.clear();
+            SignalGraph.events.add(new GraphEvent.clearEvent());
+            if (t == null || !t.isAlive()) (t = new Thread(r)).start();
         });
+
+        Events.run(EventType.Trigger.drawOver, () -> {
+            if (!Vars.state.isGame()) return;
+
+            SignalOverlay.draw();
+        });
+
+        // Events.on(StateChangeEvent.class, event -> {
+        //     if(event.to == State.menu){
+        //         run = false;
+        //     } else if(event.to == State.paused){
+        //         run = false;
+        //     } else if (event.to == State.playing){
+        //         new Thread(() -> {
+        //             run = true;
+        //             while (run) SignalGraph.updateBuilds();
+        //         }).start();
+        //     }
+        // });
     }
 
     @Override
@@ -200,6 +242,22 @@ public class Esoterum extends Mod
                 int c = gate.signal[3];
                 return a + b + c == 1;
             };
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        // new SignalAdder("full-adder")
+        // {{
+        //     vertexCount = 5;
+        //     setConns(0, 0, 0, 1, 2, 3, 4, 0);
+        //     setInputs(0, 0, 0, 0, 1, 1, 1, 0);
+        //     setOutputs(1, 0, 0, 1, 0, 0, 0, 0);
+        // }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalMem("memory")
+        {{
+            vertexCount = 26;
+            setConns(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 25, 25, 25, 25);
+            setInputs(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            setOutputs(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 

@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
@@ -22,7 +23,7 @@ public class SignalBlock extends Block
 
     public TextureRegion bottomRegion, baseRegion, signalRegion, shieldRegion;
 
-    public TextureRegion[] inputSignalRegions, outputSignalRegions;
+    public TextureRegion[] inputSignalRegions, outputSignalRegions, shieldRegions;
 
     public boolean debugDraw = false;
     public int[] inputs = new int[0];
@@ -38,7 +39,6 @@ public class SignalBlock extends Block
         configurable = true;
         update = true;
         solid = true;
-        size = 1;
         health = 60;
 
         category = Category.logic;
@@ -46,7 +46,7 @@ public class SignalBlock extends Block
         config(Long.class, (SignalBuild tile, Long i) -> {
             // Log.info("toggle shielding " + i);
             tile.shielding = tile.shielding ^ i;
-            tile.updateEdges();
+            SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             //Log.info("config Long");
         });
 
@@ -55,7 +55,7 @@ public class SignalBlock extends Block
             {
                 // Log.info("set shielding " + l);
                 tile.shielding = l;
-                tile.updateEdges();
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             //Log.info("config Object[]");
         });
@@ -91,11 +91,14 @@ public class SignalBlock extends Block
 
         bottomRegion = Core.atlas.find(name + "-bottom", "eso-none");
 
-        baseRegion = Core.atlas.find(name + "-base", "eso-base-square");
+        String[] bases = {"eso-base-square", "eso-mega-base-square", "eso-none", "eso-giga-base-square", "eso-none", "eso-none", "eso-none", "eso-tera-base-square"};
+        baseRegion = Core.atlas.find(name + "-base", bases[size-1]);
 
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
 
+        shieldRegions = new TextureRegion[16]; // pre-generated shielding for 1x1 blocks
         shieldRegion = Core.atlas.find("eso-shielding", "eso-none");
+        for (int i = 0; i < 16; i++) shieldRegions[i] = Core.atlas.find("eso-shielding-" + i, "eso-none");
 
         inputSignalRegions = new TextureRegion[size * 4];
         outputSignalRegions = new TextureRegion[size * 4];
@@ -165,9 +168,11 @@ public class SignalBlock extends Block
     public class SignalBuild extends Building
     {
         public ConnVertex[] v = new ConnVertex[vertexCount];
+        public EulerTourNode[] r = new EulerTourNode[vertexCount];
         public int[] signal = new int[vertexCount];
         public boolean[] active = new boolean[size * 4];
         public long shielding;
+        public int id;
 
         public int[] inputs()
         {
@@ -189,18 +194,18 @@ public class SignalBlock extends Block
             return size;
         }
 
+        public int vertexCount()
+        {
+            return vertexCount;
+        }
+
         @Override
         public void created()
         {
             super.created();
             if (!this.block.rotate) rotation(0);
 
-            for (int i = 0; i < vertexCount; i++)
-            {
-                if (v[i] == null) SignalGraph.addVertex(this, i);
-            }
-
-            updateEdges();
+            SignalGraph.events.add(new GraphEvent.createEvent(this));
         }
 
         public void updateEdges()
@@ -227,48 +232,39 @@ public class SignalBlock extends Block
         @Override
         public void onRemoved()
         {
-            for (int i = 0; i < vertexCount; i++) SignalGraph.removeVertex(this, i);
+            SignalGraph.events.add(new GraphEvent.destroyEvent(this));
             super.onRemoved();
-        }
-
-        @Override
-        public void updateTile()
-        {
-            for (int i = 0; i < vertexCount; i++) signal[i] = (int) SignalGraph.graph.getComponentAugmentation(v[i]);
         }
 
         @Override
         public void onProximityUpdate()
         {
             super.onProximityUpdate();
-            updateEdges();
+            SignalGraph.events.add(new GraphEvent.updateEvent(this));
         }
 
-        @Override
-        public void updateProximity()
+        public void updateSignal(boolean update)
         {
-            super.updateProximity();
-            updateEdges();
+            if (update) for (int i = 0; i < vertexCount; i++) r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
+            for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = (int) r[i].augmentation;
         }
 
         @Override
         public void draw()
         {
-
-            if (Esoterum.debug || debugDraw)
-            {
-                debugDraw();
-            }
-            else
-            {
-                Draw.rect(bottomRegion, x, y);
-                Draw.rect(baseRegion, x, y);
-
-                drawSignalRegions();
-            }
+            if (EsoVars.drawSignalRegions) Draw.rect(baseRegion, x, y);
+            else Draw.rect(uiIcon, x, y, rotation * 90);
         }
 
-        public void drawSignalRegions()
+        @Override
+        public void drawSelect()
+        {
+            super.drawSelect();
+            if (!EsoVars.drawSignalRegions) drawShieldRegions();
+            if (!EsoVars.drawSignalRegions) drawSignalRegions(Core.camera.bounds(new Rect()));
+        }
+
+        public void drawSignalRegions(Rect camera)
         {
             Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
 
@@ -280,16 +276,15 @@ public class SignalBlock extends Block
                 {
                     Draw.color(signal[conns[i]] == 1 ? getWireColor() : getWireOffColor());
                     if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
-                    if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
-                }
-                if ((shielding & (1l << i)) > 0)
-                {
-                    Draw.color(getWireOffColor());
-                    Vec2 offset = EdgeUtils.getEdgeOffset(size, i, rotation);
-                    Vec2 sideOffset = EdgeUtils.getEdgeOffset(1, i / size, rotation);
-                    Draw.rect(shieldRegion, x + offset.x * 8 - sideOffset.x * 8, y + offset.y * 8 - sideOffset.y * 8, (int) (i / size + rotation) * 90);
+                    else if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
                 }
             }
+        }
+
+        // full shield drawing code in SignalMem
+        public void drawShieldRegions()
+        {
+            Draw.rect(shieldRegions[(int)shielding & 15], x, y, rotation * 90);
         }
 
         @Override
@@ -352,29 +347,6 @@ public class SignalBlock extends Block
             return new Object[]{shielding};
         }
 
-        public void debugDraw()
-        {
-            Draw.blend(Blending.additive);
-            Draw.alpha(0.5f);
-            Fill.square(x, y, size * 4);
-            Draw.blend();
-            Draw.alpha(1);
-
-            for (int index : outputs)
-            {
-                Vec2 p = EdgeUtils.getEdgeOffset(size, index, rotation);
-
-                DrawUtils.text((tile.x + p.x) * 8, (tile.y + p.y) * 8, Pal.heal, String.valueOf(index));
-            }
-
-            for (int index : inputs)
-            {
-                Vec2 p = EdgeUtils.getEdgeOffset(size, index, rotation);
-
-                DrawUtils.text((tile.x + p.x) * 8, (tile.y + p.y) * 8, getWireColor(), String.valueOf(index));
-            }
-        }
-
         @Override
         public byte version()
         {
@@ -397,7 +369,7 @@ public class SignalBlock extends Block
             {
                 shielding = read.l();
                 for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
-                updateEdges();
+                SignalGraph.events.add(new GraphEvent.updateEvent(this));
             }
             else if (revision == 3)
             {

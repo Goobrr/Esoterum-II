@@ -53,13 +53,10 @@ public class SignalWire extends SignalBlock
         }
 
         @Override
-        public void updateTile()
+        public void updateSignal(boolean update)
         {
-            super.updateTile();
-            if (!bypass)
-            {
-                SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
-            }
+            super.updateSignal(update);
+            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != signal[0]) SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
         }
     }
 }

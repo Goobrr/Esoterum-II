@@ -2,7 +2,9 @@ package esoterum.world.blocks.signal;
 
 import arc.Core;
 import arc.graphics.g2d.*;
+import arc.math.geom.Rect;
 import arc.util.io.*;
+import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
 import mindustry.world.Block;
 
@@ -21,23 +23,18 @@ public class SignalSwitch extends SignalBlock
         alwaysReplace = true;
         replaceable = true;
 
-        config(Boolean.class, (b, s) -> {
+        config(Boolean.class, (SignalSwitchBuild b, Boolean s) -> {
             b.enabled = s;
-            SignalGraph.graph.setVertexAugmentation(((SignalSwitchBuild) b).v[0], s ? 0 : 1);
         });
 
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
             if (p[0] instanceof Long l)
             {
                 tile.shielding = l;
-                tile.updateEdges();
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
 
-            if (p.length > 1 && p[1] instanceof Boolean b)
-            {
-                tile.enabled = b;
-                SignalGraph.graph.setVertexAugmentation(tile.v[0], b ? 0 : 1);
-            }
+            if (p.length > 1 && p[1] instanceof Boolean b) tile.enabled = b;
         });
     }
 
@@ -66,11 +63,10 @@ public class SignalSwitch extends SignalBlock
         }
 
         @Override
-        public void update()
+        public void updateSignal(boolean update)
         {
-            super.update();
-
-            SignalGraph.graph.setVertexAugmentation(this.v[0], enabled ? 0 : 1);
+            super.updateSignal(update);
+            if ((enabled ? 0 : 1) != signal[0]) SignalGraph.graph.setVertexAugmentation(this.v[0], enabled ? 0 : 1);
         }
 
         @Override
@@ -94,11 +90,16 @@ public class SignalSwitch extends SignalBlock
         }
 
         @Override
+        public void drawSignalRegions(Rect camera){}
+        
+        @Override
+        public void drawShieldRegions(){}
+
+        @Override
         public void read(Reads read, byte revision)
         {
             super.read(read, revision);
             enabled = read.bool();
-            SignalGraph.graph.setVertexAugmentation(v[0], enabled ? 0 : 1);
         }
     }
 }

@@ -12,13 +12,13 @@ public class SignalRouter extends SignalBlock
     public class SignalRouterBuild extends SignalBuild
     {
         @Override
-        public void updateTile()
+        public void updateSignal(boolean update)
         {
-            super.updateTile();
+            super.updateSignal(update);
             for (int i = 0; i < size * 4; i++)
                 if (outputs[i] == 1)
                 {
-                    SignalGraph.graph.setVertexAugmentation(v[i], signal[2]);
+                    if (signal[2] != signal[i]) SignalGraph.graph.setVertexAugmentation(v[i], signal[2]);
                 }
         }
     }

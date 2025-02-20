@@ -1,8 +1,6 @@
 package esoterum.graph;
 
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import arc.struct.ObjectMap;
 
 /**
  * Describes a ConnVertex, with respect to a particular ConnGraph. There is exactly one VertexInfo object per vertex in
@@ -20,7 +18,7 @@ public class VertexInfo
      * vertex. Lookups take O(1) expected time and O(log N / log log N) time with high probability, because "edges" is a
      * HashMap, and ConnVertex.hashCode() returns a random integer.
      */
-    public Map<ConnVertex, ConnEdge> edges = new ConcurrentHashMap<ConnVertex, ConnEdge>();
+    public ObjectMap<ConnVertex, ConnEdge> edges = new ObjectMap<ConnVertex, ConnEdge>();
 
     /**
      * The maximum number of entries in "edges" since the last time we "rebuilt" that field. When the number of edges
