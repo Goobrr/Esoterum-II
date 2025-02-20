@@ -23,5 +23,6 @@ public class SignalOverlay {
                 b.drawSignalRegions(camRect);
             }
         });
+        Draw.reset();
     }
 }

@@ -10,6 +10,7 @@ import arc.struct.IntSeq;
 import arc.util.*;
 import arc.util.io.*;
 import esoterum.EsoVars;
+import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
 import mindustry.Vars;
 import mindustry.gen.Building;
@@ -38,14 +39,14 @@ public class SignalBridge extends SignalBlock
                 // Log.info("remove bridge " + p);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
-                SignalGraph.removeEdge(tile.v[0], other.v[0]);
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             else if (i != tile.pos())
             {
                 // Log.info("add bridge " + p);
                 tile.link.add(i);
                 other.link.add(tile.pos());
-                SignalGraph.addEdge(tile.v[0], other.v[0]);
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
         });
 
@@ -57,14 +58,14 @@ public class SignalBridge extends SignalBlock
                 // Log.info("remove bridge " + i);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
-                SignalGraph.removeEdge(tile.v[0], other.v[0]);
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             else if (i != tile.pos())
             {
                 // Log.info("add bridge " + i);
                 tile.link.add(i);
                 other.link.add(tile.pos());
-                SignalGraph.addEdge(tile.v[0], other.v[0]);
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
         });
 
@@ -73,7 +74,7 @@ public class SignalBridge extends SignalBlock
             {
                 tile.shielding = l;
                 // Log.info("set shielding " + l);
-                tile.updateEdges();
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             for (int i = 1; i < p.length; i++)
             {
@@ -86,7 +87,7 @@ public class SignalBridge extends SignalBlock
                         // Log.info("add bridge " + other.pos());
                         tile.link.add(b.pos());
                         b.link.add(tile.pos());
-                        SignalGraph.addEdge(tile.v[0], b.v[0]);
+                        SignalGraph.events.add(new GraphEvent.updateEvent(tile));
                     }
                 }
             }
@@ -267,11 +268,10 @@ public class SignalBridge extends SignalBlock
                     {
                         link.add(l);
                         other.link.add(pos());
-                        SignalGraph.addEdge(v[0], other.v[0]);
                     }
                 }
             }
-            updateEdges();
+            SignalGraph.events.add(new GraphEvent.updateEvent(this));
         }
     }
 }

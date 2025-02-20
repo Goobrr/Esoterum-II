@@ -46,7 +46,7 @@ public class SignalBlock extends Block
         config(Long.class, (SignalBuild tile, Long i) -> {
             // Log.info("toggle shielding " + i);
             tile.shielding = tile.shielding ^ i;
-            tile.updateEdges();
+            SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             //Log.info("config Long");
         });
 
@@ -55,7 +55,7 @@ public class SignalBlock extends Block
             {
                 // Log.info("set shielding " + l);
                 tile.shielding = l;
-                tile.updateEdges();
+                SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             //Log.info("config Object[]");
         });
@@ -172,6 +172,7 @@ public class SignalBlock extends Block
         public int[] signal = new int[vertexCount];
         public boolean[] active = new boolean[size * 4];
         public long shielding;
+        public int id;
 
         public int[] inputs()
         {
@@ -193,18 +194,18 @@ public class SignalBlock extends Block
             return size;
         }
 
+        public int vertexCount()
+        {
+            return vertexCount;
+        }
+
         @Override
         public void created()
         {
             super.created();
             if (!this.block.rotate) rotation(0);
 
-            for (int i = 0; i < vertexCount; i++)
-            {
-                if (v[i] == null) SignalGraph.addVertex(this, i);
-            }
-
-            updateEdges();
+            SignalGraph.events.add(new GraphEvent.createEvent(this));
         }
 
         public void updateEdges()
@@ -226,59 +227,33 @@ public class SignalBlock extends Block
                     b.active[index] = active[i];
                 }
             }
-            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override
         public void onRemoved()
         {
-            for (int i = 0; i < vertexCount; i++) SignalGraph.removeVertex(this, i);
+            SignalGraph.events.add(new GraphEvent.destroyEvent(this));
             super.onRemoved();
-            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override
-        public void updateTile()
+        public void onProximityUpdate()
         {
-            if (SignalGraph.needsUpdate > 0)
-            {
-                for (int i = 0; i < vertexCount; i++) r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
-                SignalGraph.needsUpdate -= vertexCount;
-            }
-            for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = (int) r[i].augmentation;
-            // for (int i = 0; i < vertexCount; i++) signal[i] = (int) SignalGraph.graph.getComponentAugmentation(v[i]);
+            super.onProximityUpdate();
+            SignalGraph.events.add(new GraphEvent.updateEvent(this));
         }
 
-        // @Override
-        // public void onProximityUpdate()
-        // {
-        //     super.onProximityUpdate();
-        //     updateEdges();
-        // }
-
-        // @Override
-        // public void updateProximity()
-        // {
-        //     super.updateProximity();
-        //     updateEdges();
-        // }
+        public void updateSignal(boolean update)
+        {
+            if (update) for (int i = 0; i < vertexCount; i++) r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
+            for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = (int) r[i].augmentation;
+        }
 
         @Override
         public void draw()
         {
-
-            if (EsoVars.drawSignalRegions)
-            {
-                //Draw.rect(bottomRegion, x, y);
-                Draw.rect(baseRegion, x, y);
-
-                // drawShieldRegions();
-                // drawSignalRegions();
-            }
-            else
-            {
-                Draw.rect(uiIcon, x, y, rotation * 90);
-            }
+            if (EsoVars.drawSignalRegions) Draw.rect(baseRegion, x, y);
+            else Draw.rect(uiIcon, x, y, rotation * 90);
         }
 
         @Override
@@ -394,7 +369,7 @@ public class SignalBlock extends Block
             {
                 shielding = read.l();
                 for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
-                updateEdges();
+                SignalGraph.events.add(new GraphEvent.updateEvent(this));
             }
             else if (revision == 3)
             {

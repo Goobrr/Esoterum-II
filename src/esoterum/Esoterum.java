@@ -1,6 +1,8 @@
 package esoterum;
 
 import arc.Events;
+import arc.util.Log;
+import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
 import esoterum.overlay.SignalOverlay;
 import esoterum.ui.*;
@@ -18,6 +20,23 @@ public class Esoterum extends Mod
 {
 
     public static boolean debug = false;
+    public static Thread t;
+    public static Runnable r = () -> {
+        try {
+            boolean update = false;
+            GraphEvent.eventType e;
+            while (true)
+            {
+                update = !SignalGraph.events.isEmpty();
+                while ((e = SignalGraph.events.poll()) != null) e.run();
+                //Log.info(SignalGraph.builds.size);
+                SignalGraph.updateBuilds(update);
+                update = false;
+            }
+        } catch (Throwable e) {
+            Log.err(e);
+        }
+    };
 
     public Esoterum()
     {
@@ -26,7 +45,8 @@ public class Esoterum extends Mod
         });
 
         Events.on(WorldLoadBeginEvent.class, event -> {
-            SignalGraph.graph.clear();
+            SignalGraph.clear();
+            if (t == null || !t.isAlive()) (t = new Thread(r)).start();
         });
 
         Events.run(EventType.Trigger.drawOver, () -> {
@@ -34,6 +54,19 @@ public class Esoterum extends Mod
 
             SignalOverlay.draw();
         });
+
+        // Events.on(StateChangeEvent.class, event -> {
+        //     if(event.to == State.menu){
+        //         run = false;
+        //     } else if(event.to == State.paused){
+        //         run = false;
+        //     } else if (event.to == State.playing){
+        //         new Thread(() -> {
+        //             run = true;
+        //             while (run) SignalGraph.updateBuilds();
+        //         }).start();
+        //     }
+        // });
     }
 
     @Override

@@ -17,14 +17,6 @@ public class SignalWire extends SignalBlock
     {
         public boolean bypass = false;
 
-        //because wires bypass needs extra logic
-        @Override
-        public void onProximityUpdate()
-        {
-            super.onProximityUpdate();
-            updateEdges();
-        }
-
         @Override
         public void updateEdges()
         {
@@ -58,18 +50,13 @@ public class SignalWire extends SignalBlock
                 else bypass = true;
             }
             else bypass = false;
-
-            SignalGraph.needsUpdate = SignalGraph.vertices;
         }
 
         @Override
-        public void updateTile()
+        public void updateSignal(boolean update)
         {
-            super.updateTile();
-            if (!bypass)
-            {
-                if ((signal[1] | signal[2] | signal[3]) != signal[0]) SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
-            }
+            super.updateSignal(update);
+            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != signal[0]) SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
         }
     }
 }

@@ -93,9 +93,9 @@ public class SignalMem extends SignalBlock {
         public void drawShieldRegions(){}
 
         @Override
-        public void updateTile()
+        public void updateSignal(boolean update)
         {
-            super.updateTile();
+            super.updateSignal(update);
             int addr = (signal[8] + 
                 (signal[9] << 1) +
                 (signal[10] << 2) +

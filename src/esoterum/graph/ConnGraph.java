@@ -1,7 +1,6 @@
 package esoterum.graph;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import arc.struct.ObjectMap;
 
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
@@ -124,7 +123,7 @@ public class ConnGraph
      * expected time and O(log N / log log N) time with high probability, because vertexInfo is a HashMap, and
      * ConnVertex.hashCode() returns a random integer.
      */
-    public Map<ConnVertex, VertexInfo> vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>();
+    public ObjectMap<ConnVertex, VertexInfo> vertexInfo = new ObjectMap<ConnVertex, VertexInfo>();
 
     /**
      * Ceiling of log base 2 of the maximum number of vertices in this graph since the last rebuild. This is 0 if that
@@ -181,7 +180,7 @@ public class ConnGraph
             return info;
         }
 
-        if (vertexInfo.size() == MAX_VERTEX_COUNT)
+        if (vertexInfo.size == MAX_VERTEX_COUNT)
         {
             throw new RuntimeException(
                     "Sorry, ConnGraph has too many vertices to perform this operation. ConnGraph does not support " +
@@ -197,11 +196,11 @@ public class ConnGraph
 
         info = new VertexInfo(eulerTourVertex);
         vertexInfo.put(vertex, info);
-        if (vertexInfo.size() > 1 << maxLogVertexCountSinceRebuild)
+        if (vertexInfo.size > 1 << maxLogVertexCountSinceRebuild)
         {
             maxLogVertexCountSinceRebuild++;
         }
-        maxVertexInfoSize = Math.max(maxVertexInfoSize, vertexInfo.size());
+        maxVertexInfoSize = Math.max(maxVertexInfoSize, vertexInfo.size);
         return info;
     }
 
@@ -213,15 +212,15 @@ public class ConnGraph
     private void remove(ConnVertex vertex)
     {
         vertexInfo.remove(vertex);
-        if (4 * vertexInfo.size() <= maxVertexInfoSize && maxVertexInfoSize > 12)
+        if (4 * vertexInfo.size <= maxVertexInfoSize && maxVertexInfoSize > 12)
         {
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy vertexInfo to a new HashMap, which will have a
             // suitable capacity.
-            vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>(vertexInfo);
-            maxVertexInfoSize = vertexInfo.size();
+            vertexInfo.shrink(0);
+            maxVertexInfoSize = vertexInfo.size;
         }
-        if (vertexInfo.size() << REBUILD_CHANGE <= 1 << maxLogVertexCountSinceRebuild)
+        if (vertexInfo.size << REBUILD_CHANGE <= 1 << maxLogVertexCountSinceRebuild)
         {
             rebuild();
         }
@@ -319,7 +318,7 @@ public class ConnGraph
             return;
         }
         int deleteCount = 0;
-        while (2 * vertexInfo.size() <= 1 << maxLogVertexCountSinceRebuild)
+        while (2 * vertexInfo.size <= 1 << maxLogVertexCountSinceRebuild)
         {
             maxLogVertexCountSinceRebuild--;
             deleteCount++;
@@ -649,9 +648,9 @@ public class ConnGraph
     private void addToEdgeMap(ConnEdge edge, VertexInfo srcInfo, ConnVertex destVertex)
     {
         srcInfo.edges.put(destVertex, edge);
-        if (srcInfo.edges.size() > srcInfo.maxEdgeCountSinceRebuild)
+        if (srcInfo.edges.size > srcInfo.maxEdgeCountSinceRebuild)
         {
-            srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size();
+            srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size;
         }
     }
 
@@ -667,7 +666,7 @@ public class ConnGraph
         {
             throw new IllegalArgumentException("Self-loops are not allowed");
         }
-        if (vertexInfo.size() >= MAX_VERTEX_COUNT - 1)
+        if (vertexInfo.size >= MAX_VERTEX_COUNT - 1)
         {
             throw new RuntimeException(
                     "Sorry, ConnGraph has too many vertices to perform this operation. ConnGraph does not support " +
@@ -957,14 +956,14 @@ public class ConnGraph
     private ConnEdge removeFromEdgeMap(VertexInfo srcInfo, ConnVertex destVertex)
     {
         ConnEdge edge = srcInfo.edges.remove(destVertex);
-        if (edge != null && 4 * srcInfo.edges.size() <= srcInfo.maxEdgeCountSinceRebuild &&
+        if (edge != null && 4 * srcInfo.edges.size <= srcInfo.maxEdgeCountSinceRebuild &&
                 srcInfo.maxEdgeCountSinceRebuild > 6)
         {
             // The capacity of a HashMap is not automatically reduced as the number of entries decreases. To avoid
             // violating our O(V log V + E) space guarantee, we copy srcInfo.edges to a new HashMap, which will have a
             // suitable capacity.
-            srcInfo.edges = new ConcurrentHashMap<ConnVertex, ConnEdge>(srcInfo.edges);
-            srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size();
+            srcInfo.edges = new ObjectMap<ConnVertex, ConnEdge>(srcInfo.edges);
+            srcInfo.maxEdgeCountSinceRebuild = srcInfo.edges.size;
         }
         return edge;
     }
@@ -1111,21 +1110,21 @@ public class ConnGraph
         return info2 != null && info1.vertex.arbitraryVisit.root() == info2.vertex.arbitraryVisit.root();
     }
 
-    /**
-     * Returns the vertices that are directly adjacent to the specified vertex.
-     */
-    public Collection<ConnVertex> adjacentVertices(ConnVertex vertex)
-    {
-        VertexInfo info = vertexInfo.get(vertex);
-        if (info != null)
-        {
-            return new ArrayList<ConnVertex>(info.edges.keySet());
-        }
-        else
-        {
-            return Collections.emptyList();
-        }
-    }
+    // /**
+    //  * Returns the vertices that are directly adjacent to the specified vertex.
+    //  */
+    // public Collection<ConnVertex> adjacentVertices(ConnVertex vertex)
+    // {
+    //     VertexInfo info = vertexInfo.get(vertex);
+    //     if (info != null)
+    //     {
+    //         return new ArrayList<ConnVertex>(info.edges.keySet());
+    //     }
+    //     else
+    //     {
+    //         return Collections.emptyList();
+    //     }
+    // }
 
     /**
      * Sets the augmentation associated with the specified vertex. This method takes O(log N) time with high
@@ -1277,7 +1276,7 @@ public class ConnGraph
     {
         // Note that we construct a new HashMap rather than calling vertexInfo.clear() in order to ensure a reduction in
         // space
-        vertexInfo = new ConcurrentHashMap<ConnVertex, VertexInfo>();
+        vertexInfo = new ObjectMap<ConnVertex, VertexInfo>();
         maxLogVertexCountSinceRebuild = 0;
         maxVertexInfoSize = 0;
     }
