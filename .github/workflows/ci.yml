@@ -7,6 +7,9 @@ on:
     types:
       - created
 
+permissions:
+  contents: write
+
 jobs:
   buildJar:
     name: Build and Publish Jar
