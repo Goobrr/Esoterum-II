@@ -16,6 +16,7 @@ public class SignalWire extends SignalBlock
     public class SignalWireBuild extends SignalBuild
     {
         public boolean bypass = false;
+        public int outputSignal = 0;
 
         @Override
         public void updateEdges()
@@ -56,7 +57,7 @@ public class SignalWire extends SignalBlock
         public void updateSignal(boolean update)
         {
             super.updateSignal(update);
-            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != signal[0]) SignalGraph.graph.setVertexAugmentation(v[0], signal[1] | signal[2] | signal[3]);
+            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != outputSignal) SignalGraph.graph.setVertexAugmentation(v[0], outputSignal = signal[1] | signal[2] | signal[3]);
         }
     }
 }
