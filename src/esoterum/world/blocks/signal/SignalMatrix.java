@@ -4,6 +4,9 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.scene.ui.layout.Table;
+import esoterum.graph.SignalGraph;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SignalMatrix extends SignalBlock
 {
@@ -20,10 +23,13 @@ public class SignalMatrix extends SignalBlock
         public Texture tex = new Texture(256, 256);
         public TextureRegion txr = new TextureRegion(tex);
 
+        private PaintOrder currentOrder;
+        private ConcurrentLinkedQueue<PaintOrder> queuedOrders = new ConcurrentLinkedQueue<>();
+
         @Override
-        public void update()
+        public void updateSignal(boolean update)
         {
-            super.update();
+            super.updateSignal(update);
 
             int x = (signal[0] |
                     (signal[1] << 1) |
@@ -51,25 +57,26 @@ public class SignalMatrix extends SignalBlock
                         (signal[20] << 15) |
                         (signal[21] << 14) |
                         0xFF);
-                if (img.getRaw(x, y) != color)
-                {
-                    img.setRaw(x, y, color);
-                    tex.draw(img);
-                }
+                queuedOrders.add(new PaintOrder(x, y, color));
             }
             else if (signal[23] > 0)
             {
-                if (img.getRaw(x, y) != 0xFF)
-                {
-                    img.set(x, y, 0xFF);
-                    tex.draw(img);
-                }
+                queuedOrders.add(new PaintOrder(x, y, 0xFF));
             }
         }
 
         @Override
         public void draw()
         {
+            boolean update = false;
+            while ((currentOrder = queuedOrders.poll()) != null)
+            {
+                update = true;
+                if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color) img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
+            }
+
+            if (update) tex.draw(img);
+
             Draw.z(30.05f);
             Draw.rect(txr, this.x, this.y, rotation * 90);
         }
@@ -104,6 +111,10 @@ public class SignalMatrix extends SignalBlock
         public void buildConfiguration(Table table)
         {
             // disable shielding for memory blocks
+        }
+
+        private record PaintOrder(int x, int y, int color)
+        {
         }
     }
 }
