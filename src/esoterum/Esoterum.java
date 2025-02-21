@@ -21,11 +21,12 @@ public class Esoterum extends Mod
 
     public static boolean debug = false;
     public static Thread t;
+    private static boolean running = true;
     public static Runnable r = () -> {
         try {
             boolean update = false;
             GraphEvent.eventType e;
-            while (true)
+            while (running)
             {
                 update = !SignalGraph.events.isEmpty();
                 while ((e = SignalGraph.events.poll()) != null) e.run();
@@ -53,6 +54,10 @@ public class Esoterum extends Mod
             if (!Vars.state.isGame()) return;
 
             SignalOverlay.draw();
+        });
+
+        Events.run(DisposeEvent.class, () -> {
+            running = false;
         });
 
         // Events.on(StateChangeEvent.class, event -> {
