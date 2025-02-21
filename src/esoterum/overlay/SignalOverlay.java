@@ -21,6 +21,7 @@ public class SignalOverlay {
             if (build instanceof SignalBuild b)
             {
                 Draw.z(30.05f);
+                Draw.color(Color.white);
                 b.drawShieldRegions();
                 b.drawSignalRegions(camRect);
             }
