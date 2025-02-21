@@ -1,3 +1,5 @@
+import arc.util.*;
+
 apply plugin: "java"
 
 version '1.0'
@@ -38,6 +40,22 @@ dependencies{
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
 
+buildscript {
+    repositories{
+        mavenCentral()
+        maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+        maven{ url 'https://www.jitpack.io' }
+    }
+
+    ext{
+        //the build number that this mod is made for
+        mindustryVersion = 'v146'
+    }
+
+    dependencies {
+        classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    }
+}
 //force arc version
 configurations.all{
     resolutionStrategy.eachDependency { details ->
@@ -60,10 +78,14 @@ task jarAndroid{
         //collect dependencies needed for desugaring
         def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{ "--classpath $it.path" }.join(" ")
 
-        def d8 = isWindows ? "d8.bat" : "d8"
+        def d8name = "d8";
+        if (OS.isWindows) d8name = "d8.bat";
+        def d8 = new File((String) (sdkRoot + "/build-tools/35.0.0/" + d8name));
+
+        if(!d8.exists()) throw IllegalStateException("Android SDK `build-tools;$androidBuildVersion` isn't installed or is corrupted")
 
         //dex and desugar files - this requires d8 in your PATH
-        "$d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
+        "$d8 $dependencies --min-api 14 --output ${base.archivesBaseName}.jar ${base.archivesBaseName}Desktop.jar"
             .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }

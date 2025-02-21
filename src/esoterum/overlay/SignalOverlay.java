@@ -4,6 +4,7 @@ import static mindustry.Vars.player;
 
 import arc.Core;
 import arc.graphics.g2d.Draw;
+import arc.graphics.Color;
 import arc.math.geom.Rect;
 import esoterum.EsoVars;
 import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
@@ -21,6 +22,7 @@ public class SignalOverlay {
             if (build instanceof SignalBuild b)
             {
                 Draw.z(30.05f);
+                Draw.color(Color.white);
                 b.drawShieldRegions();
                 b.drawSignalRegions(camRect);
             }
