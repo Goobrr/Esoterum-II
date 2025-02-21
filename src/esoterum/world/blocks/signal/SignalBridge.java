@@ -193,7 +193,7 @@ public class SignalBridge extends SignalBlock
                 {
                     Lines.line(
                             x, y,
-                            p.x * 8, p.y * 8,
+                            p.x, p.y,
                             false
                     );
                 }
