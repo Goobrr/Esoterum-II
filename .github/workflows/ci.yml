@@ -28,11 +28,11 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         with:
           name: Esoterum (zipped)
-          path: build/libs/Esoterum-IIAndroid.jar
+          path: build/libs/Esoterum-II.jar
           if-no-files-found: error
           compression-level: 0
       - name: Upload built mod artifact into release
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'release' && github.event.action == 'created'
         with:
-          files: build/libs/Esoterum-IIAndroid.jar
+          files: build/libs/Esoterum-II.jar
