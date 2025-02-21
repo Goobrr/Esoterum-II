@@ -2,8 +2,7 @@ package esoterum.world.blocks.signal;
 
 import arc.Core;
 import arc.func.Boolf;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import esoterum.graph.SignalGraph;
 
@@ -33,7 +32,7 @@ public class SignalGate extends SignalBlock
     public class SignalGateBuild extends SignalBuild
     {
         int outputSignal = 0;
-        
+
         @Override
         public void updateSignal(boolean update)
         {

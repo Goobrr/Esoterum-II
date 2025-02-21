@@ -33,7 +33,7 @@ public class SignalWire extends SignalBlock
                 if (Vars.world.build((int) (x / 8 + offset.x + sideOffset.x), (int) (y / 8 + offset.y + sideOffset.y)) instanceof SignalBuild b)
                 {
                     int index = EdgeUtils.getOffsetIndex(b.size(), x / 8 + offset.x - b.x / 8, y / 8 + offset.y - b.y / 8, b.rotation);
-                    if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1l << i)) == 0) && ((b.shielding & (1l << index)) == 0))
+                    if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1L << i)) == 0) && ((b.shielding & (1L << index)) == 0))
                     {
                         c += inputs[i];
                         last = i;
@@ -57,7 +57,8 @@ public class SignalWire extends SignalBlock
         public void updateSignal(boolean update)
         {
             super.updateSignal(update);
-            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != outputSignal) SignalGraph.graph.setVertexAugmentation(v[0], outputSignal = signal[1] | signal[2] | signal[3]);
+            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != outputSignal)
+                SignalGraph.graph.setVertexAugmentation(v[0], outputSignal = signal[1] | signal[2] | signal[3]);
         }
     }
 }

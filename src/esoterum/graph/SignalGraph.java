@@ -1,10 +1,10 @@
 package esoterum.graph;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import arc.struct.Seq;
 import esoterum.world.blocks.signal.SignalBlock;
-import esoterum.world.blocks.signal.SignalBlock.SignalBuild;;
+import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SignalGraph
 {
@@ -26,7 +26,6 @@ public class SignalGraph
     {
         b.v[k] = new ConnVertex();
         graph.setVertexAugmentation(b.v[k], 0);
-        //Log.info("add");
     }
 
     public static void addEdge(ConnVertex u, ConnVertex v)
@@ -43,7 +42,6 @@ public class SignalGraph
         }
         graph.removeVertexAugmentation(b.v[k]);
         b.v[k] = null;
-        //Log.info("rm");
     }
 
     public static void clearVertices()
@@ -89,7 +87,8 @@ public class SignalGraph
 
     public static void updateBuilds(boolean update)
     {
-        //Log.info("builds: " + builds.size);
-        builds.forEach(b -> { b.updateSignal(update); });
+        builds.forEach(b -> {
+            b.updateSignal(update);
+        });
     }
 }

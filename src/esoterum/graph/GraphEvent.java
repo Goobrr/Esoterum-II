@@ -2,16 +2,25 @@ package esoterum.graph;
 
 import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
 
-public class GraphEvent {
+public class GraphEvent
+{
 
-    public static class eventType {
+    public static class eventType
+    {
         public SignalBuild b;
-        public void run() {}
+
+        public void run()
+        {
+        }
     }
 
     public static class createEvent extends eventType
     {
-        public createEvent(SignalBuild b) { this.b = b; }
+        public createEvent(SignalBuild b)
+        {
+            this.b = b;
+        }
+
         public void run()
         {
             b.id = SignalGraph.addBuild(b);
@@ -21,7 +30,11 @@ public class GraphEvent {
 
     public static class destroyEvent extends eventType
     {
-        public destroyEvent(SignalBuild b) { this.b = b; }
+        public destroyEvent(SignalBuild b)
+        {
+            this.b = b;
+        }
+
         public void run()
         {
             for (int i = 0; i < b.vertexCount(); i++) SignalGraph.removeVertex(b, i);
@@ -31,7 +44,11 @@ public class GraphEvent {
 
     public static class updateEvent extends eventType
     {
-        public updateEvent(SignalBuild b) { this.b = b; }
+        public updateEvent(SignalBuild b)
+        {
+            this.b = b;
+        }
+
         public void run()
         {
             b.updateEdges();

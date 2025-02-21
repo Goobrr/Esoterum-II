@@ -4,8 +4,7 @@ import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.util.io.*;
-import esoterum.graph.GraphEvent;
-import esoterum.graph.SignalGraph;
+import esoterum.graph.*;
 import mindustry.world.Block;
 
 public class SignalSwitch extends SignalBlock
@@ -65,7 +64,8 @@ public class SignalSwitch extends SignalBlock
         @Override
         public void updateSignal(boolean update)
         {
-            if ((enabled ? 0 : 1) != signal[0]) SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = enabled ? 0 : 1);
+            if ((enabled ? 0 : 1) != signal[0])
+                SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = enabled ? 0 : 1);
         }
 
         @Override
@@ -89,10 +89,14 @@ public class SignalSwitch extends SignalBlock
         }
 
         @Override
-        public void drawSignalRegions(Rect camera){}
-        
+        public void drawSignalRegions(Rect camera)
+        {
+        }
+
         @Override
-        public void drawShieldRegions(){}
+        public void drawShieldRegions()
+        {
+        }
 
         @Override
         public void read(Reads read, byte revision)
