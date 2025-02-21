@@ -99,6 +99,8 @@ public class SignalSwitch extends SignalBlock
         {
             super.read(read, revision);
             enabled = read.bool();
+            signal[0] = 0;
+            SignalGraph.events.add(new GraphEvent.updateEvent(this));
         }
     }
 }

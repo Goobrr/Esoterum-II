@@ -5,6 +5,7 @@ import static mindustry.Vars.player;
 import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.math.geom.Rect;
+import esoterum.EsoVars;
 import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
 import mindustry.Vars;
 import mindustry.game.Team;
@@ -14,6 +15,7 @@ public class SignalOverlay {
     public static Rect camRect = new Rect(), tileRect = new Rect();
     public static void draw()
     {
+        if (!EsoVars.drawSignalRegions) return;
         Core.camera.bounds(camRect);
         Vars.indexer.eachBlock(player.team(), camRect, build -> {return true;}, build -> {
             if (build instanceof SignalBuild b)
