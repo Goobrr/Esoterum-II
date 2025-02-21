@@ -2,6 +2,8 @@ displayName: "Esoterum II"
 
 name: "eso"
 
+description: "A mod that adds logic components to the game, such as logic gates, wires and more."
+
 author: "@Goob_rr"
 
 main: "esoterum.Esoterum"
