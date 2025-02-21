@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.scene.ui.layout.Table;
-import esoterum.graph.SignalGraph;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -25,6 +24,12 @@ public class SignalMatrix extends SignalBlock
 
         private PaintOrder currentOrder;
         private ConcurrentLinkedQueue<PaintOrder> queuedOrders = new ConcurrentLinkedQueue<>();
+
+        private int calculateColor(int colorA, int colorB)
+        {
+            int value = colorA << 1 | colorB;
+            return value | value << 2 | value << 4 | value << 6;
+        }
 
         @Override
         public void updateSignal(boolean update)
@@ -50,13 +55,11 @@ public class SignalMatrix extends SignalBlock
 
             if (signal[22] > 0)
             {
-                int color = ((signal[16] << 31) |
-                        (signal[17] << 30) |
-                        (signal[18] << 23) |
-                        (signal[19] << 22) |
-                        (signal[20] << 15) |
-                        (signal[21] << 14) |
-                        0xFF);
+                int color =
+                        (calculateColor(signal[16], signal[17]) << 24) |
+                        (calculateColor(signal[18], signal[19]) << 16) |
+                        (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
+
                 queuedOrders.add(new PaintOrder(x, y, color));
             }
             else if (signal[23] > 0)
