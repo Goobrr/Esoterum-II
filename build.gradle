@@ -60,7 +60,13 @@ task jarAndroid{
         //collect dependencies needed for desugaring
         def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{ "--classpath $it.path" }.join(" ")
 
-        def d8 = isWindows ? "d8.bat" : "d8"
+        def d8name = "d8";
+        if (OS.isWindows) {
+            d8name = "d8.bat";
+        }
+        def d8 = new File((String) (sdkRoot + "/build-tools/35.0.0/" + d8Name));
+
+        if(!d8.exists()) throw IllegalStateException("Android SDK `build-tools;$androidBuildVersion` isn't installed or is corrupted")
 
         //dex and desugar files - this requires d8 in your PATH
         "$d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
