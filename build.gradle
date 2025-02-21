@@ -79,10 +79,8 @@ task jarAndroid{
         def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect{ "--classpath $it.path" }.join(" ")
 
         def d8name = "d8";
-        if (arc.util.OS.isWindows) {
-            d8name = "d8.bat";
-        }
-        def d8 = new File((String) (sdkRoot + "/build-tools/35.0.0/" + d8Name));
+        if (OS.isWindows) d8name = "d8.bat";
+        def d8 = new File((String) (sdkRoot + "/build-tools/35.0.0/" + d8name));
 
         if(!d8.exists()) throw IllegalStateException("Android SDK `build-tools;$androidBuildVersion` isn't installed or is corrupted")
 
