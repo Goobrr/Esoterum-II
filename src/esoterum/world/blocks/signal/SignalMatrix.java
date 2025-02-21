@@ -21,8 +21,10 @@ public class SignalMatrix extends SignalBlock
         public TextureRegion txr = new TextureRegion(tex);
 
         @Override
-        public void draw()
+        public void update()
         {
+            super.update();
+
             int x = (signal[0] |
                     (signal[1] << 1) |
                     (signal[2] << 2) |
@@ -39,6 +41,7 @@ public class SignalMatrix extends SignalBlock
                     (signal[13] << 5) |
                     (signal[14] << 6) |
                     (signal[15] << 7));
+
             if (signal[22] > 0)
             {
                 int color = ((signal[16] << 31) |
@@ -62,6 +65,11 @@ public class SignalMatrix extends SignalBlock
                     tex.draw(img);
                 }
             }
+        }
+
+        @Override
+        public void draw()
+        {
             Draw.z(30.05f);
             Draw.rect(txr, this.x, this.y, rotation * 90);
         }
