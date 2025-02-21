@@ -1,13 +1,12 @@
 package esoterum.world.blocks.signal;
 
 import arc.Core;
-import arc.graphics.*;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
-import arc.util.Log;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
@@ -44,20 +43,16 @@ public class SignalBlock extends Block
         category = Category.logic;
 
         config(Long.class, (SignalBuild tile, Long i) -> {
-            // Log.info("toggle shielding " + i);
             tile.shielding = tile.shielding ^ i;
             SignalGraph.events.add(new GraphEvent.updateEvent(tile));
-            //Log.info("config Long");
         });
 
         config(Object[].class, (SignalBuild tile, Object[] p) -> {
             if (p[0] instanceof Long l)
             {
-                // Log.info("set shielding " + l);
                 tile.shielding = l;
                 SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
-            //Log.info("config Object[]");
         });
     }
 
@@ -92,7 +87,7 @@ public class SignalBlock extends Block
         bottomRegion = Core.atlas.find(name + "-bottom", "eso-none");
 
         String[] bases = {"eso-base-square", "eso-mega-base-square", "eso-none", "eso-giga-base-square", "eso-none", "eso-none", "eso-none", "eso-tera-base-square"};
-        baseRegion = Core.atlas.find(name + "-base", bases[size-1]);
+        baseRegion = Core.atlas.find(name + "-base", bases[size - 1]);
 
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
 
@@ -219,7 +214,7 @@ public class SignalBlock extends Block
                 if (Vars.world.build((int) (x / 8 + offset.x + sideOffset.x), (int) (y / 8 + offset.y + sideOffset.y)) instanceof SignalBuild b)
                 {
                     int index = EdgeUtils.getOffsetIndex(b.size(), x / 8 + offset.x - b.x / 8, y / 8 + offset.y - b.y / 8, b.rotation);
-                    if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1l << i)) == 0) && ((b.shielding & (1l << index)) == 0))
+                    if (((b.inputs()[index] & outputs[i]) == 1 || (b.outputs()[index] & inputs[i]) == 1) && ((shielding & (1L << i)) == 0) && ((b.shielding & (1L << index)) == 0))
                     {
                         SignalGraph.addEdge(v[conns[i]], b.v[b.conns()[index]]);
                         active[i] = true;
@@ -245,7 +240,8 @@ public class SignalBlock extends Block
 
         public void updateSignal(boolean update)
         {
-            if (update) for (int i = 0; i < vertexCount; i++) r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
+            if (update) for (int i = 0; i < vertexCount; i++)
+                r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
             for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = (int) r[i].augmentation;
         }
 
@@ -284,7 +280,7 @@ public class SignalBlock extends Block
         // full shield drawing code in SignalMem
         public void drawShieldRegions()
         {
-            Draw.rect(shieldRegions[(int)shielding & 15], x, y, rotation * 90);
+            Draw.rect(shieldRegions[(int) shielding & 15], x, y, rotation * 90);
         }
 
         @Override
@@ -294,30 +290,30 @@ public class SignalBlock extends Block
             for (int i = size * 6 - rotation * size - 1; i >= size * 5 - rotation * size; i--)
             {
                 final int t = i % (size * 4);
-                TextButton b = table.button((shielding & (1l << t)) > 0 ? "" + t : "X", () -> {
-                    configure(1l << t);
+                TextButton b = table.button((shielding & (1L << t)) > 0 ? "" + t : "X", () -> {
+                    configure(1L << t);
                 }).size(40f).tooltip("Toggle Shielding").get();
                 b.update(() -> {
-                    b.setText((shielding & (1l << t)) > 0 ? "" + t : "X");
+                    b.setText((shielding & (1L << t)) > 0 ? "" + t : "X");
                 });
             }
             table.row();
             for (int i = 0; i < size; i++)
             {
                 final int t1 = (6 * size + i - rotation * size) % (size * 4);
-                TextButton b1 = table.button((shielding & (1l << t1)) > 0 ? "" + t1 : "X", () -> {
-                    configure(1l << t1);
+                TextButton b1 = table.button((shielding & (1L << t1)) > 0 ? "" + t1 : "X", () -> {
+                    configure(1L << t1);
                 }).size(40f).tooltip("Toggle Shielding").get();
                 b1.update(() -> {
-                    b1.setText((shielding & (1l << t1)) > 0 ? "" + t1 : "X");
+                    b1.setText((shielding & (1L << t1)) > 0 ? "" + t1 : "X");
                 });
                 for (int j = 0; j < size; j++) table.table().size(40f);
                 final int t2 = (size * 5 - i - 1 - rotation * size) % (size * 4);
-                TextButton b2 = table.button((shielding & (1l << t2)) > 0 ? "" + t2 : "X", () -> {
-                    configure(1l << t2);
+                TextButton b2 = table.button((shielding & (1L << t2)) > 0 ? "" + t2 : "X", () -> {
+                    configure(1L << t2);
                 }).size(40f).tooltip("Toggle Shielding").get();
                 b2.update(() -> {
-                    b2.setText((shielding & (1l << t2)) > 0 ? "" + t2 : "X");
+                    b2.setText((shielding & (1L << t2)) > 0 ? "" + t2 : "X");
                 });
                 table.row();
             }
@@ -325,11 +321,11 @@ public class SignalBlock extends Block
             for (int i = size * 7 - rotation * size; i < size * 8 - rotation * size; i++)
             {
                 final int t = i % (size * 4);
-                TextButton b = table.button((shielding & (1l << t)) > 0 ? "" + t : "X", () -> {
-                    configure(1l << t);
+                TextButton b = table.button((shielding & (1L << t)) > 0 ? "" + t : "X", () -> {
+                    configure(1L << t);
                 }).size(40f).tooltip("Toggle Shielding").get();
                 b.update(() -> {
-                    b.setText((shielding & (1l << t)) > 0 ? "" + t : "X");
+                    b.setText((shielding & (1L << t)) > 0 ? "" + t : "X");
                 });
             }
         }

@@ -1,9 +1,9 @@
 package esoterum.graph;
 
+import arc.struct.ObjectSet;
+
 import java.lang.reflect.Array;
 import java.util.Comparator;
-
-import arc.struct.ObjectSet;
 
 /**
  * Wraps a value using reference equality.  In other words, two references are equal only if their values are the same
@@ -25,11 +25,10 @@ class Reference<T>
 
     public boolean equals(Object obj)
     {
-        if (!(obj instanceof Reference))
+        if (!(obj instanceof Reference<?> reference))
         {
             return false;
         }
-        Reference<?> reference = (Reference<?>) obj;
         return value == reference.value;
     }
 
@@ -565,7 +564,7 @@ public abstract class RedBlackNode<N extends RedBlackNode<N>> implements Compara
     @SuppressWarnings({"rawtypes", "unchecked"})
     private Comparator<N> naturalOrder()
     {
-        Comparator comparator = (Comparator) NATURAL_ORDER;
+        Comparator comparator = NATURAL_ORDER;
         return (Comparator<N>) comparator;
     }
 

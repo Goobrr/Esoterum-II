@@ -2,6 +2,8 @@ package esoterum.graph;
 
 import arc.struct.ObjectMap;
 
+import java.util.Objects;
+
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
  * whether two vertices are connected - whether there is a path between them. Adding and removing edges take O(log^2 N)
@@ -1143,7 +1145,7 @@ public class ConnGraph
         EulerTourVertex vertex = ensureInfo(connVertex).vertex;
         Object oldAugmentation = vertex.augmentation;
         if (!vertex.hasAugmentation ||
-                (vertexAugmentation != null ? !vertexAugmentation.equals(oldAugmentation) : oldAugmentation != null))
+                (!Objects.equals(vertexAugmentation, oldAugmentation)))
         {
             vertex.augmentation = vertexAugmentation;
             vertex.hasAugmentation = true;

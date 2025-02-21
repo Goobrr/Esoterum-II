@@ -1,5 +1,7 @@
 package esoterum.graph;
 
+import java.util.Objects;
+
 /**
  * A node in an Euler tour tree for ConnGraph (at some particular level i). See the comments for the implementation of
  * ConnGraph.
@@ -118,7 +120,7 @@ public class EulerTourNode extends RedBlackNode<EulerTourNode>
         }
 
         if (newSize == size && !augmentedFlags && hasAugmentation == newHasAugmentation &&
-                (newAugmentation != null ? newAugmentation.equals(augmentation) : augmentation == null))
+                (Objects.equals(newAugmentation, augmentation)))
         {
             return false;
         }

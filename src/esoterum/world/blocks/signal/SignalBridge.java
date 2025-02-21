@@ -4,14 +4,12 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.math.geom.Point2;
-import arc.math.geom.Rect;
+import arc.math.geom.*;
 import arc.struct.IntSeq;
 import arc.util.*;
 import arc.util.io.*;
 import esoterum.EsoVars;
-import esoterum.graph.GraphEvent;
-import esoterum.graph.SignalGraph;
+import esoterum.graph.*;
 import mindustry.Vars;
 import mindustry.gen.Building;
 import mindustry.graphics.*;
@@ -19,8 +17,8 @@ import mindustry.world.Tile;
 
 public class SignalBridge extends SignalBlock
 {
-    int range = 100;
     public TextureRegion[] signalRegions;
+    int range = 100;
 
     public SignalBridge(String name)
     {
@@ -36,14 +34,12 @@ public class SignalBridge extends SignalBlock
             if (other == null) return;
             if (tile.link.contains(i))
             {
-                // Log.info("remove bridge " + p);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             else if (i != tile.pos())
             {
-                // Log.info("add bridge " + p);
                 tile.link.add(i);
                 other.link.add(tile.pos());
                 SignalGraph.events.add(new GraphEvent.updateEvent(tile));
@@ -55,14 +51,12 @@ public class SignalBridge extends SignalBlock
             if (other == null) return;
             if (tile.link.contains(i))
             {
-                // Log.info("remove bridge " + i);
                 tile.link.removeValue(i);
                 other.link.removeValue(tile.pos());
                 SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             else if (i != tile.pos())
             {
-                // Log.info("add bridge " + i);
                 tile.link.add(i);
                 other.link.add(tile.pos());
                 SignalGraph.events.add(new GraphEvent.updateEvent(tile));
@@ -73,18 +67,15 @@ public class SignalBridge extends SignalBlock
             if (p[0] instanceof Long l)
             {
                 tile.shielding = l;
-                // Log.info("set shielding " + l);
                 SignalGraph.events.add(new GraphEvent.updateEvent(tile));
             }
             for (int i = 1; i < p.length; i++)
             {
-                // Log.info("bulk config " + i + ": " + p[i]);
                 Tile other = Vars.world.tile(Point2.unpack(tile.pos()).add((Point2) p[i]).pack());
                 if (linkValid(tile.tile, other))
                 {
                     if (other.pos() != tile.pos() && other.build instanceof SignalBridgeBuild b)
                     {
-                        // Log.info("add bridge " + other.pos());
                         tile.link.add(b.pos());
                         b.link.add(tile.pos());
                         SignalGraph.events.add(new GraphEvent.updateEvent(tile));
@@ -144,7 +135,8 @@ public class SignalBridge extends SignalBlock
         }
 
         @Override
-        public void drawSignalRegions(Rect camera){
+        public void drawSignalRegions(Rect camera)
+        {
             Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
             Draw.rect(signalRegions[(active[0] ? 1 : 0) + ((active[1] ? 1 : 0) << 1) + ((active[2] ? 1 : 0) << 2) + ((active[3] ? 1 : 0) << 3)], x, y, rotation * 90);
 
@@ -155,7 +147,8 @@ public class SignalBridge extends SignalBlock
                 Point2 p = Point2.unpack(link.get(i));
                 p.x *= 8;
                 p.y *= 8;
-                if (!camera.overlaps(Math.min(p.x,x), Math.min(p.y,y), Math.abs(p.x - x) + 1, Math.abs(p.y - y) + 1) && (p.y > y || (p.y == y && p.x < x))) continue;
+                if (!camera.overlaps(Math.min(p.x, x), Math.min(p.y, y), Math.abs(p.x - x) + 1, Math.abs(p.y - y) + 1) && (p.y > y || (p.y == y && p.x < x)))
+                    continue;
                 if (EsoVars.drawNodesAsManhattan)
                 {
                     float halfwayX = (x + p.x) / 2;

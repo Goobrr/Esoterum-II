@@ -36,5 +36,5 @@ public interface Augmentation
      * prior call to ConnGraph.setVertexAugmentation(vertex, null), or that the "combine" method previously returned
      * null.
      */
-    public Object combine(Object value1, Object value2);
+    Object combine(Object value1, Object value2);
 }
