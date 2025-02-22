@@ -116,8 +116,16 @@ public class SignalMatrix extends SignalBlock
             // disable shielding for memory blocks
         }
 
-        private record PaintOrder(int x, int y, int color)
+        private static class PaintOrder
         {
+            public int x, y, color;
+
+            public PaintOrder(int x, int y, int color)
+            {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+            }
         }
     }
 }
