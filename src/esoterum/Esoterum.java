@@ -135,6 +135,15 @@ public class Esoterum extends Mod
             setOutputs(1, 1, 1, 1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalHyperClock("hyper-clock")
+        {{
+            rotate = false;
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(0, 0, 0, 0);
+            setOutputs(1, 1, 1, 1);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
         new SignalGate("item-sensor")
         {{
             vertexCount = 1;
