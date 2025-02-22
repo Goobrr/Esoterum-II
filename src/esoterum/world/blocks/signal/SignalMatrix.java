@@ -53,7 +53,10 @@ public class SignalMatrix extends SignalBlock
                     (signal[14] << 6) |
                     (signal[15] << 7));
 
-            if (signal[22] > 0)
+            if (signal[23] > 0)
+            {
+                queuedOrders.add(new ClearOrder());
+            } else if (signal[22] > 0)
             {
                 int color =
                         (calculateColor(signal[16], signal[17]) << 24) |
@@ -61,10 +64,6 @@ public class SignalMatrix extends SignalBlock
                         (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
 
                 queuedOrders.add(new PaintOrder(x, y, color));
-            }
-            else if (signal[23] > 0)
-            {
-                queuedOrders.add(new PaintOrder(x, y, 0xFF));
             }
         }
 
@@ -75,7 +74,8 @@ public class SignalMatrix extends SignalBlock
             while ((currentOrder = queuedOrders.poll()) != null)
             {
                 update = true;
-                if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color) img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
+                if (currentOrder instanceof ClearOrder) img.fill(0xFF);
+                else if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color) img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
             }
 
             if (update) tex.draw(img);
@@ -120,12 +120,21 @@ public class SignalMatrix extends SignalBlock
         {
             public int x, y, color;
 
+            private PaintOrder()
+            {
+
+            }
+
             public PaintOrder(int x, int y, int color)
             {
                 this.x = x;
                 this.y = y;
                 this.color = color;
             }
+        }
+
+        private static class ClearOrder extends PaintOrder
+        {
         }
     }
 }
