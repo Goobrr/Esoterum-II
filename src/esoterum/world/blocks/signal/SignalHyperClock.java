@@ -20,14 +20,6 @@ public class SignalHyperClock extends SignalBlock
     }
 
     @Override
-    public void load()
-    {
-        super.load();
-
-        baseRegion = Core.atlas.find(name, "eso-default-gate-base");
-    }
-
-    @Override
     public boolean canReplace(Block other)
     {
         return super.canReplace(other) || other instanceof SignalSwitch;
@@ -47,7 +39,7 @@ public class SignalHyperClock extends SignalBlock
         @Override
         public void draw()
         {
-            Draw.rect(uiIcon, x, y, rotation * 90);
+            Draw.rect(baseRegion, x, y, rotation * 90);
         }
 
         @Override
