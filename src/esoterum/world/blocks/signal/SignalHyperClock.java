@@ -1,6 +1,5 @@
 package esoterum.world.blocks.signal;
 
-import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import esoterum.graph.*;
@@ -27,7 +26,7 @@ public class SignalHyperClock extends SignalBlock
 
     public class SignalHyperClockBuild extends SignalBuild
     {
-        private boolean on = true;
+        public boolean on = true;
 
         @Override
         public void updateSignal(boolean update)
