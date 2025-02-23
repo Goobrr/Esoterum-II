@@ -3,20 +3,15 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
-import arc.scene.ui.Button.ButtonStyle;
-import arc.scene.ui.ImageButton;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
-import arc.util.*;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
+import arc.util.Eachable;
+import arc.util.io.*;
 import esoterum.EsoVars;
-import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
-import esoterum.ui.*;
-import mindustry.graphics.Pal;
-import mindustry.entities.units.*;
-import mindustry.ui.*;
+import esoterum.ui.EsoStyles;
+import mindustry.entities.units.BuildPlan;
+import mindustry.ui.Styles;
 
 public class SignalMem extends SignalBlock
 {
@@ -46,10 +41,11 @@ public class SignalMem extends SignalBlock
     }
 
     @Override
-    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list)
+    {
         return outputSignalRegions[0];
     }
-    
+
     public class SignalMemBuild extends SignalBuild
     {
         int[] mem = new int[256];
@@ -74,13 +70,13 @@ public class SignalMem extends SignalBlock
                     b.setStyle(EsoStyles.memflatt);
                     b.update(() -> {
                         int sel = signal[8] |
-                            (signal[9] << 1) |
-                            (signal[10] << 2) |
-                            (signal[11] << 3) |
-                            (signal[12] << 4) |
-                            (signal[13] << 5) |
-                            (signal[14] << 6) |
-                            (signal[15] << 7);
+                                (signal[9] << 1) |
+                                (signal[10] << 2) |
+                                (signal[11] << 3) |
+                                (signal[12] << 4) |
+                                (signal[13] << 5) |
+                                (signal[14] << 6) |
+                                (signal[15] << 7);
                         b.setChecked(sel == addr);
                         b.setText(String.format("%02X", mem[addr]));
                     });
@@ -149,10 +145,11 @@ public class SignalMem extends SignalBlock
         }
 
         @Override
-        public void drawSelect() {
+        public void drawSelect()
+        {
             super.drawSelect();
 
-            Draw.rect(pinoutRegion, x, y ,rotation * 90);
+            Draw.rect(pinoutRegion, x, y, rotation * 90);
         }
 
         @Override
@@ -181,13 +178,13 @@ public class SignalMem extends SignalBlock
             if (signal[24] == 1)
             {
                 mem[addr] = signal[16] |
-                    (signal[17] << 1) |
-                    (signal[18] << 2) |
-                    (signal[19] << 3) |
-                    (signal[20] << 4) |
-                    (signal[21] << 5) |
-                    (signal[22] << 6) |
-                    (signal[23] << 7);
+                        (signal[17] << 1) |
+                        (signal[18] << 2) |
+                        (signal[19] << 3) |
+                        (signal[20] << 4) |
+                        (signal[21] << 5) |
+                        (signal[22] << 6) |
+                        (signal[23] << 7);
             }
 
             if (signal[25] == 1)

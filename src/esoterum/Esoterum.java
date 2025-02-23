@@ -31,7 +31,8 @@ public class Esoterum extends Mod
                     update = !SignalGraph.events.isEmpty();
                     while ((e = SignalGraph.events.poll()) != null) e.run();
                     SignalGraph.updateBuilds(update);
-                } else Thread.sleep(100);
+                }
+                else Thread.sleep(100);
             }
         } catch (Throwable e)
         {

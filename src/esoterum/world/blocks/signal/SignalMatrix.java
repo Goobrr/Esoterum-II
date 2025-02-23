@@ -1,12 +1,12 @@
 package esoterum.world.blocks.signal;
 
-import arc.*;
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.scene.ui.layout.Table;
-import arc.util.*;
-import mindustry.entities.units.*;
+import arc.util.Eachable;
+import mindustry.entities.units.BuildPlan;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,7 +23,8 @@ public class SignalMatrix extends SignalBlock
     }
 
     @Override
-    public void load() {
+    public void load()
+    {
         super.load();
 
         placeRegion = Core.atlas.find("eso-display-matrix-place", "eso-none");
@@ -31,7 +32,8 @@ public class SignalMatrix extends SignalBlock
     }
 
     @Override
-    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list)
+    {
         return placeRegion;
     }
 
@@ -85,12 +87,13 @@ public class SignalMatrix extends SignalBlock
                     colorMapRef.set(colorMap);
                 }
 
-            } else if (signal[22] > 0)
+            }
+            else if (signal[22] > 0)
             {
                 int color =
                         (calculateColor(signal[16], signal[17]) << 24) |
-                        (calculateColor(signal[18], signal[19]) << 16) |
-                        (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
+                                (calculateColor(signal[18], signal[19]) << 16) |
+                                (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
 
                 byte[] colorMap = colorMapRef.get();
                 if (colorMap[x + y * 256] != (byte) color)
@@ -110,7 +113,8 @@ public class SignalMatrix extends SignalBlock
             {
                 update = true;
                 if (currentOrder instanceof ClearOrder) img.fill(0xFF);
-                else if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color) img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
+                else if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color)
+                    img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
             }
 
             if (update) tex.draw(img);
@@ -120,10 +124,11 @@ public class SignalMatrix extends SignalBlock
         }
 
         @Override
-        public void drawSelect() {
+        public void drawSelect()
+        {
             super.drawSelect();
 
-            Draw.rect(pinoutRegion, x, y ,rotation * 90);
+            Draw.rect(pinoutRegion, x, y, rotation * 90);
         }
 
         @Override

@@ -41,7 +41,7 @@ public class EulerTourNode extends RedBlackNode<EulerTourNode>
      * values node.vertex.augmentation for all nodes "node" in the subtree rooted at this node for which
      * node.vertex.arbitraryVisit == node, using augmentationFunc. This is null if hasAugmentation is false.
      */
-    public Object augmentation;
+    public Object augmentation = 0; // PyGuy was here
 
     /**
      * Whether the subtree rooted at this node contains at least one augmentation value. This indicates whether there is

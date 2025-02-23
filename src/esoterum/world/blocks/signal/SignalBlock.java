@@ -10,13 +10,12 @@ import arc.util.Align;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
-import esoterum.ui.*;
+import esoterum.ui.EsoStyles;
 import mindustry.Vars;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
-import mindustry.ui.*;
 import mindustry.world.Block;
 
 public class SignalBlock extends Block
