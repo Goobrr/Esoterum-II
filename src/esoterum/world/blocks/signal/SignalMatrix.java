@@ -22,10 +22,10 @@ public class SignalMatrix extends SignalBlock
         public Texture tex = new Texture(256, 256);
         public TextureRegion txr = new TextureRegion(tex);
 
-        private PaintOrder currentOrder;
-        private ConcurrentLinkedQueue<PaintOrder> queuedOrders = new ConcurrentLinkedQueue<>();
+        public PaintOrder currentOrder;
+        public ConcurrentLinkedQueue<PaintOrder> queuedOrders = new ConcurrentLinkedQueue<>();
 
-        private int calculateColor(int colorA, int colorB)
+        public int calculateColor(int colorA, int colorB)
         {
             int value = colorA << 1 | colorB;
             return value | value << 2 | value << 4 | value << 6;
@@ -116,7 +116,7 @@ public class SignalMatrix extends SignalBlock
             // disable shielding for memory blocks
         }
 
-        private static class PaintOrder
+        public static class PaintOrder
         {
             public int x, y, color;
 
@@ -133,7 +133,7 @@ public class SignalMatrix extends SignalBlock
             }
         }
 
-        private static class ClearOrder extends PaintOrder
+        public static class ClearOrder extends PaintOrder
         {
         }
     }
