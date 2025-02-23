@@ -5,11 +5,13 @@ import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
+import arc.util.*;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import esoterum.EsoVars;
 import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
+import mindustry.entities.units.*;
 
 public class SignalMem extends SignalBlock
 {
@@ -36,6 +38,16 @@ public class SignalMem extends SignalBlock
         leftWireRegion = Core.atlas.find("eso-memory-wire-left", "eso-none");
         rightWireRegion = Core.atlas.find("eso-memory-wire-right", "eso-none");
         pinoutRegion = Core.atlas.find("eso-memory-pinout", "eso-none");
+    }
+
+    @Override
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+        return outputSignalRegions[0];
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid) {
+        super.drawPlace(x, y, rotation, valid);
     }
 
     public class SignalMemBuild extends SignalBuild
