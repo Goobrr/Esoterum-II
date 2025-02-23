@@ -13,7 +13,7 @@ import esoterum.graph.SignalGraph;
 
 public class SignalMem extends SignalBlock
 {
-    public TextureRegion fullWireRegion, leftWireRegion, rightWireRegion;
+    public TextureRegion fullWireRegion, leftWireRegion, rightWireRegion, pinoutRegion;
 
     public SignalMem(String name)
     {
@@ -35,6 +35,7 @@ public class SignalMem extends SignalBlock
         fullWireRegion = Core.atlas.find("eso-memory-wire-full", "eso-none");
         leftWireRegion = Core.atlas.find("eso-memory-wire-left", "eso-none");
         rightWireRegion = Core.atlas.find("eso-memory-wire-right", "eso-none");
+        pinoutRegion = Core.atlas.find("eso-memory-pinout", "eso-none");
     }
 
     public class SignalMemBuild extends SignalBuild
@@ -112,6 +113,13 @@ public class SignalMem extends SignalBlock
         {
             if (EsoVars.drawSignalRegions) Draw.rect(outputSignalRegions[rotation], x, y);
             else Draw.rect(uiIcon, x, y, rotation * 90);
+        }
+
+        @Override
+        public void drawSelect() {
+            super.drawSelect();
+
+            Draw.rect(pinoutRegion, x, y ,rotation * 90);
         }
 
         @Override
