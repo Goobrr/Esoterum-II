@@ -9,7 +9,7 @@ import arc.util.Eachable;
 import mindustry.entities.units.BuildPlan;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.*;
 
 public class SignalMatrix extends SignalBlock
 {
@@ -48,6 +48,7 @@ public class SignalMatrix extends SignalBlock
 
         public byte[] colorMap = new byte[256 * 256];
         public AtomicReference<byte[]> colorMapRef = new AtomicReference<>(colorMap);
+        public AtomicBoolean cleared = new AtomicBoolean(true);
 
         public int calculateColor(int colorA, int colorB)
         {
@@ -79,12 +80,11 @@ public class SignalMatrix extends SignalBlock
 
             if (signal[23] > 0)
             {
-                byte[] colorMap = colorMapRef.get();
-                if (colorMap[x + y * 256] != (byte) 0xFF)
+                if (!cleared.get())
                 {
                     queuedOrders.add(new ClearOrder());
-                    colorMap[x + y * 256] = (byte) 0xFF;
-                    colorMapRef.set(colorMap);
+                    colorMapRef.set(new byte[256 * 256]);
+                    cleared.set(true);
                 }
 
             }
@@ -101,6 +101,7 @@ public class SignalMatrix extends SignalBlock
                     queuedOrders.add(new PaintOrder(x, y, color));
                     colorMap[x + y * 256] = (byte) color;
                     colorMapRef.set(colorMap);
+                    cleared.set(false);
                 }
             }
         }
