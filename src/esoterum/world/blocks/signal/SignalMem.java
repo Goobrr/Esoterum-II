@@ -3,6 +3,8 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
+import arc.scene.ui.Button.ButtonStyle;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.io.Reads;
@@ -10,10 +12,12 @@ import arc.util.io.Writes;
 import esoterum.EsoVars;
 import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
+import mindustry.graphics.Pal;
 
 public class SignalMem extends SignalBlock
 {
     public TextureRegion fullWireRegion, leftWireRegion, rightWireRegion;
+    public ButtonStyle style;
 
     public SignalMem(String name)
     {
@@ -36,11 +40,11 @@ public class SignalMem extends SignalBlock
         leftWireRegion = Core.atlas.find("eso-memory-wire-left", "eso-none");
         rightWireRegion = Core.atlas.find("eso-memory-wire-right", "eso-none");
     }
-
+    
     public class SignalMemBuild extends SignalBuild
     {
         int[] mem = new int[256];
-        int mode;
+        int bit = 0, mode = 1;
 
         @Override
         public void buildConfiguration(Table table)
@@ -48,26 +52,48 @@ public class SignalMem extends SignalBlock
             table.table().size(40f);
             table.row();
             Table gtable = table.table().get();
+            if (style == null)
+            {
+                style = new TextButton("").getStyle();
+                style.checked = style.over;
+            }
             for (int i = 0; i < 16; i++)
             {
                 for (int j = 0; j < 16; j++)
                 {
                     int addr = (i << 4) | j;
                     TextButton b = gtable.button(String.format("%02X", mem[addr]), () -> {
-                        mem[addr] = (mem[addr] + (1 << mode)) & 0xFF;
+                        mem[addr] = (mem[addr] + (1 << bit) * mode) & 255;
                     }).size(40f).get();
+                    b.setStyle(style);
                     b.update(() -> {
+                        int sel = signal[8] |
+                            (signal[9] << 1) |
+                            (signal[10] << 2) |
+                            (signal[11] << 3) |
+                            (signal[12] << 4) |
+                            (signal[13] << 5) |
+                            (signal[14] << 6) |
+                            (signal[15] << 7);
+                        b.setChecked(sel == addr);
                         b.setText(String.format("%02X", mem[addr]));
                     });
                 }
                 gtable.row();
             }
             table.row();
-            TextButton b = table.table().growX().get().button("" + (mode + 1), () -> {
-                mode = (mode + 1) % 8;
+            Table btable = table.table().growX().get();
+            TextButton b = btable.button("" + (bit + 1), () -> {
+                bit = (bit + 1) % 8;
             }).size(40f).get();
             b.update(() -> {
-                b.setText("" + (mode + 1));
+                b.setText("" + (bit + 1));
+            });
+            TextButton m = btable.button(mode > 0 ? "+" : "-", () -> {
+                mode *= -1;
+            }).size(40f).get();
+            m.update(() -> {
+                m.setText(mode > 0 ? "+" : "-");
             });
         }
 
@@ -186,7 +212,7 @@ public class SignalMem extends SignalBlock
         public void read(Reads read, byte revision)
         {
             super.read(read, revision);
-            if (revision >= 5) for (int i = 0; i < 256; i++) mem[i] = read.b();
+            if (revision >= 5) for (int i = 0; i < 256; i++) mem[i] = ((int) read.b()) & 0xFF;
         }
     }
 }
