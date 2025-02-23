@@ -13,13 +13,14 @@ import arc.util.io.Writes;
 import esoterum.EsoVars;
 import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
+import esoterum.ui.*;
 import mindustry.graphics.Pal;
 import mindustry.entities.units.*;
+import mindustry.ui.*;
 
 public class SignalMem extends SignalBlock
 {
     public TextureRegion fullWireRegion, leftWireRegion, rightWireRegion, pinoutRegion;
-    public ButtonStyle style;
 
     public SignalMem(String name)
     {
@@ -48,11 +49,6 @@ public class SignalMem extends SignalBlock
     public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
         return outputSignalRegions[0];
     }
-
-    @Override
-    public void drawPlace(int x, int y, int rotation, boolean valid) {
-        super.drawPlace(x, y, rotation, valid);
-    }
     
     public class SignalMemBuild extends SignalBuild
     {
@@ -65,11 +61,8 @@ public class SignalMem extends SignalBlock
             table.table().size(40f);
             table.row();
             Table gtable = table.table().get();
-            if (style == null)
-            {
-                style = new TextButton("").getStyle();
-                style.checked = style.over;
-            }
+            gtable.margin(5f);
+            gtable.setBackground(Styles.black5);
             for (int i = 0; i < 16; i++)
             {
                 for (int j = 0; j < 16; j++)
@@ -77,8 +70,8 @@ public class SignalMem extends SignalBlock
                     int addr = (i << 4) | j;
                     TextButton b = gtable.button(String.format("%02X", mem[addr]), () -> {
                         mem[addr] = (mem[addr] + (1 << bit) * mode) & 255;
-                    }).size(40f).get();
-                    b.setStyle(style);
+                    }).size(40f).pad(2f).get();
+                    b.setStyle(EsoStyles.memflatt);
                     b.update(() -> {
                         int sel = signal[8] |
                             (signal[9] << 1) |
@@ -96,6 +89,8 @@ public class SignalMem extends SignalBlock
             }
             table.row();
             Table btable = table.table().growX().get();
+            btable.setBackground(Styles.black5);
+            btable.margin(5f);
             TextButton b = btable.button("" + (bit + 1), () -> {
                 bit = (bit + 1) % 8;
             }).size(40f).get();

@@ -42,6 +42,7 @@ public class Esoterum extends Mod
     public Esoterum()
     {
         Events.on(ClientLoadEvent.class, event -> {
+            EsoStyles.init();
             EsoUI.init();
         });
 

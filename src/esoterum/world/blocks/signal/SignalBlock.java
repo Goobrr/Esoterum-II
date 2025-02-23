@@ -10,11 +10,13 @@ import arc.util.Align;
 import arc.util.io.*;
 import esoterum.*;
 import esoterum.graph.*;
+import esoterum.ui.*;
 import mindustry.Vars;
 import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
+import mindustry.ui.*;
 import mindustry.world.Block;
 
 public class SignalBlock extends Block
@@ -293,6 +295,7 @@ public class SignalBlock extends Block
                 TextButton b = table.button((shielding & (1L << t)) > 0 ? "" + t : "X", () -> {
                     configure(1L << t);
                 }).size(40f).tooltip("Toggle Shielding").get();
+                b.setStyle(EsoStyles.esoflatt);
                 b.update(() -> {
                     b.setText((shielding & (1L << t)) > 0 ? "" + t : "X");
                 });
@@ -304,6 +307,7 @@ public class SignalBlock extends Block
                 TextButton b1 = table.button((shielding & (1L << t1)) > 0 ? "" + t1 : "X", () -> {
                     configure(1L << t1);
                 }).size(40f).tooltip("Toggle Shielding").get();
+                b1.setStyle(EsoStyles.esoflatt);
                 b1.update(() -> {
                     b1.setText((shielding & (1L << t1)) > 0 ? "" + t1 : "X");
                 });
@@ -312,6 +316,7 @@ public class SignalBlock extends Block
                 TextButton b2 = table.button((shielding & (1L << t2)) > 0 ? "" + t2 : "X", () -> {
                     configure(1L << t2);
                 }).size(40f).tooltip("Toggle Shielding").get();
+                b2.setStyle(EsoStyles.esoflatt);
                 b2.update(() -> {
                     b2.setText((shielding & (1L << t2)) > 0 ? "" + t2 : "X");
                 });
@@ -324,6 +329,7 @@ public class SignalBlock extends Block
                 TextButton b = table.button((shielding & (1L << t)) > 0 ? "" + t : "X", () -> {
                     configure(1L << t);
                 }).size(40f).tooltip("Toggle Shielding").get();
+                b.setStyle(EsoStyles.esoflatt);
                 b.update(() -> {
                     b.setText((shielding & (1L << t)) > 0 ? "" + t : "X");
                 });

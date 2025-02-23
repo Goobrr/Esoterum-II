@@ -1,19 +1,37 @@
 package esoterum.world.blocks.signal;
 
+import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.scene.ui.layout.Table;
+import arc.util.*;
+import mindustry.entities.units.*;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SignalMatrix extends SignalBlock
 {
+    public TextureRegion placeRegion, pinoutRegion;
+
     public SignalMatrix(String name)
     {
         super(name);
         size = 8;
         rotate = true;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        placeRegion = Core.atlas.find("eso-display-matrix-place", "eso-none");
+        pinoutRegion = Core.atlas.find("eso-display-matrix-pinout", "eso-none");
+    }
+
+    @Override
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list) {
+        return placeRegion;
     }
 
     public class SignalMatrixBuild extends SignalBuild
@@ -82,6 +100,13 @@ public class SignalMatrix extends SignalBlock
 
             Draw.z(30.05f);
             Draw.rect(txr, this.x, this.y, rotation * 90);
+        }
+
+        @Override
+        public void drawSelect() {
+            super.drawSelect();
+
+            Draw.rect(pinoutRegion, x, y ,rotation * 90);
         }
 
         @Override
