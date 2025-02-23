@@ -1,8 +1,8 @@
-
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/Goobrr/Esoterum-II/refs/heads/master/.github/images/logo_light.png">
-        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Goobrr/Esoterum-II/refs/heads/master/.github/images/logo_dark.png">
+        <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo_light.png">
+        <source media="(prefers-color-scheme: light)" srcset=".github/images/logo_dark.png">
+        <img>
     </picture>
 </p>
 
