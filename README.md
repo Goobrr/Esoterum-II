@@ -1,7 +1,10 @@
-<picture>
-    <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo_light.png">
-    <source media="(prefers-color-scheme: light)" srcset=".github/images/logo_dark.png">
-</picture>
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo_light.png">
+        <source media="(prefers-color-scheme: light)" srcset=".github/images/logo_dark.png">
+        <img>
+    </picture>
+</p>
 
 # Esoterum II
 
