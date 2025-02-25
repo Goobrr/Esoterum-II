@@ -18,9 +18,9 @@ public class SignalGraph
     };
 
     public static ConnGraph graph = new ConnGraph(AUGMENTATION);
-    public static Seq<SignalBuild> builds = new Seq<SignalBuild>();
+    public static Seq<SignalBuild> builds = new Seq<>();
 
-    public static ConcurrentLinkedQueue<GraphEvent.eventType> events = new ConcurrentLinkedQueue<GraphEvent.eventType>();
+    public static ConcurrentLinkedQueue<GraphEvent.eventType> events = new ConcurrentLinkedQueue<>();
 
     public static void addVertex(SignalBlock.SignalBuild b, int k)
     {

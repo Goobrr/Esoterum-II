@@ -1,7 +1,7 @@
 package esoterum;
 
 import arc.Events;
-import arc.util.Log;
+import arc.util.*;
 import esoterum.graph.*;
 import esoterum.overlay.SignalOverlay;
 import esoterum.ui.*;
@@ -19,6 +19,8 @@ public class Esoterum extends Mod
 {
     public static Thread t;
     private static boolean running = true;
+    public static float latency = 0;
+
     public static Runnable r = () -> {
         try
         {
@@ -28,10 +30,13 @@ public class Esoterum extends Mod
             {
                 if (Vars.state.isGame() && !Vars.state.isPaused())
                 {
+                    Time.mark();
                     update = !SignalGraph.events.isEmpty();
                     while ((e = SignalGraph.events.poll()) != null) e.run();
                     SignalGraph.updateBuilds(update);
-                } else Thread.sleep(100);
+                    latency = Time.elapsed();
+                }
+                else Thread.sleep(100);
             }
         } catch (Throwable e)
         {
@@ -42,7 +47,9 @@ public class Esoterum extends Mod
     public Esoterum()
     {
         Events.on(ClientLoadEvent.class, event -> {
+            EsoStyles.init();
             EsoUI.init();
+            DebugFrag.build();
         });
 
         Events.on(WorldLoadBeginEvent.class, event -> {

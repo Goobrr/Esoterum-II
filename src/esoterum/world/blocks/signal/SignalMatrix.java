@@ -1,19 +1,40 @@
 package esoterum.world.blocks.signal;
 
+import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import arc.scene.ui.layout.Table;
+import arc.util.Eachable;
+import mindustry.entities.units.BuildPlan;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.*;
 
 public class SignalMatrix extends SignalBlock
 {
+    public TextureRegion placeRegion, pinoutRegion;
+
     public SignalMatrix(String name)
     {
         super(name);
         size = 8;
         rotate = true;
+    }
+
+    @Override
+    public void load()
+    {
+        super.load();
+
+        placeRegion = Core.atlas.find("eso-display-matrix-place", "eso-none");
+        pinoutRegion = Core.atlas.find("eso-display-matrix-pinout", "eso-none");
+    }
+
+    @Override
+    public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list)
+    {
+        return placeRegion;
     }
 
     public class SignalMatrixBuild extends SignalBuild
@@ -24,6 +45,10 @@ public class SignalMatrix extends SignalBlock
 
         public PaintOrder currentOrder;
         public ConcurrentLinkedQueue<PaintOrder> queuedOrders = new ConcurrentLinkedQueue<>();
+
+        public byte[] colorMap = new byte[256 * 256];
+        public AtomicReference<byte[]> colorMapRef = new AtomicReference<>(colorMap);
+        public AtomicBoolean cleared = new AtomicBoolean(true);
 
         public int calculateColor(int colorA, int colorB)
         {
@@ -55,15 +80,29 @@ public class SignalMatrix extends SignalBlock
 
             if (signal[23] > 0)
             {
-                queuedOrders.add(new ClearOrder());
-            } else if (signal[22] > 0)
+                if (!cleared.get())
+                {
+                    queuedOrders.add(new ClearOrder());
+                    colorMapRef.set(new byte[256 * 256]);
+                    cleared.set(true);
+                }
+
+            }
+            else if (signal[22] > 0)
             {
                 int color =
                         (calculateColor(signal[16], signal[17]) << 24) |
-                        (calculateColor(signal[18], signal[19]) << 16) |
-                        (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
+                                (calculateColor(signal[18], signal[19]) << 16) |
+                                (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
 
-                queuedOrders.add(new PaintOrder(x, y, color));
+                byte[] colorMap = colorMapRef.get();
+                if (colorMap[x + y * 256] != (byte) color)
+                {
+                    queuedOrders.add(new PaintOrder(x, y, color));
+                    colorMap[x + y * 256] = (byte) color;
+                    colorMapRef.set(colorMap);
+                    cleared.set(false);
+                }
             }
         }
 
@@ -75,13 +114,22 @@ public class SignalMatrix extends SignalBlock
             {
                 update = true;
                 if (currentOrder instanceof ClearOrder) img.fill(0xFF);
-                else if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color) img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
+                else if (img.getRaw(currentOrder.x, currentOrder.y) != currentOrder.color)
+                    img.setRaw(currentOrder.x, currentOrder.y, currentOrder.color);
             }
 
             if (update) tex.draw(img);
 
             Draw.z(30.05f);
             Draw.rect(txr, this.x, this.y, rotation * 90);
+        }
+
+        @Override
+        public void drawSelect()
+        {
+            super.drawSelect();
+
+            Draw.rect(pinoutRegion, x, y, rotation * 90);
         }
 
         @Override

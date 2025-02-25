@@ -1,8 +1,8 @@
 package esoterum.world.blocks.signal;
 
-import arc.graphics.g2d.*;
+import arc.graphics.g2d.Draw;
 import arc.math.geom.Rect;
-import esoterum.graph.*;
+import esoterum.graph.SignalGraph;
 import mindustry.world.Block;
 
 public class SignalHyperClock extends SignalBlock
