@@ -22,6 +22,7 @@ public class EsoStyles
         memflatt = new TextButton.TextButtonStyle()
         {{
             over = Styles.accentDrawable;
+            checked = Styles.accentDrawable;
             font = Fonts.def;
             fontColor = Styles.flatt.fontColor;
             disabledFontColor = Styles.flatt.disabledFontColor;
