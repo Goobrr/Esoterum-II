@@ -3,6 +3,9 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
+import arc.scene.ui.Button;
+import arc.scene.ui.Image;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
@@ -11,6 +14,7 @@ import esoterum.EsoVars;
 import esoterum.graph.SignalGraph;
 import esoterum.ui.EsoStyles;
 import mindustry.entities.units.BuildPlan;
+import mindustry.gen.Icon;
 import mindustry.ui.Styles;
 
 public class SignalMem extends SignalBlock
@@ -27,6 +31,7 @@ public class SignalMem extends SignalBlock
 
         config(Object[].class, (SignalMemBuild tile, Object[] p) -> {
             if (p[0] instanceof int[] m) tile.mem = m.clone();
+            if (p[1] instanceof Boolean b) tile.persist = b;
         });
     }
 
@@ -50,6 +55,7 @@ public class SignalMem extends SignalBlock
     {
         int[] mem = new int[256];
         int bit = 0, mode = 1;
+        boolean persist = false;
 
         @Override
         public void buildConfiguration(Table table)
@@ -90,14 +96,23 @@ public class SignalMem extends SignalBlock
             TextButton b = btable.button("" + (bit + 1), () -> {
                 bit = (bit + 1) % 8;
             }).size(40f).get();
+            b.setStyle(EsoStyles.esoflatt);
             b.update(() -> {
                 b.setText("" + (bit + 1));
             });
             TextButton m = btable.button(mode > 0 ? "+" : "-", () -> {
                 mode *= -1;
             }).size(40f).get();
+            m.setStyle(EsoStyles.esoflatt);
             m.update(() -> {
                 m.setText(mode > 0 ? "+" : "-");
+            });
+            ImageButton p = btable.button(persist ? Icon.lock : Icon.lockOpen, () -> {
+                persist = !persist;
+            }).size(40f).get();
+            p.setStyle(EsoStyles.esoflati);
+            p.update(() -> {
+                p.replaceImage(new Image(persist ? Icon.lock : Icon.lockOpen));
             });
         }
 
@@ -140,7 +155,7 @@ public class SignalMem extends SignalBlock
         @Override
         public void draw()
         {
-            if (EsoVars.drawSignalRegions) Draw.rect(outputSignalRegions[rotation], x, y);
+            if (EsoVars.drawSignalRegions) Draw.rect(persist ? inputSignalRegions[rotation + 8] : outputSignalRegions[rotation], x, y);
             else Draw.rect(uiIcon, x, y, rotation * 90);
         }
 
@@ -159,7 +174,7 @@ public class SignalMem extends SignalBlock
 
         public Object[] config()
         {
-            return new Object[]{mem};
+            return new Object[]{mem, persist};
         }
 
         @Override
@@ -204,13 +219,23 @@ public class SignalMem extends SignalBlock
                     SignalGraph.graph.setVertexAugmentation(v[1], (mem[addr] >> 6) & 1);
                 if (((mem[addr] >> 7) & 1) != signal[0])
                     SignalGraph.graph.setVertexAugmentation(v[0], (mem[addr] >> 7) & 1);
+            } else if (persist)
+            {
+                if(signal[7] != 0) SignalGraph.graph.setVertexAugmentation(v[7], 0);
+                if(signal[6] != 0) SignalGraph.graph.setVertexAugmentation(v[6], 0);
+                if(signal[5] != 0) SignalGraph.graph.setVertexAugmentation(v[5], 0);
+                if(signal[4] != 0) SignalGraph.graph.setVertexAugmentation(v[4], 0);
+                if(signal[3] != 0) SignalGraph.graph.setVertexAugmentation(v[3], 0);
+                if(signal[2] != 0) SignalGraph.graph.setVertexAugmentation(v[2], 0);
+                if(signal[1] != 0) SignalGraph.graph.setVertexAugmentation(v[1], 0);
+                if(signal[0] != 0) SignalGraph.graph.setVertexAugmentation(v[0], 0);
             }
         }
 
         @Override
         public byte version()
         {
-            return 5;
+            return 6;
         }
 
         @Override
@@ -218,6 +243,7 @@ public class SignalMem extends SignalBlock
         {
             super.write(write);
             for (int i = 0; i < 256; i++) write.b(mem[i]);
+            write.bool(persist);
         }
 
         @Override
@@ -225,6 +251,7 @@ public class SignalMem extends SignalBlock
         {
             super.read(read, revision);
             if (revision >= 5) for (int i = 0; i < 256; i++) mem[i] = ((int) read.b()) & 0xFF;
+            if (revision >= 6) persist = read.bool();
         }
     }
 }
