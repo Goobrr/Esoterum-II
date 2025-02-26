@@ -87,7 +87,7 @@ public class SignalGraph
 
     public static void updateBuilds(boolean update)
     {
-        builds.forEach(b -> {
+        builds.each(b -> {
             b.updateSignal(update);
         });
     }
