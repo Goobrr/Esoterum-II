@@ -3,6 +3,9 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
+import arc.scene.ui.Button;
+import arc.scene.ui.Image;
+import arc.scene.ui.ImageButton;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
 import arc.util.Eachable;
@@ -11,6 +14,7 @@ import esoterum.EsoVars;
 import esoterum.graph.SignalGraph;
 import esoterum.ui.EsoStyles;
 import mindustry.entities.units.BuildPlan;
+import mindustry.gen.Icon;
 import mindustry.ui.Styles;
 
 public class SignalMem extends SignalBlock
@@ -92,14 +96,23 @@ public class SignalMem extends SignalBlock
             TextButton b = btable.button("" + (bit + 1), () -> {
                 bit = (bit + 1) % 8;
             }).size(40f).get();
+            b.setStyle(EsoStyles.esoflatt);
             b.update(() -> {
                 b.setText("" + (bit + 1));
             });
             TextButton m = btable.button(mode > 0 ? "+" : "-", () -> {
                 mode *= -1;
             }).size(40f).get();
+            m.setStyle(EsoStyles.esoflatt);
             m.update(() -> {
                 m.setText(mode > 0 ? "+" : "-");
+            });
+            ImageButton p = btable.button(persist ? Icon.lock : Icon.lockOpen, () -> {
+                persist = !persist;
+            }).size(40f).get();
+            p.setStyle(EsoStyles.esoflati);
+            p.update(() -> {
+                p.replaceImage(new Image(persist ? Icon.lock : Icon.lockOpen));
             });
         }
 
@@ -142,7 +155,7 @@ public class SignalMem extends SignalBlock
         @Override
         public void draw()
         {
-            if (EsoVars.drawSignalRegions) Draw.rect(persist ? outputSignalRegions[rotation] : inputSignalRegions[rotation], x, y);
+            if (EsoVars.drawSignalRegions) Draw.rect(persist ? inputSignalRegions[rotation + 8] : outputSignalRegions[rotation], x, y);
             else Draw.rect(uiIcon, x, y, rotation * 90);
         }
 
