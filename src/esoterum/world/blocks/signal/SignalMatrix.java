@@ -164,7 +164,7 @@ public class SignalMatrix extends SignalBlock
             // disable shielding for memory blocks
         }
 
-        public static class PaintOrder
+        public class PaintOrder
         {
             public int x, y, color;
 
@@ -181,7 +181,7 @@ public class SignalMatrix extends SignalBlock
             }
         }
 
-        public static class ClearOrder extends PaintOrder
+        public class ClearOrder extends PaintOrder
         {
         }
     }
