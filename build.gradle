@@ -73,7 +73,7 @@ var jarAndroidTask = tasks.register("jarAndroid", Jar) {
         if (!platformRoot) throw new GradleException("Android SDK `platforms;android-$androidSdkVersion` isn't installed or is corrupted")
 
         //collect dependencies needed for desugaring
-        def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect { "--classpath $it.path" }.join(" ")
+        def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [platformRoot]).collect { "--classpath $it.path" }.join(" ")
 
         def d8name = "d8"
         if (OS.isWindows) d8name = "d8.bat"
