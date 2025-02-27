@@ -46,8 +46,8 @@ public class SignalMatrix extends SignalBlock
         public PaintOrder currentOrder;
         public ConcurrentLinkedQueue<PaintOrder> queuedOrders = new ConcurrentLinkedQueue<>();
 
-        public byte[] colorMap = new byte[256 * 256];
-        public AtomicReference<byte[]> colorMapRef = new AtomicReference<>(colorMap);
+        public int[] colorMap = new int[256 * 256];
+        public AtomicReference<int[]> colorMapRef = new AtomicReference<>(colorMap);
         public AtomicBoolean cleared = new AtomicBoolean(true);
 
         public int calculateColor(int colorA, int colorB)
@@ -83,7 +83,7 @@ public class SignalMatrix extends SignalBlock
                 if (!cleared.get())
                 {
                     queuedOrders.add(new ClearOrder());
-                    colorMapRef.set(new byte[256 * 256]);
+                    colorMapRef.set(new int[256 * 256]);
                     cleared.set(true);
                 }
 
@@ -95,11 +95,11 @@ public class SignalMatrix extends SignalBlock
                                 (calculateColor(signal[18], signal[19]) << 16) |
                                 (calculateColor(signal[20], signal[21]) << 8) | 0xFF;
 
-                byte[] colorMap = colorMapRef.get();
-                if (colorMap[x + y * 256] != (byte) color)
+                int[] colorMap = colorMapRef.get();
+                if (colorMap[x + y * 256] != color)
                 {
                     queuedOrders.add(new PaintOrder(x, y, color));
-                    colorMap[x + y * 256] = (byte) color;
+                    colorMap[x + y * 256] = color;
                     colorMapRef.set(colorMap);
                     cleared.set(false);
                 }

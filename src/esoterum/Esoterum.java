@@ -267,6 +267,14 @@ public class Esoterum extends Mod
             setInputs(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
             setOutputs(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalDrawer("drawer")
+        {{
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(0, 0, 0, 0);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
     @Override
