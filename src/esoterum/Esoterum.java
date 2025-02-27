@@ -108,6 +108,7 @@ public class Esoterum extends Mod
             drawArrow = false;
             vertexCount = 1;
             hasGraph = false;
+            dark = true;
             setConns(0, 0, 0, 0);
             setInputs(1, 1, 1, 1);
             setOutputs(1, 1, 1, 1);

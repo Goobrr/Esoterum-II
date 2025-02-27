@@ -1,6 +1,7 @@
 package esoterum.graph;
 
 import arc.struct.Seq;
+import esoterum.EsoVars;
 import esoterum.world.blocks.signal.SignalBlock;
 import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
 
@@ -19,6 +20,7 @@ public class SignalGraph
 
     public static ConnGraph graph = new ConnGraph(AUGMENTATION);
     public static Seq<SignalBuild> builds = new Seq<>();
+    public static Seq<SignalBuild> brights = new Seq<>();
 
     public static ConcurrentLinkedQueue<GraphEvent.eventType> events = new ConcurrentLinkedQueue<>();
 
@@ -58,6 +60,7 @@ public class SignalGraph
     {
         graph.clear();
         builds.clear();
+        brights.clear();
         graph = new ConnGraph(AUGMENTATION);
     }
 
@@ -77,6 +80,12 @@ public class SignalGraph
         return builds.size - 1;
     }
 
+    public static int addBright(SignalBuild b)
+    {
+        brights.add(b);
+        return brights.size - 1;
+    }
+
     public static void removeBuild(int id)
     {
         SignalBuild b = builds.pop();
@@ -84,10 +93,21 @@ public class SignalGraph
         b.id = id;
         builds.set(id, b);
     }
+    
+    public static void removeBright(int id)
+    {
+        SignalBuild b = brights.pop();
+        if (id == brights.size) return;
+        b.brightid = id;
+        brights.set(id, b);
+    }
 
     public static void updateBuilds(boolean update)
     {
-        builds.each(b -> {
+        if (EsoVars.darkMode) brights.each(b -> {
+            b.updateSignal(update);
+        });
+        else builds.each(b -> {
             b.updateSignal(update);
         });
     }

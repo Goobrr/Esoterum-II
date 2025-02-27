@@ -26,7 +26,7 @@ public class SignalOverlay
                 Draw.z(30.05f);
                 Draw.color(Color.white);
                 b.drawShieldRegions();
-                b.drawSignalRegions(camRect);
+                if (!EsoVars.darkMode || !b.dark()) b.drawSignalRegions(camRect);
             }
         });
         Draw.reset();
