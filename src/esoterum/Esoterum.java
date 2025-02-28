@@ -222,10 +222,20 @@ public class Esoterum extends Mod
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
             function = gate -> {
-                int a = gate.signal[1];
-                int b = gate.signal[2];
-                int c = gate.signal[3];
-                return a + b + c > 1;
+                return gate.signal[1] == (gate.active[1] ? 1 : 0)
+                    && gate.signal[2] == (gate.active[2] ? 1 : 0)
+                    && gate.signal[3] == (gate.active[3] ? 1 : 0);
+            };
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("bi-and-gate")
+        {{
+            vertexCount = 3;
+            setConns(0, 1, 2, 1);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 1, 0, 1);
+            function = gate -> {
+                return (gate.signal[1] & gate.signal[2]) == 1;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
@@ -254,10 +264,18 @@ public class Esoterum extends Mod
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
             function = gate -> {
-                int a = gate.signal[1];
-                int b = gate.signal[2];
-                int c = gate.signal[3];
-                return a + b + c == 1;
+                return (gate.signal[1] ^ gate.signal[2] ^ gate.signal[3]) == 1;
+            };
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalGate("bi-xor-gate")
+        {{
+            vertexCount = 3;
+            setConns(0, 1, 2, 1);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 1, 0, 1);
+            function = gate -> {
+                return (gate.signal[1] ^ gate.signal[2]) == 1;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
@@ -275,6 +293,14 @@ public class Esoterum extends Mod
             setConns(0, 0, 0, 0);
             setInputs(1, 1, 1, 1);
             setOutputs(0, 0, 0, 0);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalFlipFlop("t-flip-flop")
+        {{
+            vertexCount = 4;
+            setConns(0, 1, 2, 3);
+            setInputs(0, 1, 1, 1);
+            setOutputs(1, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
