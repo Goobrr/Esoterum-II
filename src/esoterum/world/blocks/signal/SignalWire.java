@@ -3,6 +3,7 @@ package esoterum.world.blocks.signal;
 
 import arc.math.geom.Vec2;
 import esoterum.EdgeUtils;
+import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
 import mindustry.Vars;
 
@@ -11,12 +12,19 @@ public class SignalWire extends SignalBlock
     public SignalWire(String name)
     {
         super(name);
+
+        dark = true;
     }
 
     public class SignalWireBuild extends SignalBuild
     {
-        public boolean bypass = false;
+        public boolean bypass = true;
         public int outputSignal = 0;
+
+        @Override
+        public boolean dark(){
+            return bypass;
+        }
 
         @Override
         public void updateEdges()
@@ -48,9 +56,18 @@ public class SignalWire extends SignalBlock
             {
                 SignalGraph.addEdge(v[0], v[conns[last]]);
                 if (bypass) SignalGraph.graph.setVertexAugmentation(v[0], 0);
-                else bypass = true;
+                else
+                {
+                    bypass = true;
+                    SignalGraph.removeBright(brightid);
+                }
+
             }
-            else bypass = false;
+            else if (bypass)
+            {
+                bypass = false;
+                SignalGraph.addBright(this);
+            }
         }
 
         @Override

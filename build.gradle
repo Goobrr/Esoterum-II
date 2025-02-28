@@ -7,32 +7,19 @@ version '1.0'
 
 sourceSets.main.java.srcDirs = ["src"]
 
+var targetCompat = 8
+var sourceCompat = JavaVersion.VERSION_17
+
 repositories {
     mavenCentral()
     maven { url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
     maven { url 'https://www.jitpack.io' }
-}
-
-java {
-    targetCompatibility = 8
-    sourceCompatibility = JavaVersion.VERSION_17
+    maven { url "https://raw.githubusercontent.com/GlennFolker/EntityAnnoMaven/main" }
 }
 
 ext {
-    //the build number that this mod is made for
-    mindustryVersion = 'v146'
-    jabelVersion = "93fde537c7"
     //windows sucks
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
-}
-
-//java 8 backwards compatibility flag
-allprojects {
-    tasks.withType(JavaCompile).tap {
-        configureEach {
-            options.compilerArgs.addAll(['--release', '17'])
-        }
-    }
 }
 
 dependencies {
@@ -40,6 +27,7 @@ dependencies {
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
+    annotationProcessor "com.github.GlennFolker.EntityAnno:downgrader:$entVersion"
 }
 
 buildscript {
@@ -49,15 +37,11 @@ buildscript {
         maven { url 'https://www.jitpack.io' }
     }
 
-    ext {
-        //the build number that this mod is made for
-        mindustryVersion = 'v146'
-    }
-
     dependencies {
         classpath "com.github.Anuken.Mindustry:core:$mindustryVersion"
     }
 }
+
 //force arc version
 configurations.configureEach {
     resolutionStrategy.eachDependency { details ->
@@ -67,33 +51,44 @@ configurations.configureEach {
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    targetCompatibility = targetCompat
+    sourceCompatibility = sourceCompat
+
+    options.release = 8
+    options.compilerArgs.add("-Xlint:-options")
+
+    options.incremental = true
+    options.encoding = "UTF-8"
+}
+
 var jarAndroidTask = tasks.register("jarAndroid", Jar) {
     dependsOn "jar"
 
     doLast {
-        if (!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.")
+        if (!sdkRoot || !new File(sdkRoot as String).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.")
 
-        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find { f -> new File(f, "android.jar").exists() }
+        def platformRoot = new File("$sdkRoot/platforms/android-$androidSdkVersion/android.jar")
 
-        if (!platformRoot) throw new GradleException("No android.jar found. Ensure that you have an Android platform installed.")
+        if (!platformRoot) throw new GradleException("Android SDK `platforms;android-$androidSdkVersion` isn't installed or is corrupted")
 
         //collect dependencies needed for desugaring
-        def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [new File(platformRoot, "android.jar")]).collect { "--classpath $it.path" }.join(" ")
+        def dependencies = (configurations.compileClasspath.asList() + configurations.runtimeClasspath.asList() + [platformRoot]).collect { "--classpath $it.path" }.join(" ")
 
         def d8name = "d8"
         if (OS.isWindows) d8name = "d8.bat"
-        def d8 = new File((String) (sdkRoot + "/build-tools/35.0.0/" + d8name))
+        def d8 = new File((String) (sdkRoot + "/build-tools/$androidBuildVersion/" + d8name))
 
-        if (!d8.exists()) throw IllegalStateException("Android SDK `build-tools;$androidBuildVersion` isn't installed or is corrupted")
+        if (!d8.exists()) throw new IllegalStateException("Android SDK `build-tools;$androidBuildVersion` isn't installed or is corrupted")
 
         //dex and desugar files - this requires d8 in your PATH
-        "$d8 $dependencies --min-api 14 --output ${base.archivesBaseName}Global.jar ${base.archivesBaseName}Desktop.jar"
+        "$d8 $dependencies --min-api $androidMinVersion --output ${modArtifact}Global.jar ${modArtifact}Desktop.jar"
                 .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
 jar {
-    archiveFileName = "${base.archivesBaseName}Desktop.jar"
+    archiveFileName = "${modArtifact}Desktop.jar"
 
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
@@ -112,14 +107,14 @@ jar {
 tasks.register("deploy", Jar) {
     dependsOn jarAndroid
     dependsOn jar
-    archiveFileName = "${base.archivesBaseName}.jar"
+    archiveFileName = "${modArtifact}.jar"
 
-    from { [zipTree("$buildDir/libs/${base.archivesBaseName}Desktop.jar"), zipTree("$buildDir/libs/${base.archivesBaseName}Global.jar")] }
+    from { [zipTree("$buildDir/libs/${modArtifact}Desktop.jar"), zipTree("$buildDir/libs/${modArtifact}Global.jar")] }
 
     doLast {
         delete {
-            delete "$buildDir/libs/${base.archivesBaseName}Desktop.jar"
-            delete "$buildDir/libs/${base.archivesBaseName}Global.jar"
+            delete "$buildDir/libs/${modArtifact}Desktop.jar"
+            delete "$buildDir/libs/${modArtifact}Global.jar"
         }
     }
 }

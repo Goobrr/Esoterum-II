@@ -108,6 +108,7 @@ public class Esoterum extends Mod
             drawArrow = false;
             vertexCount = 1;
             hasGraph = false;
+            dark = true;
             setConns(0, 0, 0, 0);
             setInputs(1, 1, 1, 1);
             setOutputs(1, 1, 1, 1);
@@ -266,6 +267,14 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 24, 24, 24, 25, 25, 25, 25);
             setInputs(0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
             setOutputs(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new SignalDrawer("drawer")
+        {{
+            vertexCount = 1;
+            setConns(0, 0, 0, 0);
+            setInputs(1, 1, 1, 1);
+            setOutputs(0, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 

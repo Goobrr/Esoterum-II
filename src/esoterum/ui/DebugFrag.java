@@ -41,7 +41,7 @@ public class DebugFrag {
         t.label(() -> "" + (Core.app.getJavaHeap() / 1024 / 1024) + "mb").left().expandX().expandY().top().left().style(Styles.outlineLabel).width(100).name("memory").get().setAlignment(Align.left);
 
         t.label(() -> "Size").expandX().expandY().top().left().style(Styles.outlineLabel).width(100).get().setAlignment(Align.left);
-        t.label(() -> "" + SignalGraph.builds.size).expandX().expandY().top().left().style(Styles.outlineLabel).width(100).name("size").get().setAlignment(Align.left);
+        t.label(() -> "" + (EsoVars.darkMode ? SignalGraph.brights.size : SignalGraph.builds.size)).expandX().expandY().top().left().style(Styles.outlineLabel).width(100).name("size").get().setAlignment(Align.left);
         t.row();
 
         t.row();

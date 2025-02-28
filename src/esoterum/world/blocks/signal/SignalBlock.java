@@ -25,6 +25,7 @@ public class SignalBlock extends Block
 
     public TextureRegion[] inputSignalRegions, outputSignalRegions, shieldRegions;
 
+    public boolean dark = false;
     public boolean debugDraw = false;
     public int[] inputs = new int[0];
     public int[] outputs = new int[0];
@@ -168,7 +169,12 @@ public class SignalBlock extends Block
         public int[] signal = new int[vertexCount];
         public boolean[] active = new boolean[size * 4];
         public long shielding;
-        public int id;
+        public int id, brightid;
+
+        public boolean dark()
+        {
+            return dark;
+        }
 
         public int[] inputs()
         {

@@ -24,7 +24,21 @@ public class GraphEvent
         public void run()
         {
             b.id = SignalGraph.addBuild(b);
+            if (!b.dark()) b.brightid = SignalGraph.addBright(b);
             b.updateEdges();
+        }
+    }
+
+    public static class brightenEvent extends eventType
+    {
+        public brightenEvent(SignalBuild b)
+        {
+            this.b = b;
+        }
+
+        public void run()
+        {
+            b.brightid = SignalGraph.addBright(b); 
         }
     }
 
@@ -39,6 +53,20 @@ public class GraphEvent
         {
             for (int i = 0; i < b.vertexCount(); i++) SignalGraph.removeVertex(b, i);
             SignalGraph.removeBuild(b.id);
+            if (!b.dark()) SignalGraph.removeBright(b.brightid);
+        }
+    }
+
+    public static class darkenEvent extends eventType
+    {
+        public darkenEvent(SignalBuild b)
+        {
+            this.b = b;
+        }
+
+        public void run()
+        {
+            SignalGraph.removeBright(b.brightid);
         }
     }
 

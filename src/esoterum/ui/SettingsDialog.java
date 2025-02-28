@@ -59,6 +59,7 @@ public class SettingsDialog
 
                 table.checkPref("manhattannode", true);
                 table.checkPref("drawsignals", true);
+                table.checkPref("darkmode", false);
             });
 
             run();
@@ -111,6 +112,7 @@ public class SettingsDialog
     {
         EsoVars.drawNodesAsManhattan = settings.getBool("manhattannode");
         EsoVars.drawSignalRegions = settings.getBool("drawsignals");
+        EsoVars.darkMode = settings.getBool("darkmode");
     }
 
     private class LabelSetting extends SettingsMenuDialog.SettingsTable.Setting

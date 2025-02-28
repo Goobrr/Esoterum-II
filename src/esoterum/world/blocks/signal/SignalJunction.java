@@ -21,6 +21,8 @@ public class SignalJunction extends SignalBlock
 
         hasGraph = false;
         rotate = true;
+
+        dark = true;
     }
 
     @Override
