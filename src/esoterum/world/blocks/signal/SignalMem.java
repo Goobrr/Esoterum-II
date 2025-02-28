@@ -219,7 +219,7 @@ public class SignalMem extends SignalBlock
                     SignalGraph.graph.setVertexAugmentation(v[1], (mem[addr] >> 6) & 1);
                 if (((mem[addr] >> 7) & 1) != signal[0])
                     SignalGraph.graph.setVertexAugmentation(v[0], (mem[addr] >> 7) & 1);
-            } else if (persist)
+            } else if (!persist)
             {
                 if(signal[7] != 0) SignalGraph.graph.setVertexAugmentation(v[7], 0);
                 if(signal[6] != 0) SignalGraph.graph.setVertexAugmentation(v[6], 0);
