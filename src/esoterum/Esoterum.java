@@ -5,6 +5,7 @@ import arc.util.*;
 import esoterum.graph.*;
 import esoterum.overlay.SignalOverlay;
 import esoterum.ui.*;
+import esoterum.world.blocks.decor.*;
 import esoterum.world.blocks.signal.*;
 import mindustry.Vars;
 import mindustry.content.Items;
@@ -302,6 +303,11 @@ public class Esoterum extends Mod
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
+
+        new LabelBlock("label")
+        {{
+            size = 1;
+        }}.requirements(Category.effect, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
     }
 
     @Override
