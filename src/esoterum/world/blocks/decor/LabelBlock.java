@@ -45,8 +45,8 @@ public class LabelBlock extends Block {
             tile.alignV = i[1];
         });
 
-        config(String[].class, (LabelBuild tile, String[] s) -> {
-            tile.configure(new int[]{Integer.valueOf(s[0]), Integer.valueOf(s[1])});
+        config(Object[].class, (LabelBuild tile, Object[] s) -> {
+            tile.configure(new int[]{Integer.valueOf((String)s[0]), Integer.valueOf((String)s[1])});
             tile.configure(s[2]);
         });
 
@@ -169,8 +169,8 @@ public class LabelBlock extends Block {
         }
 
         @Override
-        public String[] config() {
-            return new String[]{String.valueOf(alignH), String.valueOf(alignV), labelText};
+        public Object[] config() {
+            return new Object[]{String.valueOf(alignH), String.valueOf(alignV), labelText};
         }
 
         @Override
