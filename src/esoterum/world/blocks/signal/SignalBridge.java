@@ -18,15 +18,15 @@ import mindustry.world.Tile;
 public class SignalBridge extends SignalBlock
 {
     public TextureRegion[] signalRegions;
-    int range = 100;
+    int range = 1000;
 
     public SignalBridge(String name)
     {
         super(name);
 
         configurable = true;
-        clipSize = range * 2 + 4f;
-        clipSize *= Vars.tilesize;
+        // clipSize = range * 2 + 4f;
+        // clipSize *= Vars.tilesize;
 
         dark = true;
 
