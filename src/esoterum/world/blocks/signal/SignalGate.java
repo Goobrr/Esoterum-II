@@ -31,14 +31,13 @@ public class SignalGate extends SignalBlock
 
     public class SignalGateBuild extends SignalBuild
     {
-        int outputSignal = 0;
-
+        public int outputSignal;
+        
         @Override
-        public void updateSignal(boolean update)
+        public void updateSignal()
         {
-            super.updateSignal(update);
             int r = function.get(this) ? 1 : 0;
-            if (r != outputSignal) SignalGraph.graph.setVertexAugmentation(v[0], outputSignal = r);
+            if (r != outputSignal) SignalGraph.graph.setNodeAugmentation(e[0], signal[0] = outputSignal = r);
         }
 
         @Override

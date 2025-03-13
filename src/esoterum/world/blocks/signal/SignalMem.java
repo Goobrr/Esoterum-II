@@ -54,6 +54,7 @@ public class SignalMem extends SignalBlock
     public class SignalMemBuild extends SignalBuild
     {
         int[] mem = new int[256];
+        int[] out = new int[8];
         int bit = 0, mode = 1;
         boolean persist = false;
 
@@ -178,9 +179,9 @@ public class SignalMem extends SignalBlock
         }
 
         @Override
-        public void updateSignal(boolean update)
+        public void updateSignal()
         {
-            super.updateSignal(update);
+            super.updateSignal();
             int addr = signal[8] |
                     (signal[9] << 1) |
                     (signal[10] << 2) |
@@ -204,31 +205,31 @@ public class SignalMem extends SignalBlock
 
             if (signal[25] == 1)
             {
-                if ((mem[addr] & 1) != signal[7]) SignalGraph.graph.setVertexAugmentation(v[7], mem[addr] & 1);
-                if (((mem[addr] >> 1) & 1) != signal[6])
-                    SignalGraph.graph.setVertexAugmentation(v[6], (mem[addr] >> 1) & 1);
-                if (((mem[addr] >> 2) & 1) != signal[5])
-                    SignalGraph.graph.setVertexAugmentation(v[5], (mem[addr] >> 2) & 1);
-                if (((mem[addr] >> 3) & 1) != signal[4])
-                    SignalGraph.graph.setVertexAugmentation(v[4], (mem[addr] >> 3) & 1);
-                if (((mem[addr] >> 4) & 1) != signal[3])
-                    SignalGraph.graph.setVertexAugmentation(v[3], (mem[addr] >> 4) & 1);
-                if (((mem[addr] >> 5) & 1) != signal[2])
-                    SignalGraph.graph.setVertexAugmentation(v[2], (mem[addr] >> 5) & 1);
-                if (((mem[addr] >> 6) & 1) != signal[1])
-                    SignalGraph.graph.setVertexAugmentation(v[1], (mem[addr] >> 6) & 1);
-                if (((mem[addr] >> 7) & 1) != signal[0])
-                    SignalGraph.graph.setVertexAugmentation(v[0], (mem[addr] >> 7) & 1);
+                if ((mem[addr] & 1) != out[7]) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = mem[addr] & 1);
+                if (((mem[addr] >> 1) & 1) != out[6])
+                    SignalGraph.graph.setNodeAugmentation(e[6], out[6] = (mem[addr] >> 1) & 1);
+                if (((mem[addr] >> 2) & 1) != out[5])
+                    SignalGraph.graph.setNodeAugmentation(e[5], out[5] = (mem[addr] >> 2) & 1);
+                if (((mem[addr] >> 3) & 1) != out[4])
+                    SignalGraph.graph.setNodeAugmentation(e[4], out[4] = (mem[addr] >> 3) & 1);
+                if (((mem[addr] >> 4) & 1) != out[3])
+                    SignalGraph.graph.setNodeAugmentation(e[3], out[3] = (mem[addr] >> 4) & 1);
+                if (((mem[addr] >> 5) & 1) != out[2])
+                    SignalGraph.graph.setNodeAugmentation(e[2], out[2] = (mem[addr] >> 5) & 1);
+                if (((mem[addr] >> 6) & 1) != out[1])
+                    SignalGraph.graph.setNodeAugmentation(e[1], out[1] = (mem[addr] >> 6) & 1);
+                if (((mem[addr] >> 7) & 1) != out[0])
+                    SignalGraph.graph.setNodeAugmentation(e[0], out[0] = (mem[addr] >> 7) & 1);
             } else if (!persist)
             {
-                if(signal[7] != 0) SignalGraph.graph.setVertexAugmentation(v[7], 0);
-                if(signal[6] != 0) SignalGraph.graph.setVertexAugmentation(v[6], 0);
-                if(signal[5] != 0) SignalGraph.graph.setVertexAugmentation(v[5], 0);
-                if(signal[4] != 0) SignalGraph.graph.setVertexAugmentation(v[4], 0);
-                if(signal[3] != 0) SignalGraph.graph.setVertexAugmentation(v[3], 0);
-                if(signal[2] != 0) SignalGraph.graph.setVertexAugmentation(v[2], 0);
-                if(signal[1] != 0) SignalGraph.graph.setVertexAugmentation(v[1], 0);
-                if(signal[0] != 0) SignalGraph.graph.setVertexAugmentation(v[0], 0);
+                if(out[7] != 0) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = 0);
+                if(out[6] != 0) SignalGraph.graph.setNodeAugmentation(e[6], out[6] = 0);
+                if(out[5] != 0) SignalGraph.graph.setNodeAugmentation(e[5], out[5] = 0);
+                if(out[4] != 0) SignalGraph.graph.setNodeAugmentation(e[4], out[4] = 0);
+                if(out[3] != 0) SignalGraph.graph.setNodeAugmentation(e[3], out[3] = 0);
+                if(out[2] != 0) SignalGraph.graph.setNodeAugmentation(e[2], out[2] = 0);
+                if(out[1] != 0) SignalGraph.graph.setNodeAugmentation(e[1], out[1] = 0);
+                if(out[0] != 0) SignalGraph.graph.setNodeAugmentation(e[0], out[0] = 0);
             }
         }
 

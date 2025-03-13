@@ -43,15 +43,8 @@ public class SignalDrawer extends SignalBlock {
         public int frompos = -1, topos = -1;
         public SignalMatrixBuild from, to;
         @Override
-        public void updateSignal(boolean update){
-            super.updateSignal(update);
-            if (update)
-            {
-                if (Vars.world.build(frompos) instanceof SignalMatrixBuild b) from = b;
-                else { frompos = -1; from = null; }
-                if (Vars.world.build(topos) instanceof SignalMatrixBuild b) to = b;
-                else { topos = -1; to = null; }
-            }
+        public void updateSignal(){
+            super.updateSignal();
             if (from != null && to != null && signal[0] > 0)
             {
                 for (int x=0;x<256;x++){

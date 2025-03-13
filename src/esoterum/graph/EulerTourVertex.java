@@ -39,7 +39,7 @@ public class EulerTourVertex
     /**
      * The augmentation associated with this vertex, if any. This is null instead if higherVertex != null.
      */
-    public Object augmentation;
+    public int /**/ augmentation;
 
     /**
      * Whether there is any augmentation associated with this vertex. This is false instead if higherVertex != null.

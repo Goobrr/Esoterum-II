@@ -12,11 +12,21 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class DebugFrag {
+    private static float latency0 = 0;
+    private static float latency1 = 0;
+    private static float latency2 = 0;
+    private static float latency3 = 0;
+    private static float latency4 = 0;
     private static float latency = 0;
 
     public static void build(){
         Timer.schedule(() -> {
-            latency = Esoterum.latency;
+            latency4 = latency3;
+            latency3 = latency2;
+            latency2 = latency1;
+            latency1 = latency0;
+            latency0 = Esoterum.latency;
+            latency = (latency0 + latency1 + latency2 + latency3 + latency4) / 5;
         }, 0, 0.25f);
 
         WidgetGroup hudGroup = Vars.ui.hudGroup;

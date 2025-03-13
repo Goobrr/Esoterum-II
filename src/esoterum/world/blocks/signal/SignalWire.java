@@ -55,7 +55,7 @@ public class SignalWire extends SignalBlock
             if (c == 1)
             {
                 SignalGraph.addEdge(v[0], v[conns[last]]);
-                if (bypass) SignalGraph.graph.setVertexAugmentation(v[0], 0);
+                if (bypass) SignalGraph.graph.setNodeAugmentation(e[0], 0);
                 else
                 {
                     bypass = true;
@@ -71,11 +71,11 @@ public class SignalWire extends SignalBlock
         }
 
         @Override
-        public void updateSignal(boolean update)
+        public void updateSignal()
         {
-            super.updateSignal(update);
-            if (!bypass) if ((signal[1] | signal[2] | signal[3]) != outputSignal)
-                SignalGraph.graph.setVertexAugmentation(v[0], outputSignal = signal[1] | signal[2] | signal[3]);
+            if (!bypass) if ((signal[0] = r[1].augmentation | r[2].augmentation | r[3].augmentation) != outputSignal)
+                SignalGraph.graph.setNodeAugmentation(e[0], outputSignal = signal[0]);
+            else if (r[0] != null) signal[0] = r[0].augmentation;
         }
     }
 }

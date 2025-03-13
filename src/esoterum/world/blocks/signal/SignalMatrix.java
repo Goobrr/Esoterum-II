@@ -57,9 +57,9 @@ public class SignalMatrix extends SignalBlock
         }
 
         @Override
-        public void updateSignal(boolean update)
+        public void updateSignal()
         {
-            super.updateSignal(update);
+            super.updateSignal();
 
             int x = (signal[0] |
                     (signal[1] << 1) |

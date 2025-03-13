@@ -1,7 +1,5 @@
 package esoterum.graph;
 
-import java.util.Objects;
-
 /**
  * A node in an Euler tour tree for ConnGraph (at some particular level i). See the comments for the implementation of
  * ConnGraph.
@@ -11,17 +9,12 @@ public class EulerTourNode extends RedBlackNode<EulerTourNode>
     /**
      * The dummy leaf node.
      */
-    public static final EulerTourNode LEAF = new EulerTourNode(null, null);
+    public static final EulerTourNode LEAF = new EulerTourNode(null);
 
     /**
      * The vertex this node visits.
      */
     public final EulerTourVertex vertex;
-    /**
-     * The combining function for combining user-provided augmentations. augmentationFunc is null if this node is not in
-     * the highest level.
-     */
-    public final Augmentation augmentationFunc;
     /**
      * The number of nodes in the subtree rooted at this node.
      */
@@ -41,7 +34,7 @@ public class EulerTourNode extends RedBlackNode<EulerTourNode>
      * values node.vertex.augmentation for all nodes "node" in the subtree rooted at this node for which
      * node.vertex.arbitraryVisit == node, using augmentationFunc. This is null if hasAugmentation is false.
      */
-    public Object augmentation = 0; // PyGuy was here
+    public int /**/ augmentation = 0; // PyGuy was here
 
     /**
      * Whether the subtree rooted at this node contains at least one augmentation value. This indicates whether there is
@@ -50,10 +43,9 @@ public class EulerTourNode extends RedBlackNode<EulerTourNode>
      */
     public boolean hasAugmentation;
 
-    public EulerTourNode(EulerTourVertex vertex, Augmentation augmentationFunc)
+    public EulerTourNode(EulerTourVertex vertex)
     {
         this.vertex = vertex;
-        this.augmentationFunc = augmentationFunc;
     }
 
     /**
@@ -84,43 +76,40 @@ public class EulerTourNode extends RedBlackNode<EulerTourNode>
         int newSize = left.size + right.size + 1;
         boolean augmentedFlags = augmentFlags();
 
-        Object newAugmentation = null;
+        int /**/ newAugmentation = 0;
         boolean newHasAugmentation = false;
-        if (augmentationFunc != null)
+        if (left.hasAugmentation)
         {
-            if (left.hasAugmentation)
+            newAugmentation = left.augmentation;
+            newHasAugmentation = true;
+        }
+        if (vertex.hasAugmentation && vertex.arbitraryVisit == this)
+        {
+            if (newHasAugmentation)
             {
-                newAugmentation = left.augmentation;
+                newAugmentation = newAugmentation | vertex.augmentation;
+            }
+            else
+            {
+                newAugmentation = vertex.augmentation;
                 newHasAugmentation = true;
             }
-            if (vertex.hasAugmentation && vertex.arbitraryVisit == this)
+        }
+        if (right.hasAugmentation)
+        {
+            if (newHasAugmentation)
             {
-                if (newHasAugmentation)
-                {
-                    newAugmentation = augmentationFunc.combine(newAugmentation, vertex.augmentation);
-                }
-                else
-                {
-                    newAugmentation = vertex.augmentation;
-                    newHasAugmentation = true;
-                }
+                newAugmentation = newAugmentation | right.augmentation;
             }
-            if (right.hasAugmentation)
+            else
             {
-                if (newHasAugmentation)
-                {
-                    newAugmentation = augmentationFunc.combine(newAugmentation, right.augmentation);
-                }
-                else
-                {
-                    newAugmentation = right.augmentation;
-                    newHasAugmentation = true;
-                }
+                newAugmentation = right.augmentation;
+                newHasAugmentation = true;
             }
         }
 
         if (newSize == size && !augmentedFlags && hasAugmentation == newHasAugmentation &&
-                (Objects.equals(newAugmentation, augmentation)))
+                (newAugmentation == augmentation))
         {
             return false;
         }

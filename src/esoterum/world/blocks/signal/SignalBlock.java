@@ -166,6 +166,7 @@ public class SignalBlock extends Block
     {
         public ConnVertex[] v = new ConnVertex[vertexCount];
         public EulerTourNode[] r = new EulerTourNode[vertexCount];
+        public EulerTourNode[] e = new EulerTourNode[vertexCount];
         public int[] signal = new int[vertexCount];
         public boolean[] active = new boolean[size * 4];
         public long shielding;
@@ -245,11 +246,9 @@ public class SignalBlock extends Block
             SignalGraph.events.add(new GraphEvent.updateEvent(this));
         }
 
-        public void updateSignal(boolean update)
+        public void updateSignal()
         {
-            if (update) for (int i = 0; i < vertexCount; i++)
-                r[i] = SignalGraph.graph.vertexInfo.get(v[i]).vertex.arbitraryVisit.root();
-            for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = (int) r[i].augmentation;
+            for (int i = 0; i < vertexCount; i++) if (r[i] != null) signal[i] = r[i].augmentation;
         }
 
         @Override
@@ -375,12 +374,12 @@ public class SignalBlock extends Block
             if (revision >= 4)
             {
                 shielding = read.l();
-                for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
+                for (int i = 0; i < vertexCount; i++) read.i();
                 SignalGraph.events.add(new GraphEvent.updateEvent(this));
             }
             else if (revision == 3)
             {
-                for (int i = 0; i < vertexCount; i++) signal[i] = read.i();
+                for (int i = 0; i < vertexCount; i++) read.i();
             }
             else if (revision == 1 && hasGraph)
             {

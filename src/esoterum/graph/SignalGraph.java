@@ -3,22 +3,17 @@ package esoterum.graph;
 import arc.struct.Seq;
 import esoterum.EsoVars;
 import esoterum.world.blocks.signal.SignalBlock;
+import esoterum.world.blocks.signal.SignalDrawer;
 import esoterum.world.blocks.signal.SignalBlock.SignalBuild;
+import esoterum.world.blocks.signal.SignalDrawer.SignalDrawerBuild;
+import esoterum.world.blocks.signal.SignalMatrix.SignalMatrixBuild;
+import mindustry.Vars;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SignalGraph
 {
-    private static final Augmentation AUGMENTATION = new Augmentation()
-    {
-        @Override
-        public Object combine(Object value1, Object value2)
-        {
-            return (int) value1 | (int) value2;
-        }
-    };
-
-    public static ConnGraph graph = new ConnGraph(AUGMENTATION);
+    public static ConnGraph graph = new ConnGraph();
     public static Seq<SignalBuild> builds = new Seq<>();
     public static Seq<SignalBuild> brights = new Seq<>();
 
@@ -48,7 +43,7 @@ public class SignalGraph
 
     public static void clearVertices()
     {
-        graph = new ConnGraph(AUGMENTATION);
+        graph = new ConnGraph();
     }
 
     public static void removeEdge(ConnVertex u, ConnVertex v)
@@ -61,7 +56,7 @@ public class SignalGraph
         graph.clear();
         builds.clear();
         brights.clear();
-        graph = new ConnGraph(AUGMENTATION);
+        graph = new ConnGraph();
     }
 
     public static void clearEdges(ConnVertex v)
@@ -104,11 +99,25 @@ public class SignalGraph
 
     public static void updateBuilds(boolean update)
     {
+        if (update) builds.each(b -> {
+            for (int i = 0; i < b.vertexCount(); i++)
+            {
+                b.e[i] = SignalGraph.graph.vertexInfo.get(b.v[i]).vertex.arbitraryVisit;
+                b.r[i] = b.e[i].root();
+            }
+            if (b instanceof SignalDrawerBuild d)
+            {
+                if (Vars.world.build(d.frompos) instanceof SignalMatrixBuild m) d.from = m;
+                else { d.frompos = -1; d.from = null; }
+                if (Vars.world.build(d.topos) instanceof SignalMatrixBuild m) d.to = m;
+                else { d.topos = -1; d.to = null; }
+            }
+        });
         if (EsoVars.darkMode) brights.each(b -> {
-            b.updateSignal(update);
+            b.updateSignal();
         });
         else builds.each(b -> {
-            b.updateSignal(update);
+            b.updateSignal();
         });
     }
 }

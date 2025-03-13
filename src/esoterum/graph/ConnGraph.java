@@ -2,8 +2,6 @@ package esoterum.graph;
 
 import arc.struct.ObjectMap;
 
-import java.util.Objects;
-
 /**
  * Implements an undirected graph with dynamic connectivity. It supports adding and removing edges and determining
  * whether two vertices are connected - whether there is a path between them. Adding and removing edges take O(log^2 N)
@@ -116,8 +114,9 @@ public class ConnGraph
 
     /**
      * The augmentation function for the graph, if any.
+     * Hardcode int to avoid boxing
      */
-    private final Augmentation augmentation;
+    // private final Augmentation augmentation;
 
     /**
      * A map from each vertex in this graph to information about the vertex in this graph. If a vertex has no adjacent
@@ -141,32 +140,11 @@ public class ConnGraph
     private int maxVertexInfoSize;
 
     /**
-     * Constructs a new ConnGraph with no augmentation.
+     * Constructs a new ConnGraph.
      */
     public ConnGraph()
     {
-        augmentation = null;
-    }
-
-    /**
-     * Constructs an augmented ConnGraph, using the specified function to combine augmentation values.
-     */
-    public ConnGraph(Augmentation augmentation)
-    {
-        this.augmentation = augmentation;
-    }
-
-    /**
-     * Equivalent implementation is contractual.
-     */
-    private void assertIsAugmented()
-    {
-        if (augmentation == null)
-        {
-            throw new RuntimeException(
-                    "You may only call augmentation-related methods on ConnGraph if the graph is augmented, i.e. if an " +
-                            "Augmentation was passed to the constructor");
-        }
+        
     }
 
     /**
@@ -190,7 +168,7 @@ public class ConnGraph
         }
 
         EulerTourVertex eulerTourVertex = new EulerTourVertex();
-        EulerTourNode node = new EulerTourNode(eulerTourVertex, augmentation);
+        EulerTourNode node = new EulerTourNode(eulerTourVertex);
         eulerTourVertex.arbitraryVisit = node;
         node.left = EulerTourNode.LEAF;
         node.right = EulerTourNode.LEAF;
@@ -586,7 +564,7 @@ public class ConnGraph
             root = max.remove();
             EulerTourNode[] splitRoots = root.split(vertex2.arbitraryVisit);
             root = splitRoots[1].concatenate(splitRoots[0]);
-            EulerTourNode newNode = new EulerTourNode(vertex2, root.augmentationFunc);
+            EulerTourNode newNode = new EulerTourNode(vertex2);
             newNode.left = EulerTourNode.LEAF;
             newNode.right = EulerTourNode.LEAF;
             newNode.isRed = true;
@@ -600,7 +578,7 @@ public class ConnGraph
         EulerTourNode[] splitRoots = vertex1.arbitraryVisit.root().split(vertex1.arbitraryVisit);
         EulerTourNode before = splitRoots[0];
         EulerTourNode after = splitRoots[1];
-        EulerTourNode newNode = new EulerTourNode(vertex1, root.augmentationFunc);
+        EulerTourNode newNode = new EulerTourNode(vertex1);
         before.concatenate(root, newNode).concatenate(after);
         return new EulerTourEdge(newNode, max);
     }
@@ -712,7 +690,7 @@ public class ConnGraph
         if (lowerVertex == null)
         {
             lowerVertex = new EulerTourVertex();
-            EulerTourNode lowerNode = new EulerTourNode(lowerVertex, null);
+            EulerTourNode lowerNode = new EulerTourNode(lowerVertex);
             lowerVertex.arbitraryVisit = lowerNode;
             vertex.lowerVertex = lowerVertex;
             lowerVertex.higherVertex = vertex;
@@ -1138,14 +1116,13 @@ public class ConnGraph
      * @return The augmentation that was previously associated with the vertex. Returns null if it did not have any
      * associated augmentation.
      */
-    public Object setVertexAugmentation(ConnVertex connVertex, Object vertexAugmentation)
+    public int /**/ setVertexAugmentation(ConnVertex connVertex, int /**/ vertexAugmentation)
     {
-        assertIsAugmented();
-        if (connVertex == null) return null;
+        if (connVertex == null) return 0;
         EulerTourVertex vertex = ensureInfo(connVertex).vertex;
-        Object oldAugmentation = vertex.augmentation;
+        int /**/ oldAugmentation = vertex.augmentation;
         if (!vertex.hasAugmentation ||
-                (!Objects.equals(vertexAugmentation, oldAugmentation)))
+                (vertexAugmentation != oldAugmentation))
         {
             vertex.augmentation = vertexAugmentation;
             vertex.hasAugmentation = true;
@@ -1161,30 +1138,42 @@ public class ConnGraph
     }
 
     /**
+     * Checkless version of setVertexAugmentation
+     * @param eulerTourNode
+     * @param vertexAugmentation
+     */
+    public void setNodeAugmentation(EulerTourNode node, int /**/ vertexAugmentation)
+    {
+        if (node == null) return;
+        node.vertex.augmentation = vertexAugmentation;
+        node.vertex.hasAugmentation = true;
+        for (; node != null && node.augment(); node = node.parent);
+    }
+
+    /**
      * Removes any augmentation associated with the specified vertex. This method takes O(log N) time with high
      * probability.
      *
      * @return The augmentation that was previously associated with the vertex. Returns null if it did not have any
      * associated augmentation.
      */
-    public Object removeVertexAugmentation(ConnVertex connVertex)
+    public int /**/ removeVertexAugmentation(ConnVertex connVertex)
     {
-        assertIsAugmented();
         VertexInfo info = vertexInfo.get(connVertex);
         if (info == null)
         {
-            return null;
+            return 0;
         }
 
         EulerTourVertex vertex = info.vertex;
-        Object oldAugmentation = vertex.augmentation;
+        int /**/ oldAugmentation = vertex.augmentation;
         if (info.edges.isEmpty())
         {
             remove(connVertex);
         }
         else if (vertex.hasAugmentation)
         {
-            vertex.augmentation = null;
+            vertex.augmentation = 0;
             vertex.hasAugmentation = false;
             for (EulerTourNode node = vertex.arbitraryVisit; node != null; node = node.parent)
             {
@@ -1201,9 +1190,8 @@ public class ConnGraph
      * Returns the augmentation associated with the specified vertex. Returns null if it does not have any associated
      * augmentation. At present, this method takes constant expected time. Contrast with getComponentAugmentation.
      */
-    public Object getVertexAugmentation(ConnVertex vertex)
+    public int /**/ getVertexAugmentation(ConnVertex vertex)
     {
-        assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
         if (info != null)
         {
@@ -1211,7 +1199,7 @@ public class ConnGraph
         }
         else
         {
-            return null;
+            return 0;
         }
     }
 
@@ -1220,13 +1208,12 @@ public class ConnGraph
      * containing the specified vertex. Returns null if none of those vertices has any associated augmentation. This
      * method takes O(log N) time with high probability.
      */
-    public Object getComponentAugmentation(ConnVertex vertex)
+    public int /**/ getComponentAugmentation(ConnVertex vertex)
     {
-        assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
         if (info != null)
         {
-            return info.vertex.arbitraryVisit.root().augmentation == null ? 0 : info.vertex.arbitraryVisit.root().augmentation;
+            return info.vertex.arbitraryVisit.root().augmentation;
         }
         else
         {
@@ -1240,7 +1227,6 @@ public class ConnGraph
      */
     public boolean vertexHasAugmentation(ConnVertex vertex)
     {
-        assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
         if (info != null)
         {
@@ -1258,7 +1244,6 @@ public class ConnGraph
      */
     public boolean componentHasAugmentation(ConnVertex vertex)
     {
-        assertIsAugmented();
         VertexInfo info = vertexInfo.get(vertex);
         if (info != null)
         {

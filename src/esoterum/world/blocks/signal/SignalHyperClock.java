@@ -29,7 +29,7 @@ public class SignalHyperClock extends SignalBlock
         public boolean on = true;
 
         @Override
-        public void updateSignal(boolean update)
+        public void updateSignal()
         {
             SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = on ? 1 : 0);
             on = !on;

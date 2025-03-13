@@ -6,10 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.Rect;
 import mindustry.graphics.Pal;
 
-// TODO
-// 1. un-hack signal propagation
-// 2. >1 size compatibility
-
 public class SignalJunction extends SignalBlock
 {
 
