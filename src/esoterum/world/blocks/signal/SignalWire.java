@@ -3,6 +3,8 @@ package esoterum.world.blocks.signal;
 
 import arc.math.geom.Vec2;
 import esoterum.EdgeUtils;
+import esoterum.EsoVars;
+import esoterum.Esoterum;
 import esoterum.graph.GraphEvent;
 import esoterum.graph.SignalGraph;
 import mindustry.Vars;
@@ -55,7 +57,8 @@ public class SignalWire extends SignalBlock
             if (c == 1)
             {
                 SignalGraph.addEdge(v[0], v[conns[last]]);
-                if (bypass) SignalGraph.graph.setNodeAugmentation(e[0], 0);
+                e[0] = SignalGraph.graph.vertexInfo.get(v[0]).vertex.arbitraryVisit;
+                if (bypass) SignalGraph.graph.setNodeAugmentation(e[0], signal[0] = 0);
                 else
                 {
                     bypass = true;
@@ -73,7 +76,10 @@ public class SignalWire extends SignalBlock
         @Override
         public void updateSignal()
         {
-            if (!bypass) if ((signal[0] = r[1].augmentation | r[2].augmentation | r[3].augmentation) != outputSignal)
+            if (r[1] != null) signal[1] = r[1].augmentation;
+            if (r[2] != null) signal[2] = r[2].augmentation;
+            if (r[3] != null) signal[3] = r[3].augmentation;
+            if (!bypass) if ((signal[0] = signal[1] | signal[2] | signal[3]) != outputSignal)
                 SignalGraph.graph.setNodeAugmentation(e[0], outputSignal = signal[0]);
             else if (r[0] != null) signal[0] = r[0].augmentation;
         }
