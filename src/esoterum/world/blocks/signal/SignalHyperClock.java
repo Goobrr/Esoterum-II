@@ -31,7 +31,7 @@ public class SignalHyperClock extends SignalBlock
         @Override
         public void updateSignal()
         {
-            SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = on ? 1 : 0);
+            SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = on ? -1 : 0);
             on = !on;
         }
 

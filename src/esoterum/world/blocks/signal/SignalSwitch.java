@@ -64,8 +64,8 @@ public class SignalSwitch extends SignalBlock
         @Override
         public void updateSignal()
         {
-            if ((enabled ? 0 : 1) != signal[0])
-                SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = enabled ? 0 : 1);
+            if ((enabled ? 0 : -1) != signal[0])
+                SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = enabled ? 0 : -1);
         }
 
         @Override

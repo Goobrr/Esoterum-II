@@ -139,7 +139,7 @@ public class SignalBridge extends SignalBlock
         @Override
         public void drawSignalRegions(Rect camera)
         {
-            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
+            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
             Draw.rect(signalRegions[(active[0] ? 1 : 0) + ((active[1] ? 1 : 0) << 1) + ((active[2] ? 1 : 0) << 2) + ((active[3] ? 1 : 0) << 3)], x, y, rotation * 90);
 
             Draw.z(Layer.power);

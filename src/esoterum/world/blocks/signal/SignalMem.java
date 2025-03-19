@@ -127,7 +127,7 @@ public class SignalMem extends SignalBlock
                     | signal[4]
                     | signal[5]
                     | signal[6]
-                    | signal[7]) > 0 ? getWireColor() : getWireOffColor());
+                    | signal[7]) != 0 ? getWireColor() : getWireOffColor());
             Draw.rect(fullWireRegion, x, y, rotation * 90);
             Draw.color((signal[8]
                     | signal[9]
@@ -136,7 +136,7 @@ public class SignalMem extends SignalBlock
                     | signal[12]
                     | signal[13]
                     | signal[14]
-                    | signal[15]) > 0 ? getWireColor() : getWireOffColor());
+                    | signal[15]) != 0 ? getWireColor() : getWireOffColor());
             Draw.rect(fullWireRegion, x, y, rotation * 90 + 90);
             Draw.color((signal[16]
                     | signal[17]
@@ -145,11 +145,11 @@ public class SignalMem extends SignalBlock
                     | signal[20]
                     | signal[21]
                     | signal[22]
-                    | signal[23]) > 0 ? getWireColor() : getWireOffColor());
+                    | signal[23]) != 0 ? getWireColor() : getWireOffColor());
             Draw.rect(fullWireRegion, x, y, rotation * 90 + 180);
-            Draw.color(signal[24] > 0 ? getWireColor() : getWireOffColor());
+            Draw.color(signal[24] != 0 ? getWireColor() : getWireOffColor());
             Draw.rect(leftWireRegion, x, y, rotation * 90);
-            Draw.color(signal[25] > 0 ? getWireColor() : getWireOffColor());
+            Draw.color(signal[25] != 0 ? getWireColor() : getWireOffColor());
             Draw.rect(rightWireRegion, x, y, rotation * 90);
         }
 
@@ -182,44 +182,44 @@ public class SignalMem extends SignalBlock
         public void updateSignal()
         {
             super.updateSignal();
-            int addr = signal[8] |
-                    (signal[9] << 1) |
-                    (signal[10] << 2) |
-                    (signal[11] << 3) |
-                    (signal[12] << 4) |
-                    (signal[13] << 5) |
-                    (signal[14] << 6) |
-                    (signal[15] << 7);
+            int addr = (signal[8] == 0 ? 0 : 1) |
+                (signal[9] == 0 ? 0 : 1 << 1) |
+                (signal[10] == 0 ? 0 : 1 << 2) |
+                (signal[11] == 0 ? 0 : 1 << 3) |
+                (signal[12] == 0 ? 0 : 1 << 4) |
+                (signal[13] == 0 ? 0 : 1 << 5) |
+                (signal[14] == 0 ? 0 : 1 << 6) |
+                (signal[15] == 0 ? 0 : 1 << 7);
 
-            if (signal[24] == 1)
+            if (signal[24] != 0)
             {
-                mem[addr] = signal[16] |
-                        (signal[17] << 1) |
-                        (signal[18] << 2) |
-                        (signal[19] << 3) |
-                        (signal[20] << 4) |
-                        (signal[21] << 5) |
-                        (signal[22] << 6) |
-                        (signal[23] << 7);
+                mem[addr] = (signal[16] == 0 ? 0 : 1) |
+                    (signal[17] == 0 ? 0 : 1 << 1) |
+                    (signal[18] == 0 ? 0 : 1 << 2) |
+                    (signal[19] == 0 ? 0 : 1 << 3) |
+                    (signal[20] == 0 ? 0 : 1 << 4) |
+                    (signal[21] == 0 ? 0 : 1 << 5) |
+                    (signal[22] == 0 ? 0 : 1 << 6) |
+                    (signal[23] == 0 ? 0 : 1 << 7);
             }
 
-            if (signal[25] == 1)
+            if (signal[25] != 0)
             {
-                if ((mem[addr] & 1) != out[7]) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = mem[addr] & 1);
+                if ((mem[addr] & 1) != out[7]) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = (mem[addr] & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 1) & 1) != out[6])
-                    SignalGraph.graph.setNodeAugmentation(e[6], out[6] = (mem[addr] >> 1) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[6], out[6] = ((mem[addr] >> 1) & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 2) & 1) != out[5])
-                    SignalGraph.graph.setNodeAugmentation(e[5], out[5] = (mem[addr] >> 2) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[5], out[5] = ((mem[addr] >> 2) & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 3) & 1) != out[4])
-                    SignalGraph.graph.setNodeAugmentation(e[4], out[4] = (mem[addr] >> 3) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[4], out[4] = ((mem[addr] >> 3) & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 4) & 1) != out[3])
-                    SignalGraph.graph.setNodeAugmentation(e[3], out[3] = (mem[addr] >> 4) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[3], out[3] = ((mem[addr] >> 4) & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 5) & 1) != out[2])
-                    SignalGraph.graph.setNodeAugmentation(e[2], out[2] = (mem[addr] >> 5) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[2], out[2] = ((mem[addr] >> 5) & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 6) & 1) != out[1])
-                    SignalGraph.graph.setNodeAugmentation(e[1], out[1] = (mem[addr] >> 6) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[1], out[1] = ((mem[addr] >> 6) & 1) == 0 ? 0 : -1);
                 if (((mem[addr] >> 7) & 1) != out[0])
-                    SignalGraph.graph.setNodeAugmentation(e[0], out[0] = (mem[addr] >> 7) & 1);
+                    SignalGraph.graph.setNodeAugmentation(e[0], out[0] = ((mem[addr] >> 7) & 1) == 0 ? 0 : -1);
             } else if (!persist)
             {
                 if(out[7] != 0) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = 0);

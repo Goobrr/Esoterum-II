@@ -41,6 +41,7 @@ public class SignalBlock extends Block
         update = true;
         solid = true;
         health = 60;
+        rotate = true;
 
         category = Category.logic;
 
@@ -268,22 +269,20 @@ public class SignalBlock extends Block
 
         public void drawSignalRegions(Rect camera)
         {
-            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
-
-            Draw.rect(signalRegion, x, y, rotation * 90);
-
             for (int i = 0; i < size * 4; i++)
             {
                 if (active[i])
                 {
-                    Draw.color(signal[conns[i]] == 1 ? getWireColor() : getWireOffColor());
+                    Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[conns[i]] & 0xFFFF) / 0xFFFF));
                     if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
                     else if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
                 }
             }
+
+            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
+            Draw.rect(signalRegion, x, y, rotation * 90);
         }
 
-        // full shield drawing code in SignalMem
         public void drawShieldRegions()
         {
             Draw.rect(shieldRegions[(int) shielding & 15], x, y, rotation * 90);

@@ -81,7 +81,7 @@ public class SignalWire extends SignalBlock
             if (r[3] != null) signal[3] = r[3].augmentation;
             if (!bypass) if ((signal[0] = signal[1] | signal[2] | signal[3]) != outputSignal)
                 SignalGraph.graph.setNodeAugmentation(e[0], outputSignal = signal[0]);
-            else if (r[0] != null) signal[0] = r[0].augmentation;
+            else; else if (r[0] != null) signal[0] = r[0].augmentation;
         }
     }
 }

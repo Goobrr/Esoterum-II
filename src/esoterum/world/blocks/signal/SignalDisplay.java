@@ -29,7 +29,7 @@ public class SignalDisplay extends SignalBlock
         @Override
         public void draw()
         {
-            Draw.color(signal[0] == 1 ? getWireColor() : getWireOffColor());
+            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
             Draw.rect(signalRegion, x, y);
         }
 

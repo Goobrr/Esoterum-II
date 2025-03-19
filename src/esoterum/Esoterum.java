@@ -105,7 +105,6 @@ public class Esoterum extends Mod
         new SignalBlock("true-signal-router")
         {{
             rotate = true;
-            rotateDraw = false;
             drawArrow = false;
             vertexCount = 1;
             hasGraph = false;
@@ -163,10 +162,10 @@ public class Esoterum extends Mod
                 Building front = gate.front();
                 if (front != null && front.items() != null)
                 {
-                    return !front.items().empty();
+                    return !front.items().empty() ? -1 : 0;
                 }
 
-                return false;
+                return 0;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
@@ -181,10 +180,10 @@ public class Esoterum extends Mod
                 if (front != null)
                 {
                     front.enabled = ((gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation) >= 1);
-                    return front.enabled;
+                    return front.enabled ? -1 : 0;
                 }
 
-                return false;
+                return 0;
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
@@ -207,13 +206,30 @@ public class Esoterum extends Mod
             setOutputs(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
+        new SignalSplitter("signal-splitter")
+        {{
+            
+            vertexCount = 2;
+            setConns(0, 0, 1, 0);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 0, 0, 0);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));;
+
+        new SignalMerger("signal-merger")
+        {{
+            vertexCount = 2;
+            setConns(0, 0, 1, 0);
+            setInputs(0, 0, 1, 0);
+            setOutputs(1, 0, 0, 0);
+        }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));;
+
         new SignalGate("signal-diode")
         {{
             vertexCount = 2;
             setConns(0, 0, 1, 0);
             setInputs(0, 0, 1, 0);
             setOutputs(1, 0, 0, 0);
-            function = gate -> (gate.r[1].augmentation == 1);
+            function = gate -> gate.r[1].augmentation;
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("and-gate")
@@ -222,11 +238,9 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
-            function = gate -> {
-                return gate.r[1].augmentation == (gate.active[1] ? 1 : 0)
-                    && gate.r[2].augmentation == (gate.active[2] ? 1 : 0)
-                    && gate.r[3].augmentation == (gate.active[3] ? 1 : 0);
-            };
+            function = gate -> (gate.active[1] ? gate.r[1].augmentation : -1)
+                & (gate.active[2] ? gate.r[2].augmentation : -1)
+                & (gate.active[3] ? gate.r[3].augmentation : -1);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("bi-and-gate")
@@ -235,9 +249,7 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 1);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 1, 0, 1);
-            function = gate -> {
-                return (gate.r[1].augmentation & gate.r[2].augmentation) == 1;
-            };
+            function = gate -> (gate.r[1].augmentation & gate.r[2].augmentation);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("or-gate")
@@ -246,7 +258,7 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
-            function = gate -> (gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation) == 1; // functionally a diode
+            function = gate -> (gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation); // functionally a diode
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("not-gate")
@@ -255,7 +267,7 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
-            function = gate -> (gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation) != 1; // functionally NOR
+            function = gate -> ~(gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation); // functionally NOR
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("xor-gate")
@@ -265,7 +277,7 @@ public class Esoterum extends Mod
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
             function = gate -> {
-                return (gate.r[1].augmentation ^ gate.r[2].augmentation ^ gate.r[3].augmentation) == 1;
+                return (gate.r[1].augmentation ^ gate.r[2].augmentation ^ gate.r[3].augmentation);
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
@@ -275,9 +287,7 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 1);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 1, 0, 1);
-            function = gate -> {
-                return (gate.r[1].augmentation ^ gate.r[2].augmentation) == 1;
-            };
+            function = gate -> (gate.r[1].augmentation ^ gate.r[2].augmentation);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalMem("memory")

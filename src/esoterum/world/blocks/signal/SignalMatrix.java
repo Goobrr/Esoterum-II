@@ -61,22 +61,22 @@ public class SignalMatrix extends SignalBlock
         {
             super.updateSignal();
 
-            int x = (signal[0] |
-                    (signal[1] << 1) |
-                    (signal[2] << 2) |
-                    (signal[3] << 3) |
-                    (signal[4] << 4) |
-                    (signal[5] << 5) |
-                    (signal[6] << 6) |
-                    (signal[7] << 7));
-            int y = (signal[8] |
-                    (signal[9] << 1) |
-                    (signal[10] << 2) |
-                    (signal[11] << 3) |
-                    (signal[12] << 4) |
-                    (signal[13] << 5) |
-                    (signal[14] << 6) |
-                    (signal[15] << 7));
+            int x = (signal[0] == 0 ? 0 : 1) |
+                    (signal[1] == 0 ? 0 : 1 << 1) |
+                    (signal[2] == 0 ? 0 : 1 << 2) |
+                    (signal[3] == 0 ? 0 : 1 << 3) |
+                    (signal[4] == 0 ? 0 : 1 << 4) |
+                    (signal[5] == 0 ? 0 : 1 << 5) |
+                    (signal[6] == 0 ? 0 : 1 << 6) |
+                    (signal[7] == 0 ? 0 : 1 << 7);
+            int y = (signal[8] == 0 ? 0 : 1) |
+                    (signal[9] == 0 ? 0 : 1 << 1) |
+                    (signal[10] == 0 ? 0 : 1 << 2) |
+                    (signal[11] == 0 ? 0 : 1 << 3) |
+                    (signal[12] == 0 ? 0 : 1 << 4) |
+                    (signal[13] == 0 ? 0 : 1 << 5) |
+                    (signal[14] == 0 ? 0 : 1 << 6) |
+                    (signal[15] == 0 ? 0 : 1 << 7);
 
             if (signal[23] > 0)
             {
