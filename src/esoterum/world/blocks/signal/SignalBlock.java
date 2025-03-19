@@ -253,6 +253,17 @@ public class SignalBlock extends Block
         }
 
         @Override
+        public void displayBars(Table table)
+        {
+            super.displayBars(table);
+            table.table(e -> {
+                e.row();
+                e.left();
+                e.label(() -> "State: " + (String.format("%04X", signal[0] & 0xFFFF))).color(Color.lightGray);
+            }).left();
+        }
+
+        @Override
         public void draw()
         {
             if (EsoVars.drawSignalRegions) Draw.rect(baseRegion, x, y);
