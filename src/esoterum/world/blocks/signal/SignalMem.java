@@ -1,7 +1,9 @@
 package esoterum.world.blocks.signal;
 
 import arc.Core;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.Mathf;
 import arc.math.geom.Rect;
 import arc.scene.ui.Button;
 import arc.scene.ui.Image;
@@ -118,38 +120,45 @@ public class SignalMem extends SignalBlock
         }
 
         @Override
+        public Color getWireColor(int i)
+        {
+            if ((i & 0xFFFF) == 0) return colors[i >> 16].cpy().value(0.3f);
+            return colors[i >> 16].cpy().value(Mathf.lerp(0.5f, 1f, (float) (i & 0xFFFF) / 0xFFFF));
+        }
+
+        @Override
         public void drawSignalRegions(Rect camera)
         {
-            Draw.color((signal[0]
+            Draw.color(getWireColor(signal[0]
                     | signal[1]
                     | signal[2]
                     | signal[3]
                     | signal[4]
                     | signal[5]
                     | signal[6]
-                    | signal[7]) != 0 ? getWireColor() : getWireOffColor());
+                    | signal[7]));
             Draw.rect(fullWireRegion, x, y, rotation * 90);
-            Draw.color((signal[8]
+            Draw.color(getWireColor(signal[8]
                     | signal[9]
                     | signal[10]
                     | signal[11]
                     | signal[12]
                     | signal[13]
                     | signal[14]
-                    | signal[15]) != 0 ? getWireColor() : getWireOffColor());
+                    | signal[15]));
             Draw.rect(fullWireRegion, x, y, rotation * 90 + 90);
-            Draw.color((signal[16]
+            Draw.color(getWireColor(signal[16]
                     | signal[17]
                     | signal[18]
                     | signal[19]
                     | signal[20]
                     | signal[21]
                     | signal[22]
-                    | signal[23]) != 0 ? getWireColor() : getWireOffColor());
+                    | signal[23]));
             Draw.rect(fullWireRegion, x, y, rotation * 90 + 180);
-            Draw.color(signal[24] != 0 ? getWireColor() : getWireOffColor());
+            Draw.color(getWireColor(signal[24]));
             Draw.rect(leftWireRegion, x, y, rotation * 90);
-            Draw.color(signal[25] != 0 ? getWireColor() : getWireOffColor());
+            Draw.color(getWireColor(signal[25]));
             Draw.rect(rightWireRegion, x, y, rotation * 90);
         }
 
@@ -205,21 +214,21 @@ public class SignalMem extends SignalBlock
 
             if (signal[25] != 0)
             {
-                if ((mem[addr] & 1) != out[7]) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = (mem[addr] & 1) == 0 ? 0 : -1);
+                if ((mem[addr] & 1) != out[7]) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = (mem[addr] & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 1) & 1) != out[6])
-                    SignalGraph.graph.setNodeAugmentation(e[6], out[6] = ((mem[addr] >> 1) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[6], out[6] = ((mem[addr] >> 1) & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 2) & 1) != out[5])
-                    SignalGraph.graph.setNodeAugmentation(e[5], out[5] = ((mem[addr] >> 2) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[5], out[5] = ((mem[addr] >> 2) & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 3) & 1) != out[4])
-                    SignalGraph.graph.setNodeAugmentation(e[4], out[4] = ((mem[addr] >> 3) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[4], out[4] = ((mem[addr] >> 3) & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 4) & 1) != out[3])
-                    SignalGraph.graph.setNodeAugmentation(e[3], out[3] = ((mem[addr] >> 4) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[3], out[3] = ((mem[addr] >> 4) & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 5) & 1) != out[2])
-                    SignalGraph.graph.setNodeAugmentation(e[2], out[2] = ((mem[addr] >> 5) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[2], out[2] = ((mem[addr] >> 5) & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 6) & 1) != out[1])
-                    SignalGraph.graph.setNodeAugmentation(e[1], out[1] = ((mem[addr] >> 6) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[1], out[1] = ((mem[addr] >> 6) & 1) == 0 ? 0 : 0xFFFF);
                 if (((mem[addr] >> 7) & 1) != out[0])
-                    SignalGraph.graph.setNodeAugmentation(e[0], out[0] = ((mem[addr] >> 7) & 1) == 0 ? 0 : -1);
+                    SignalGraph.graph.setNodeAugmentation(e[0], out[0] = ((mem[addr] >> 7) & 1) == 0 ? 0 : 0xFFFF);
             } else if (!persist)
             {
                 if(out[7] != 0) SignalGraph.graph.setNodeAugmentation(e[7], out[7] = 0);

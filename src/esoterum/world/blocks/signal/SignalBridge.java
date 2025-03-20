@@ -139,11 +139,11 @@ public class SignalBridge extends SignalBlock
         @Override
         public void drawSignalRegions(Rect camera)
         {
-            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
+            Draw.color(getWireColor(0));
             Draw.rect(signalRegions[(active[0] ? 1 : 0) + ((active[1] ? 1 : 0) << 1) + ((active[2] ? 1 : 0) << 2) + ((active[3] ? 1 : 0) << 3)], x, y, rotation * 90);
 
             Draw.z(Layer.power);
-            Lines.stroke(1f, signal[0] == 1 ? getWireColor() : getWireOffColor());
+            Lines.stroke(1f, getWireColor(0));
             for (int i = 0; i < link.size; i++)
             {
                 Point2 p = Point2.unpack(link.get(i));
@@ -199,16 +199,14 @@ public class SignalBridge extends SignalBlock
         @Override
         public void drawConfigure()
         {
-            Tmp.c1.set(Color.white).lerp(team.color, signal[0]);
-
-            Drawf.circles(x, y, size * 8 / 2f + 1f + Mathf.absin(Time.time, 4f, 1f), Tmp.c1);
-            Drawf.circles(x, y, range * 8, Tmp.c1);
+            Drawf.circles(x, y, size * 8 / 2f + 1f + Mathf.absin(Time.time, 4f, 1f), getWireColor(0));
+            Drawf.circles(x, y, range * 8, getWireColor(0));
 
             for (int i = 0; i < link.size; i++)
             {
                 Building b = Vars.world.build(link.get(i));
                 if (b == null) continue;
-                Drawf.square(b.x, b.y, b.block.size * 8 / 2f + 1f, Tmp.c1);
+                Drawf.square(b.x, b.y, b.block.size * 8 / 2f + 1f, getWireColor(0));
             }
         }
 

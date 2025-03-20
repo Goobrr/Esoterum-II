@@ -3,6 +3,8 @@ package esoterum.world.blocks.signal;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
+import arc.math.Interp;
+import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.scene.ui.TextButton;
 import arc.scene.ui.layout.Table;
@@ -32,19 +34,20 @@ public class SignalBlock extends Block
     public int vertexCount = 1;
     public int[] conns = new int[0];
     public boolean hasGraph = true;
+    public Color[] colors = new Color[9];
 
     public SignalBlock(String name)
     {
         super(name);
-
+        
         configurable = true;
         update = true;
         solid = true;
         health = 60;
         rotate = true;
-
+        
         category = Category.logic;
-
+        
         config(Long.class, (SignalBuild tile, Long i) -> {
             tile.shielding = tile.shielding ^ i;
             SignalGraph.events.add(new GraphEvent.updateEvent(tile));
@@ -64,40 +67,40 @@ public class SignalBlock extends Block
     {
         super.drawPlace(x, y, rotation, valid);
     }
-
+    
     public void setInputs(int... indices)
     {
         inputs = indices;
     }
-
+    
     public void setOutputs(int... indices)
     {
         outputs = indices;
     }
-
+    
     public void setConns(int... vc)
     {
         conns = vc;
     }
-
+    
     @Override
     public void load()
     {
         super.load();
-
+        
         uiIcon = fullIcon = Core.atlas.find(name + "-full");
-
+        
         bottomRegion = Core.atlas.find(name + "-bottom", "eso-none");
-
+        
         String[] bases = {"eso-base-square", "eso-mega-base-square", "eso-none", "eso-giga-base-square", "eso-none", "eso-none", "eso-none", "eso-tera-base-square"};
         baseRegion = Core.atlas.find(name + "-base", bases[size - 1]);
-
+        
         signalRegion = Core.atlas.find(name + "-signal", "eso-none");
-
+        
         shieldRegions = new TextureRegion[16]; // pre-generated shielding for 1x1 blocks
         shieldRegion = Core.atlas.find("eso-shielding", "eso-none");
         for (int i = 0; i < 16; i++) shieldRegions[i] = Core.atlas.find("eso-shielding-" + i, "eso-none");
-
+        
         inputSignalRegions = new TextureRegion[size * 4];
         outputSignalRegions = new TextureRegion[size * 4];
         for (int i = 0; i < size * 4; i++)
@@ -111,33 +114,18 @@ public class SignalBlock extends Block
     public void init()
     {
         super.init();
-
-        if (inputs == null)
-        {
-            inputs = new int[size * 4];
-            for (int i = 0; i < size * 4; i++)
-            {
-                inputs[i] = 1;
-            }
-        }
-        if (outputs == null)
-        {
-            outputs = new int[size * 4];
-            for (int i = 0; i < size * 4; i++)
-            {
-                outputs[i] = 1;
-            }
-        }
-        if (conns == null)
-        {
-            conns = new int[size * 4];
-            for (int i = 0; i < size * 4; i++)
-            {
-                conns[i] = 0;
-            }
-        }
+        
+        colors[0] = new Color(-1).fromHsv(60, 0.8f, 1f);
+        colors[1] = new Color(-1).fromHsv(120, 0.8f, 1f);
+        colors[2] = new Color(-1).fromHsv(180, 0.8f, 1f);
+        colors[3] = new Color(-1).fromHsv(210, 0.8f, 1f);
+        colors[4] = new Color(-1).fromHsv(270, 0.8f, 1f);
+        colors[5] = new Color(-1).fromHsv(300, 0.8f, 1f);
+        colors[6] = new Color(-1).fromHsv(0, 0.8f, 1f);
+        colors[7] = new Color(-1).fromHsv(30, 0.8f, 1f);
+        colors[8] = new Color(-1);
     }
-
+    
     @Override
     public Object pointConfig(Object config, arc.func.Cons<Point2> transformer)
     {
@@ -152,17 +140,7 @@ public class SignalBlock extends Block
         }
         return config;
     }
-
-    public Color getWireOffColor()
-    {
-        return Color.white;
-    }
-
-    public Color getWireColor()
-    {
-        return Pal.accent;
-    }
-
+    
     public class SignalBuild extends Building
     {
         public ConnVertex[] v = new ConnVertex[vertexCount];
@@ -172,6 +150,23 @@ public class SignalBlock extends Block
         public boolean[] active = new boolean[size * 4];
         public long shielding;
         public int id, brightid;
+        
+        public Color getWireOffColor()
+        {
+            return Color.white;
+        }
+    
+        public Color getWireColor()
+        {
+            return Pal.accent;
+        }
+        
+        public Color getWireColor(int i)
+        {
+            if ((signal[i] & 0xFFFF) == 0) return colors[signal[i] >> 16].cpy().value(0.2025f);
+            float f = (Mathf.lerp(0.45f, 1f, Mathf.log(2f, (float) (signal[i] & 0xFFFF) + 1) / 16));
+            return colors[signal[i] >> 16].cpy().value(f * f);
+        }
 
         public boolean dark()
         {
@@ -280,17 +275,14 @@ public class SignalBlock extends Block
 
         public void drawSignalRegions(Rect camera)
         {
-            for (int i = 0; i < size * 4; i++)
+            for (int i = 0; i < size * 4; i++) if (active[i])
             {
-                if (active[i])
-                {
-                    Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[conns[i]] & 0xFFFF) / 0xFFFF));
-                    if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
-                    else if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
-                }
+                Draw.color(getWireColor(conns[i]));
+                if (inputs[i] == 1) Draw.rect(inputSignalRegions[i], x, y, rotation * 90);
+                else if (outputs[i] == 1) Draw.rect(outputSignalRegions[i], x, y, rotation * 90);
             }
 
-            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
+            Draw.color(getWireColor(0));
             Draw.rect(signalRegion, x, y, rotation * 90);
         }
 

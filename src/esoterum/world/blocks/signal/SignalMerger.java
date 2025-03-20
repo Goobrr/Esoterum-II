@@ -18,16 +18,16 @@ public class SignalMerger extends SignalSplitter
         {
             if (r[0] != null) signal[0] = r[0].augmentation;
             if (r[1] != null) signal[1] = r[1].augmentation;
-            int r = signal[1] != 0 ? 1 << index : 0;
+            int r = (color == 8 ? signal[1] & 0x70000 : (color << 16)) | ((signal[1] & 0xFFFF) != 0 ? 1 << index : 0);
             if (r != outputSignal) SignalGraph.graph.setNodeAugmentation(e[0], outputSignal = r);
         }
 
         @Override
         public void drawSignalRegions(Rect camera)
         {
-            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
+            Draw.color(getWireColor(0));
             if (active[0]) Draw.rect(outputSignalRegions[0], x, y, rotation * 90);
-            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[1] & 0xFFFF) / 0xFFFF));
+            Draw.color(getWireColor(1));
             Draw.rect(signalRegions[index], x, y, rotation * 90);
             if (active[2]) Draw.rect(inputSignalRegions[2], x, y, rotation * 90);
         }

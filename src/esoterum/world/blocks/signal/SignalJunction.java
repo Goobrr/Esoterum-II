@@ -35,10 +35,10 @@ public class SignalJunction extends SignalBlock
         {
             super.drawSignalRegions(camera);
 
-            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
+            Draw.color(getWireColor(rotateDraw ? 0 : rotation % 2));
             Draw.rect(signalRegion1, x, y, rotateDraw ? rotdeg() : 0);
 
-            Draw.color(getWireOffColor().cpy().lerp(getWireColor(), (float) (signal[0] & 0xFFFF) / 0xFFFF));
+            Draw.color(getWireColor(rotateDraw ? 1 : 1 - rotation % 2));
             Draw.rect(signalRegion2, x, y, rotateDraw ? rotdeg() : 0);
         }
     }

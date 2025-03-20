@@ -162,7 +162,7 @@ public class Esoterum extends Mod
                 Building front = gate.front();
                 if (front != null && front.items() != null)
                 {
-                    return !front.items().empty() ? -1 : 0;
+                    return !front.items().empty() ? 0xFFFF : 0;
                 }
 
                 return 0;
@@ -180,7 +180,7 @@ public class Esoterum extends Mod
                 if (front != null)
                 {
                     front.enabled = ((gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation) >= 1);
-                    return front.enabled ? -1 : 0;
+                    return front.enabled ? 0xFFFF : 0;
                 }
 
                 return 0;
@@ -238,9 +238,9 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
-            function = gate -> (gate.active[1] ? gate.r[1].augmentation : -1)
-                & (gate.active[2] ? gate.r[2].augmentation : -1)
-                & (gate.active[3] ? gate.r[3].augmentation : -1);
+            function = gate -> (gate.active[1] ? gate.r[1].augmentation : 0x7FFFF)
+                & (gate.active[2] ? gate.r[2].augmentation : 0x7FFFF)
+                & (gate.active[3] ? gate.r[3].augmentation : 0x7FFFF);
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("bi-and-gate")
@@ -267,7 +267,7 @@ public class Esoterum extends Mod
             setConns(0, 1, 2, 3);
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
-            function = gate -> ~(gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation); // functionally NOR
+            function = gate -> (gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation) ^ 0xFFFF; // functionally NOR
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 
         new SignalGate("xor-gate")
@@ -277,7 +277,8 @@ public class Esoterum extends Mod
             setInputs(0, 1, 1, 1);
             setOutputs(1, 0, 0, 0);
             function = gate -> {
-                return (gate.r[1].augmentation ^ gate.r[2].augmentation ^ gate.r[3].augmentation);
+                return ((gate.r[1].augmentation | gate.r[2].augmentation | gate.r[3].augmentation) & 0x70000)
+                     | ((gate.r[1].augmentation ^ gate.r[2].augmentation ^ gate.r[3].augmentation) & 0xFFFF);
             };
         }}.requirements(Category.logic, BuildVisibility.shown, ItemStack.with(Items.copper, 1));
 

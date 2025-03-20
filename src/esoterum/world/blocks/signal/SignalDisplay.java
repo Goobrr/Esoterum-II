@@ -11,21 +11,21 @@ public class SignalDisplay extends SignalBlock
     {
         super(name);
     }
-
-    @Override
-    public Color getWireOffColor()
-    {
-        return EsoVars.displayOffColor;
-    }
-
-    @Override
-    public Color getWireColor()
-    {
-        return EsoVars.displayColor;
-    }
-
+    
     public class SignalDisplayBuild extends SignalBuild
     {
+        @Override
+        public Color getWireOffColor()
+        {
+            return EsoVars.displayOffColor;
+        }
+        
+        @Override
+        public Color getWireColor()
+        {
+            return EsoVars.displayColor;
+        }
+            
         @Override
         public void draw()
         {

@@ -1,11 +1,9 @@
 package esoterum.world.blocks.signal;
 
-import arc.graphics.g2d.Draw;
-import arc.math.geom.Rect;
 import esoterum.graph.SignalGraph;
 import mindustry.world.Block;
 
-public class SignalHyperClock extends SignalBlock
+public class SignalHyperClock extends SignalGate
 {
     public SignalHyperClock(String name)
     {
@@ -24,26 +22,15 @@ public class SignalHyperClock extends SignalBlock
         return super.canReplace(other) || other instanceof SignalSwitch;
     }
 
-    public class SignalHyperClockBuild extends SignalBuild
+    public class SignalHyperClockBuild extends SignalGateBuild
     {
         public boolean on = true;
 
         @Override
         public void updateSignal()
         {
-            SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = on ? -1 : 0);
+            SignalGraph.graph.setVertexAugmentation(this.v[0], signal[0] = (color == 8 ? 0 : (color << 16)) | (on ? 0xFFFF : 0));
             on = !on;
-        }
-
-        @Override
-        public void draw()
-        {
-            Draw.rect(baseRegion, x, y, rotation * 90);
-        }
-
-        @Override
-        public void drawSignalRegions(Rect camera)
-        {
         }
     }
 }
