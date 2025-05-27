@@ -160,9 +160,9 @@ public class Esoterum extends Mod
             setOutputs(0, 1, 1, 1);
             function = gate -> {
                 Building front = gate.front();
-                if (front != null && front.items() != null)
+                if (front != null && front.items != null)
                 {
-                    return !front.items().empty() ? 0xFFFF : 0;
+                    return !front.items.empty() ? 0xFFFF : 0;
                 }
 
                 return 0;

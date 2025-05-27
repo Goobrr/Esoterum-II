@@ -10,6 +10,6 @@ main: "esoterum.Esoterum"
 
 version: 1.0
 
-minGameVersion: 146
+minGameVersion: 147
 
 java: true
