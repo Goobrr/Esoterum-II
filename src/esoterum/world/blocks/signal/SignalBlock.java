@@ -202,7 +202,7 @@ public class SignalBlock extends Block
         public void created()
         {
             super.created();
-            if (!this.block.rotate) rotation(0);
+            if (!this.block.rotate) rotation = 0;
 
             SignalGraph.events.add(new GraphEvent.createEvent(this));
         }
